@@ -7,6 +7,6 @@ use App\Models\Business\AccountStatus;
 
 class AccountObserver {
   public function creating(Account $account) {
-  	$account->account_status_id = (AccountStatus::where('name', 'incomplete')->first())->id;
+  	$account->account_status_id = (AccountStatus::where('code', 100)->first())->id;
   }
 }

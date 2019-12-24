@@ -106,9 +106,9 @@ class SquareTest extends TestCase {
     $transaction = \App\Models\Transaction\Transaction::first();
     $status = \App\Models\Transaction\TransactionStatus::where(['name' => 'paid'])->first();
     $transaction->update(['status_id' => $status->id]);
-    sleep(1);
-    $employee = \App\Models\Business\Employee::first();
-    $this->assertEquals($employee->external_id, $externalEmployeeId);
+    sleep(3);
+    $employee =$transaction->fresh()->business->employees;
+    $this->assertEquals($employee[0]->external_id, $externalEmployeeId);
     $this->assertDatabaseHas('employees', ['external_id' => $externalEmployeeId]);
   }
 

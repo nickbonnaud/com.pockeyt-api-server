@@ -19,7 +19,7 @@ class PosAccountResource extends JsonResource
             'type' => $this->type,
             'takes_tips' => $this->takes_tips,
             'allows_open_tickets' => $this->allows_open_tickets,
-            'status' => $this->status->name
+            'status' => $this->status
         ];
     }
 }

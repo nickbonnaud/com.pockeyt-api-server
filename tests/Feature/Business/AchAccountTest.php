@@ -10,6 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class AchAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_creating_pay_fac_account_creates_ach_account() {
     $this->assertEquals(0, count(AchAccount::all()));
     factory(\App\Models\Business\AccountStatus::class)->create();

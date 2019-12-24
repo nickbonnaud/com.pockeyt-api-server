@@ -19,9 +19,9 @@ class PayFacBusinessResource extends JsonResource
     	'business_name' => $this->business_name,
       'address' => [
         'address' => $this->address,
-        'address_secondary' => $this->address_secondary,
+        'address_secondary' => $this->address_secondary == null ? '' : $this->address_secondary,
         'city' => $this->city,
-        'state' => $this->state,
+        'state' => strtoupper($this->state),
         'zip' => $this->zip,
       ],
     	'entity_type' => $this->payFacAccount->entity_type

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUnassignedTransactionPurchasedItemsTable extends Migration
+class CreateUnassignedPurchasedItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateUnassignedTransactionPurchasedItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('unassigned_transaction_purchased_items', function (Blueprint $table) {
+        Schema::create('unassigned_purchased_items', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('unassigned_transaction_id');
             $table->unsignedInteger('item_id');
@@ -33,6 +33,6 @@ class CreateUnassignedTransactionPurchasedItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('unassigned_transaction_purchased_items');
+        Schema::dropIfExists('unassigned_purchased_items');
     }
 }

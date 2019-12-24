@@ -13,6 +13,11 @@ use App\Handlers\Http\HttpHandler;
 class ShopifyAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_shopify_oauth_must_have_hmac_signature() {
     $status = factory(\App\Models\Business\PosAccountStatus::class)->create();
     $account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);

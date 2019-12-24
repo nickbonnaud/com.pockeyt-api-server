@@ -10,6 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class AchBusinessTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_creating_a_pay_fac_business_creates_an_ach_business() {
     $this->assertEquals(0, count(AchBusiness::all()));
     factory(\App\Models\Business\AccountStatus::class)->create();
@@ -17,7 +22,7 @@ class AchBusinessTest extends TestCase {
     $this->assertEquals(1, count(AchBusiness::all()));
     $achBusiness = AchBusiness::where('ach_account_id', $payFacBusiness->payFacAccount->account->achAccount->id)->first();
     $this->assertEquals($payFacBusiness->business_name, $achBusiness->business_name);
-    $this->assertNotEquals($payFacBusiness->payFacAccount->entity_type, $achBusiness->achAccount->business_type);
+    $this->assertEquals($payFacBusiness->payFacAccount->entity_type, $achBusiness->achAccount->business_type);
   }
 
   public function test_updating_pay_fac_business_updates_ach_business() {

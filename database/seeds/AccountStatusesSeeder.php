@@ -13,63 +13,63 @@ class AccountStatusesSeeder extends Seeder
   public function run() {
     DB::table('account_statuses')->insert([
   		[
-	  		'name' => 'profile account incomplete',
+	  		'name' => 'Profile Account Incomplete',
 	  		'code' => 100
 	  	],
 	  	[
-	  		'name' => 'photo account incomplete',
+	  		'name' => 'Photo Account Incomplete',
 	  		'code' => 101
 	  	],
   		[
-	  		'name' => 'business account incomplete',
+	  		'name' => 'Business Account Incomplete',
 	  		'code' => 102
 	  	],
 	  	[
-	  		'name' => 'owners account incomplete',
+	  		'name' => 'Owners Account Incomplete',
 	  		'code' => 103
 	  	],
 	  	[
-	  		'name' => 'bank account incomplete',
+	  		'name' => 'Bank Account Incomplete',
 	  		'code' => 104
 	  	],
 	  	[
-	  		'name' => 'geo account incomplete',
+	  		'name' => 'Geo Account Incomplete',
 	  		'code' => 105
 	  	],
 	  	[
-	  		'name' => 'pos account incomplete',
+	  		'name' => 'Pos Account Incomplete',
 	  		'code' => 106
 	  	],
 	  	[
-	  		'name' => 'payfac pending/ach pending',
-	  		'code' => 107
+	  		'name' => 'Credit Processor Pending/ACH Processor Pending',
+	  		'code' => 120
 	  	],
 	  	[
-	  		'name' => 'payfac ready/ach pending',
-	  		'code' => 108
+	  		'name' => 'Credit Processor Ready/ACH Processor Pending',
+	  		'code' => 121
 	  	],
 	  	[
-	  		'name' => 'payfac pending/ach ready',
-	  		'code' => 109
+	  		'name' => 'Credit Processor Pending/ACH Processor Ready',
+	  		'code' => 122
 	  	],
 	  	[
-	  		'name' => 'ready',
+	  		'name' => 'Account Active',
 	  		'code' => 200
 	  	],
 	  	[
-	  		'name' => 'unknown error',
+	  		'name' => 'Unknown Account Error',
 	  		'code' => 500
 	  	],
 	  	[
-	  		'name' => 'payfac failed',
+	  		'name' => 'Credit Processor not Approved',
 	  		'code' => 501
 	  	],
 	  	[
-	  		'name' => 'ach failed',
+	  		'name' => 'ACH Processor not Approved',
 	  		'code' => 502
 	  	],
 	  	[
-	  		'name' => 'payfac/ach failed',
+	  		'name' => 'Credit Processor & ACH Processor not Approved',
 	  		'code' => 503
 	  	]
   	]);

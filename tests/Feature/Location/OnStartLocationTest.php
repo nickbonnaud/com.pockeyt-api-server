@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class OnStartLocationTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unauth_customer_cannot_create_on_start_location() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $region = factory(\App\Models\Location\Region::class, 20)->create();

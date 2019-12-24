@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Hash;
 class BusinessTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unauthorized_business_cannot_retrieve_their_data() {
     $business = factory(\App\Models\Business\Business::class)->create();
 

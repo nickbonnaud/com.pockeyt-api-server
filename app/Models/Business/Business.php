@@ -60,7 +60,11 @@ class Business extends Authenticatable implements JWTSubject {
 	}
 
 	public function employees() {
-		return $this->hasMany('App\Models\Business\employee');
+		return $this->hasMany('App\Models\Business\Employee');
+	}
+
+	public function messages() {
+		return $this->hasMany('App\Models\Business\BusinessMessage');
 	}
 
 	//////////////////// Relationship Methods ////////////////////
@@ -128,7 +132,8 @@ class Business extends Authenticatable implements JWTSubject {
 	public static function formatToken($token = null) {
 		return [
       'value' => $token,
-      'expiry' => $token ? Carbon::now()->addMinutes(env('JWT_TTL'))->timestamp : null
+      'token_type' => 'bearer',
+      'expiry' => $token ? Carbon::now()->addMinutes(auth('business')->factory()->getTTL())->timestamp : null
     ];
 	}
 }

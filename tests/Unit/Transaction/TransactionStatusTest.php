@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class TransactionStatusTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+	public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_transaction_belongs_to_a_transaction_status() {
 		$status = factory(\App\Models\Transaction\TransactionStatus::class)->create();
 		$transaction = factory(\App\Models\Transaction\Transaction::class)->create(['status_id' => $status->id]);

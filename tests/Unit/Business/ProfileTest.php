@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class ProfileTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_business_profile_creates_a_unique_identifier() {
   	$businessProfile = factory(\App\Models\Business\Profile::class)->create();
   	$this->assertNotNull($businessProfile->identifier);

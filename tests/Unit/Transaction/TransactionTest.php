@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class TransactionTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+	public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_transaction_creates_a_unique_identifier() {
 		$transaction = factory(\App\Models\Transaction\Transaction::class)->create();
 		$this->assertNotNull($transaction->identifier);

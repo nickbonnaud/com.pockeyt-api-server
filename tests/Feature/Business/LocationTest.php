@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class LocationTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_creating_a_geo_account_creates_location() {
     factory(\App\Models\Business\AccountStatus::class)->create();
     $region = factory(\App\Models\Location\Region::class)->create();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Business;
 
+use Illuminate\Http\Request;
 use App\Models\Business\Business;
 use App\Models\Business\PayFacOwner;
 use App\Http\Controllers\Controller;
@@ -17,8 +18,8 @@ class PayFacOwnerController extends Controller {
 
   public function store(StorePayFacOwnerRequest $request) {
   	$business = Business::getAuthBusiness();
-  	$business->account->payFacAccount->storeData($request->validated(), $type = 'owner');
-  	return PayFacOwnerResource::collection($business->fresh()->account->getPayFacOwners());
+  	$owner = $business->account->payFacAccount->storeData($request->validated(), $type = 'owner');
+  	return new PayFacOwnerResource($owner);
   }
 
   public function update(UpdatePayFacOwnerRequest $request, PayFacOwner $payFacOwner) {
@@ -26,7 +27,21 @@ class PayFacOwnerController extends Controller {
     if ($payFacOwner->getOwningBusiness()->id != $business->id) {
       return response()->json(['errors' => 'Permission denied.'], 403);
     }
+    
     $payFacOwner->updateData($request->validated());
-    return PayFacOwnerResource::collection($business->fresh()->account->getPayFacOwners());
+    return new PayFacOwnerResource($payFacOwner->fresh());
+  }
+
+  public function destroy(Request $request, PayFacOwner $payFacOwner) {
+    $business = Business::getAuthBusiness();
+    if ($payFacOwner->getOwningBusiness()->id != $business->id) {
+      return response()->json(['errors' => 'Permission denied.'], 403);
+    }
+
+    if ($payFacOwner->primary) {
+      return response()->json(['errors' => 'Cannot delete primary owner.'], 403);
+    }
+    $payFacOwner->delete();
+    return response()->json(['success' => true], 200);
   }
 }

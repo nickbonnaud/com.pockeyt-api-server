@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class LoyaltyCardTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_loyalty_card_belongs_to_a_customer() {
   	$customer = factory(\App\Models\Customer\Customer::class)->create();
   	$loyaltyCard = factory(\App\Models\Customer\LoyaltyCard::class)->create(['customer_id' => $customer->id]);

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Business;
 use Illuminate\Http\Request;
 use App\Models\Business\Business;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
 use App\Models\Location\ActiveLocation;
 use App\Filters\CustomerLocationFilters;
 use App\Models\Location\HistoricLocation;
@@ -21,6 +20,6 @@ class CustomerController extends Controller {
   	$business = Business::getAuthBusiness();
   	$query = $request->query('status') == 'active' ? ActiveLocation::filter($filters) : HistoricLocation::filter($filters);
   	$query->where('location_id', $business->location->id)->orderBy('created_at', 'desc');
-  	return ActiveCustomerResource::collection($query->paginate()->appends(Input::except('page')));
+  	return ActiveCustomerResource::collection($query->paginate()->appends($request->except('page')));
   }
 }

@@ -13,7 +13,8 @@ class DatabaseSeeder extends Seeder {
   	$this->call([
   		AccountStatusesSeeder::class,
   		TransactionStatusesSeeder::class,
-      RefundStatusesSeeder::class
+      RefundStatusesSeeder::class,
+      PosAccountStatusesSeeder::class
   	]);
   }
 }

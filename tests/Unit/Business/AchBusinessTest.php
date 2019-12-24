@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class AchBusinessTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_an_ach_business_belongs_to_an_ach_account() {
   	factory(\App\Models\Business\AccountStatus::class)->create();
     $achAccount = factory(\App\Models\Business\AchAccount::class)->create();

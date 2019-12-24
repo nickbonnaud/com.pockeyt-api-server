@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class CustomerTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_customer_creates_a_unique_identifier() {
   	$customer = factory(\App\Models\Customer\Customer::class)->create();
   	$this->assertNotNull($customer->identifier);

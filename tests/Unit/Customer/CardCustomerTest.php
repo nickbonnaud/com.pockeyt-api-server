@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class CardCustomerTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_card_customer_creates_a_shopper_reference() {
 		$cardCustomer = factory(\App\Models\Customer\CardCustomer::class)->create();
 		$this->assertNotNull($cardCustomer->shopper_reference);

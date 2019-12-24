@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Business;
 
+use Illuminate\Http\Request;
 use App\Models\Business\Business;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\Business\StoreBusinessRequest;
 use App\Http\Requests\Business\LoginBusinessRequest;
 
 class AuthController extends Controller {
   
   public function __construct() {
-  	$this->middleware('auth:business')->only(['logout', 'refresh']);
+  	$this->middleware('auth:business')->only(['logout', 'refresh', 'verify']);
   } 
 
   public function register(StoreBusinessRequest $request) {
@@ -30,6 +32,11 @@ class AuthController extends Controller {
     return $this->formatResponse(Business::updateToken());
   }
 
+  public function verify(Request $request) {
+    $business = Business::getAuthBusiness();
+    return response()->json(['data' => ['password_verified' => Hash::check($request->password, $business->password)]]);
+  }
+
 
 
 
@@ -37,7 +44,7 @@ class AuthController extends Controller {
   private function formatResponse($loginResult) {
     return response()->json([
       'data' => [
-        'token' => Business::formatToken($loginResult['token']),
+        'token' => $loginResult['token'],
       ],
       'errors' => [
         'email' => array($loginResult['error']),

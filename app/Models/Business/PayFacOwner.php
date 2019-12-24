@@ -2,6 +2,7 @@
 
 namespace App\Models\Business;
 
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,8 +16,10 @@ class PayFacOwner extends Model {
 
 	protected $guarded = ['identifier'];
 	protected $hidden = ['id', 'pay_fac_account_id', 'ssn', 'gender'];
-	protected $casts = ['dob' => 'date'];
+	protected $casts = ['primary' => 'boolean'];
 	protected $uuidFieldName = 'identifier';
+
+	protected $dates = ['dob'];
 
 	//////////////////// Routing ////////////////////
 
@@ -33,7 +36,7 @@ class PayFacOwner extends Model {
 	//////////////////// Mutator Methods ////////////////////
 
 	public function setSsnAttribute($value) {
-		if (!Str::contains($value, 'X')) {
+		if (!Str::contains(strtoupper($value), 'X')) {
 			$this->attributes['ssn'] = encrypt($value);
 		}
 	}
@@ -56,7 +59,7 @@ class PayFacOwner extends Model {
 
 	public static function storeData($payFacAccountId, $payFacData) {
 		$payFacData['pay_fac_account_id'] = $payFacAccountId;
-		self::create($payFacData);
+		return self::create($payFacData);
 	}
 
 	public function updateData($ownerData) {

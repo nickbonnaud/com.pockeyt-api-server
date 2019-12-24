@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class LightspeedRetailAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_lightspeed_retail_account_creates_an_identifier() {
   	$posAccount = factory(\App\Models\Business\PosAccount::class)->create();
   	$lightSpeedAccount = factory(\App\Models\Business\LightspeedRetailAccount::class)->create(['pos_account_id' => $posAccount->id]);

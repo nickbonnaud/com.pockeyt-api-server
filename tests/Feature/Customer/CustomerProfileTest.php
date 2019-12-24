@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class CustomerProfileTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unauth_customer_cannot_create_a_profile() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
 

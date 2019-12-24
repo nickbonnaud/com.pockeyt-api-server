@@ -10,6 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PayFacBusinessTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+	public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_an_unauthorized_business_cannot_store_business_data() {
 		factory(\App\Models\Business\AccountStatus::class)->create();
 		$payFacBusiness = factory(\App\Models\Business\PayFacBusiness::class)->make();
@@ -58,6 +63,7 @@ class PayFacBusinessTest extends TestCase {
 		$business = factory(\App\Models\Business\Business::class)->create();
 		$header = $this->businessHeaders($business);
 		$response = $this->json('POST', '/api/business/payfac/business', $payFacBusiness, $header)->getData();
+
 		$this->assertDatabaseHas('accounts', ['id' => $business->account->id]);
 		$this->assertDatabaseHas('pay_fac_accounts', ['id' => $business->account->payFacAccount->id]);
 		$this->assertDatabaseHas('pay_fac_businesses', ['id' => $business->account->getPayFacBusiness()->id]);
@@ -108,8 +114,8 @@ class PayFacBusinessTest extends TestCase {
 
 		$response = $this->json('PATCH', "/api/business/payfac/business/{$payFacBusiness['identifier']}", $payFacBusinessArray, $header)->getData();
 
-		$this->assertDatabaseHas('pay_fac_accounts', ['id' => $payFacBusiness->payFacAccount->id, 'entity_type' =>'Business']);
+		$this->assertDatabaseHas('pay_fac_accounts', ['id' => $payFacBusiness->payFacAccount->id, 'entity_type' => 'partnership']);
 
-		$this->assertEquals('Business', $response->data->entity_type);
+		$this->assertEquals('partnership', $response->data->entity_type);
 	}
 }

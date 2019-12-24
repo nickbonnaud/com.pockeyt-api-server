@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Business\Business;
 use App\Filters\TransactionFilters;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
 use App\Models\Transaction\Transaction;
 use App\Http\Resources\Business\TransactionResource;
 
@@ -24,6 +23,6 @@ class TransactionController extends Controller {
   	if ($request->has('sum')) {
   		return response()->json(['data' => ['sales_data' => $query->sum($request->query('sum'))]]);
   	}
-  	return TransactionResource::collection($query->paginate(10)->appends(Input::except('page')));
+  	return TransactionResource::collection($query->paginate(10)->appends($request->except('page')));
   }
 }

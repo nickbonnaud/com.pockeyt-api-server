@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class CloverAccountTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+	public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_clover_account_creates_an_identifier() {
 		$posAccount = factory(\App\Models\Business\PosAccount::class)->create();
 		$cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['pos_account_id' => $posAccount->id]);

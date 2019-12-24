@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class LoyaltyProgramTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+	public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_loyalty_program_belongs_to_a_business() {
 		$business = factory(\App\Models\Business\Business::class)->create();
 		$loyaltyProgram = factory(\App\Models\Business\LoyaltyProgram::class)->create(['business_id' => $business->id]);

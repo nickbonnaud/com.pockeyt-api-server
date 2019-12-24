@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class ProfilePhotosTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_profile_owns_profile_photos() {
   	$profile = factory(\App\Models\Business\Profile::class)->create();
   	$photos = factory(\App\Models\Business\ProfilePhotos::class)->make();

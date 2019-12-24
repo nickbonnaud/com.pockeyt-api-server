@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PayFacAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_payfac_account_creates_a_unique_identifier() {
     factory(\App\Models\Business\AccountStatus::class)->create();
     $account = factory(\App\Models\Business\PayFacAccount::class)->create();

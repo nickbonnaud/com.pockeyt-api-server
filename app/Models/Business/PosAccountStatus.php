@@ -9,7 +9,7 @@ class PosAccountStatus extends Model {
   //////////////////// Attribute Mods/Helpers ////////////////////
 
 	protected $fillable = ['name', 'code'];
-	protected $hidden = ['id'];
+	protected $hidden = ['id', 'created_at', 'updated_at'];
 
 	//////////////////// Relationships ////////////////////
 

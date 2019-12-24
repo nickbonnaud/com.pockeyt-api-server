@@ -13,6 +13,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ShopifyTest extends TestCase {
   use WithFaker, RefreshDatabase;
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
   
   public function test_a_shopify_account_cannot_receive_a_webhook_without_hmac_header() {
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create();

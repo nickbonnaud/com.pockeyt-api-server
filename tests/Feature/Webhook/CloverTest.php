@@ -8,7 +8,7 @@ use App\Models\Transaction\Transaction;
 use Illuminate\Foundation\Testing\WithFaker;
 use App\Models\Transaction\UnassignedTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Transaction\UnassignedTransactionPurchasedItem;
+use App\Models\Transaction\UnassignedPurchasedItem;
 use App\Models\Transaction\PurchasedItem;
 use App\Models\Refund\Refund;
 
@@ -59,7 +59,7 @@ class CloverTest extends TestCase {
     $storedTransaction = UnassignedTransaction::where('pos_transaction_id', 'not_stored')->first();
     $testOrder = CloverTestHelpers::getNotStoredOrder('not_stored');
 
-    $this->assertDatabaseHas('unassigned_transaction_purchased_items', ['unassigned_transaction_id' => $storedTransaction->id]);
+    $this->assertDatabaseHas('unassigned_purchased_items', ['unassigned_transaction_id' => $storedTransaction->id]);
     $this->assertEquals(count($testOrder['lineItems']['elements']), count($storedTransaction->purchasedItems));
   }
 
@@ -86,7 +86,7 @@ class CloverTest extends TestCase {
     $attributes = $this->updatePayLoadAddItem();
     $headers = $this->cloverWebhookHeader();
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC']);
-    $this->json('POST', $url, $attributes, $headers)->getData();
+    $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $storedTransaction = UnassignedTransaction::where('pos_transaction_id', 'add_items_initial')->first();
     $testOrderOld = CloverTestHelpers::getAddItemsInitial('add_items_initial');
     $this->assertEquals(count($testOrderOld['lineItems']['elements']), $storedTransaction->purchasedItems->count());
@@ -278,7 +278,7 @@ class CloverTest extends TestCase {
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $this->assertEquals("Received.", $response->success);
     $this->assertEquals(0, UnassignedTransaction::count());
-    $this->assertEquals(0, UnassignedTransactionPurchasedItem::count());
+    $this->assertEquals(0, UnassignedPurchasedItem::count());
   }
 
   public function test_a_clover_webhook_paid_is_not_stored_update_event() {
@@ -289,12 +289,12 @@ class CloverTest extends TestCase {
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'pos_account_id' => $posAccount->id]);
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $this->assertEquals(1, UnassignedTransaction::count());
-    $this->assertEquals(4, UnassignedTransactionPurchasedItem::count());
+    $this->assertEquals(4, UnassignedPurchasedItem::count());
 
     $attributes = $this->createPayLoadFinalNotTender();
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $this->assertEquals(0, UnassignedTransaction::count());
-    $this->assertEquals(0, UnassignedTransactionPurchasedItem::count());
+    $this->assertEquals(0, UnassignedPurchasedItem::count());
   }
 
   public function test_a_clover_webhook_partial_paid_create_stores_unassigned_transaction_modified_total() {
@@ -333,7 +333,7 @@ class CloverTest extends TestCase {
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'pos_account_id' => $posAccount->id]);
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $this->assertEquals(0, UnassignedTransaction::count());
-    $this->assertEquals(0, UnassignedTransactionPurchasedItem::count());
+    $this->assertEquals(0, UnassignedPurchasedItem::count());
   }
 
   public function test_a_clover_webhook_partial_is_not_stored_if_all_partials_paid_update_event() {
@@ -350,7 +350,7 @@ class CloverTest extends TestCase {
     $attributes = $this->updatePartialComplete();
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $this->assertEquals(0, UnassignedTransaction::count());
-    $this->assertEquals(0, UnassignedTransactionPurchasedItem::count());
+    $this->assertEquals(0, UnassignedPurchasedItem::count());
   }
 
   public function test_a_clover_webhook_update_does_not_change_stored_if_relevant_fields_not_changed() {
@@ -377,12 +377,12 @@ class CloverTest extends TestCase {
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'pos_account_id' => $posAccount->id]);
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $this->assertEquals(1, UnassignedTransaction::count());
-    $this->assertEquals(4, UnassignedTransactionPurchasedItem::count());
+    $this->assertEquals(4, UnassignedPurchasedItem::count());
 
     $attributes = $this->createPayLoadDelete();
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
     $this->assertEquals(0, UnassignedTransaction::count());
-    $this->assertEquals(0, UnassignedTransactionPurchasedItem::count());
+    $this->assertEquals(0, UnassignedPurchasedItem::count());
   }
 
 

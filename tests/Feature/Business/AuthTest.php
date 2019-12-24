@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\WithFaker;
 class AuthTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_business_can_register_and_is_returned_a_token() {
     $email = $this->faker->email;
     $password = $this->faker->password;
@@ -19,8 +24,10 @@ class AuthTest extends TestCase {
     ];
 
     $response = $this->json('POST', '/api/business/auth/register', $attributes)->getData();
+    $business = \App\Models\Business\Business::first();
+
     $this->assertDatabaseHas('businesses', ['email' => $email]);
-    $this->assertNotEmpty($response->data->token->value);
+    $this->assertNotEmpty($response->data->token);
     $this->assertNull($response->errors->email[0]);
   }
 
@@ -96,7 +103,7 @@ class AuthTest extends TestCase {
     ];
 
     $response = $this->json('POST', '/api/business/auth/login', $attributes)->getData();
-    $this->assertNotEmpty($response->data->token->value);
+    $this->assertNotEmpty($response->data->token);
     $this->assertNull($response->errors->email[0]);
   }
 
@@ -128,7 +135,7 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/business/auth/logout', $headers)->assertStatus(200);
     $response = $response->getData();
-    $this->assertNull($response->data->token->value);
+    $this->assertNull($response->data->token);
 
     $response = $this->json('GET', '/api/business/auth/logout', $headers)->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
@@ -147,8 +154,8 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/business/auth/refresh', $headers)->assertStatus(200);
     $response = $response->getData();
-    $this->assertNotNull($response->data->token->value);
-    $this->assertNotEquals($headers['Authorization'], $response->data->token->value);
+    $this->assertNotNull($response->data->token);
+    $this->assertNotEquals($headers['Authorization'], $response->data->token);
 
     $response = $this->json('GET', '/api/business/auth/refresh', $headers)->assertStatus(500);
     $this->assertEquals('The token has been blacklisted', ($response->getData())->message);
@@ -159,5 +166,43 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/business/auth/logout')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
+  }
+
+  public function test_an_unauth_business_cannot_verify_correct_current_password() {
+    $password = 'p@ssw0rd!';
+    $business = factory(\App\Models\Business\Business::class)->create(['password' => $password]);
+
+    $formData = [
+      'password' => $password
+    ];
+
+    $response = $this->json('POST', '/api/business/auth/verify', $formData)->assertStatus(401);
+    $this->assertEquals('Unauthenticated.', ($response->getData())->message);
+  }
+
+  public function test_an_auth_business_can_verify_correct_current_password() {
+    $password = 'p@ssw0rd!';
+    $business = factory(\App\Models\Business\Business::class)->create(['password' => $password]);
+    $this->businessHeaders($business);
+
+    $formData = [
+      'password' => $password
+    ];
+
+    $response = $this->json('POST', '/api/business/auth/verify', $formData)->getData();
+    $this->assertEquals(true, $response->data->password_verified);
+  }
+
+  public function test_verify_password_returns_false_if_not_correct_password() {
+    $password = 'p@ssw0rd!';
+    $business = factory(\App\Models\Business\Business::class)->create(['password' => $password]);
+    $this->businessHeaders($business);
+
+    $formData = [
+      'password' => ''
+    ];
+
+    $response = $this->json('POST', '/api/business/auth/verify', $formData)->getData();
+    $this->assertEquals(false, $response->data->password_verified);
   }
 }

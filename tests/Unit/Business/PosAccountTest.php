@@ -9,25 +9,30 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PosAccountTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_pos_account_creates_an_identifier() {
     $account = factory(\App\Models\Business\PosAccount::class)->create();
     $this->assertNotNull($account->identifier);
   }
 
   public function test_a_pos_account_belongs_to_a_pos_account_status() {
-		$status = factory(\App\Models\Business\PosAccountStatus::class)->create();
+		$status = \App\Models\Business\PosAccountStatus::first();
   	$account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);
   	$this->assertInstanceOf('App\Models\Business\PosAccount', $status->posAccounts->first());
 	}
 
 	public function test_a_pos_account_status_has_many_pos_accounts() {
-  	$status = factory(\App\Models\Business\PosAccountStatus::class)->create();
+  	$status = \App\Models\Business\PosAccountStatus::first();
   	$account = factory(\App\Models\Business\PosAccount::class, 5)->create(['pos_account_status_id' => $status->id]);
   	$this->assertEquals(5, $status->posAccounts->count());
   }
 
   public function test_a_pos_account_has_one_pos_status() {
-  	$status = factory(\App\Models\Business\PosAccountStatus::class)->create();
+  	$status = \App\Models\Business\PosAccountStatus::first();
   	$account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);
   	$this->assertInstanceOf('App\Models\Business\PosAccountStatus', $account->status);
   }

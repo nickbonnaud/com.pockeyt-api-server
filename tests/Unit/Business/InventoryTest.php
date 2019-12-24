@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class InventoryTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_inventory_belongs_to_a_business() {
   	$business = factory(\App\Models\Business\Business::class)->create();
   	$inventory = factory(\App\Models\Business\Inventory::class)->create(['business_id' => $business->id]);

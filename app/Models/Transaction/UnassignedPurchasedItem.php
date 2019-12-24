@@ -4,7 +4,7 @@ namespace App\Models\Transaction;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UnassignedTransactionPurchasedItem extends Model {
+class UnassignedPurchasedItem extends Model {
 
 	//////////////////// Attribute Mods/Helpers ////////////////////
 

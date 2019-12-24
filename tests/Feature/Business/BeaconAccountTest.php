@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class BeaconAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_creating_geo_account_creates_beacon_account() {
     $location = factory(\App\Models\Business\Location::class)->create();
     $profile = factory(\App\Models\Business\Profile::class)->create(['business_id' => $location->business->id]);

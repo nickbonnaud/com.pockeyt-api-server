@@ -11,6 +11,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class VendAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_vend_oauth_redirects_to_login_if_not_logged_in() {
     $status = factory(\App\Models\Business\PosAccountStatus::class)->create();
     $account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);

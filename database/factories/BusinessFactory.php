@@ -102,7 +102,7 @@ $factory->define(Business\PayFacOwner::class, function(Faker $faker) {
 		'first_name' => $faker->firstName,
 		'phone' => $faker->numerify('(###) ###-####'),
 		'email' => $faker->email,
-		'primary' => true,
+		'primary' => false,
 		'percent_ownership' => 80,
 		'title' => 'CEO'
 	];
@@ -192,10 +192,11 @@ $factory->define(Business\Location::class, function(Faker $faker) {
 });
 
 $factory->define(Business\GeoAccount::class, function(Faker $faker) {
-	$location = factory(Business\Location::class)->create();
 	return [
-		'identifier' => $location->identifier,
-		'location_id' => $location->id,
+		'identifier' => $faker->uuid,
+		'location_id' => function() {
+			return factory(Business\Location::class)->create()->id;
+		},
 		'lat' => $faker->latitude,
 		'lng' => $faker->longitude,
 		'radius' => 50
@@ -235,7 +236,7 @@ $factory->define(Business\ActiveItem::class, function(Faker $faker) {
 
 $factory->define(Business\InactiveItem::class, function(Faker $faker) {
 	return [
-		'active_id' => $faker->numberBetween($min = 0, $max = 1000),
+		'active_id' => $faker->numerify('#######'),
 		'inventory_id' => function() {
 			return factory(Business\Inventory::class)->create()->id;
 		},
@@ -248,8 +249,8 @@ $factory->define(Business\InactiveItem::class, function(Faker $faker) {
 
 $factory->define(Business\PosAccountStatus::class, function() {
 	return [
-		'name' => 'incomplete',
-		'code' => 0
+		'name' => 'Connection Pending',
+		'code' => 100
 	];
 });
 
@@ -332,6 +333,29 @@ $factory->define(Business\Employee::class, function(Faker $faker) {
 		'external_id' => $faker->uuid,
 		'first_name' => $faker->firstName,
 		'last_name' => $faker->lastName,
+	];
+});
+
+$factory->define(Business\BusinessMessage::class, function(Faker $faker) {
+	return [
+		'business_id' => function() {
+			return factory(Business\Business::class)->create()->id;
+		},
+		'title' => $faker->sentence($nbWords = 15, $variableNbWords = true),
+		'body' => $faker->paragraph($nbSentences = 3, $variableNbSentences = true),
+		'sent_by_business' => false,
+		'read' => false
+	];
+});
+
+$factory->define(Business\BusinessMessageReply::class, function(Faker $faker) {
+	return [
+		'business_message_id' => function() {
+			return factory(Business\BusinessMessage::class)->create()->id;
+		},
+		'body' => $faker->sentence($nbWords = 15, $variableNbWords = true),
+		'sent_by_business' => false,
+		'read' => false
 	];
 });
 

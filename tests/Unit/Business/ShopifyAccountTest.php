@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class ShopifyAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_shopify_account_creates_an_identifier() {
   	$posAccount = factory(\App\Models\Business\PosAccount::class)->create();
   	$shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create(['pos_account_id' => $posAccount->id]);

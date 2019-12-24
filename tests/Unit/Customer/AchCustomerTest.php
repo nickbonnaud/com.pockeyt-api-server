@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class AchCustomerTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_ach_customer_belongs_to_a_customer_account() {
   	$account = factory(\App\Models\Customer\CustomerAccount::class)->create();
   	$achAccount = factory(\App\Models\Customer\AchCustomer::class)->create(['customer_account_id' => $account->id]);

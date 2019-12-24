@@ -10,6 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class InactiveItemTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_inactive_item_belongs_to_an_inventory() {
 		$inventory = factory(\App\Models\Business\Inventory::class)->create();
 		$inactiveItem = factory(\App\Models\Business\InactiveItem::class)->create(['inventory_id' => $inventory->id]);

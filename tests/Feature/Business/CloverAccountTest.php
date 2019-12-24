@@ -14,6 +14,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class CloverAccountTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_an_unauth_request_cannot_store_clover_data() {
 		$status = factory(\App\Models\Business\PosAccountStatus::class)->create();
     $account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);

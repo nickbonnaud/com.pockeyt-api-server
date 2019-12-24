@@ -74,7 +74,7 @@ $factory->define(Transaction\UnassignedTransaction::class, function (Faker $fake
 	];
 });
 
-$factory->define(Transaction\UnassignedTransactionPurchasedItem::class, function (Faker $faker) {
+$factory->define(Transaction\UnassignedPurchasedItem::class, function (Faker $faker) {
 	return [
 		'unassigned_transaction_id' => function() {
 			return factory(Transaction\UnassignedTransaction::class)->create()->id;

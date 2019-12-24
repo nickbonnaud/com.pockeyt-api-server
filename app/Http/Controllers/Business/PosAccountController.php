@@ -23,4 +23,14 @@ class PosAccountController extends Controller {
   	$posAccount = PosAccount::createAccount(Business::getAuthBusiness(), $request->validated());
   	return new PosAccountResource($posAccount);
   }
+
+  public function update(StorePosAccountRequest $request, PosAccount $posAccount) {
+    $business = Business::getAuthBusiness();
+    if ($posAccount->business->id !== $business->id) {
+      return response()->json(['errors' => 'Permission denied.'], 403);
+    }
+
+    $posAccount->updateAccount($request->validated());
+    return new PosAccountResource($posAccount);
+  }
 }

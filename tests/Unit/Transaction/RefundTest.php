@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class RefundTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_refund_belongs_to_a_transaction() {
   	$transaction = factory(\App\Models\Transaction\Transaction::class)->create();
   	$refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => $transaction->id]);

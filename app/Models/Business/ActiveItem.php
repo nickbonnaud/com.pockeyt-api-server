@@ -22,7 +22,7 @@ class ActiveItem extends Model {
 	}
 
 	public function unassignedPurchasedItems() {
-		return $this->hasMany('App\Models\Transaction\UnassignedTransactionPurchasedItem', 'item_id');
+		return $this->hasMany('App\Models\Transaction\UnassignedPurchasedItem', 'item_id');
 	}
 
 	//////////////////// Core Methods ////////////////////

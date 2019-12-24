@@ -8,6 +8,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BusinessTest extends TestCase {
 	use WithFaker, RefreshDatabase;
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
 	
   public function test_a_business_creates_a_unique_identifier() {
   	$business = factory(\App\Models\Business\Business::class)->create();

@@ -13,6 +13,11 @@ use App\Models\Business\Photo;
 class PhotoTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unauthorized_business_cannot_store_a_photo() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();

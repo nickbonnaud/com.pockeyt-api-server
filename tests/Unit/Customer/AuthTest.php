@@ -10,6 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class AuthTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_customer_password_is_auto_hashed_when_created() {
   	$password = 'password';
   	$customer = factory(\App\Models\Customer\Customer::class)->create(['password' => $password]);

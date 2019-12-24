@@ -7,6 +7,6 @@ use App\Models\Business\PosAccountStatus;
 
 class PosAccountObserver {
 	public function creating(PosAccount $account) {
-		$account->pos_account_status_id = (PosAccountStatus::where('name', 'incomplete')->first())->id;
+		$account->pos_account_status_id = (PosAccountStatus::where('code', 100)->first())->id;
 	}
 }

@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PayFacBankTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unauthorized_business_cannot_store_bank_data() {
     factory(\App\Models\Business\AccountStatus::class)->create();
     $payFacBank = factory(\App\Models\Business\PayFacBank::class)->make();
@@ -54,7 +59,7 @@ class PayFacBankTest extends TestCase {
     $payFacBankArray['account_number'] = $account;
     $payFacBankArray['first_name'] = $newFirstName;
 
-    $response = $this->json('POST', '/api/business/payfac/bank', $payFacBankArray)->assertStatus(401);
+    $response = $this->json('PATCH', "/api/business/payfac/bank/{$payFacBank['identifier']}", $payFacBankArray)->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 

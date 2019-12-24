@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class LocationTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_a_location_creates_a_unique_identifier() {
     $location = factory(\App\Models\Business\Location::class)->create();
     $this->assertNotNull($location->identifier);

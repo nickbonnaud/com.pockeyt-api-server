@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Hash;
 class CustomerTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unauthorized_customer_cannot_retrieve_their_data() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
 

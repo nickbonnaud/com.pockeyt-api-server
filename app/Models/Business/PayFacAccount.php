@@ -57,7 +57,7 @@ class PayFacAccount extends Model {
 		if ($type == 'business') {
 			PayFacBusiness::storeData($this->id, $payFacData);
 		} elseif ($type == 'owner') {
-			PayFacOwner::storeData($this->id, $payFacData);
+			return PayFacOwner::storeData($this->id, $payFacData);
 		} elseif ($type == 'bank') {
 			PayFacBank::storeData($this->id, $payFacData);
 		}

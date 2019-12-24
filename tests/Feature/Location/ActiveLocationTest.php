@@ -10,6 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class ActiveLocationTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_deleting_an_active_location_creates_a_historic_location() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);

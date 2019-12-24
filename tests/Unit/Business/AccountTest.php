@@ -9,14 +9,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class AccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_account_belongs_to_an_account_status() {
-  	$status = factory(\App\Models\Business\AccountStatus::class)->create();
+  	$status = \App\Models\Business\AccountStatus::first();
   	$account = factory(\App\Models\Business\Account::class)->create(['account_status_id' => $status->id]);
   	$this->assertInstanceOf('App\Models\Business\Account', $status->accounts->first());
   }
 
   public function test_an_account_status_has_many_accounts() {
-  	$status = factory(\App\Models\Business\AccountStatus::class)->create();
+  	$status = \App\Models\Business\AccountStatus::first();
   	$accountOne = factory(\App\Models\Business\Account::class)->create(['account_status_id' => $status->id]);
   	$accountTwp = factory(\App\Models\Business\Account::class)->create(['account_status_id' => $status->id]);
   	$this->assertEquals(2, $status->accounts->count());
@@ -43,8 +48,7 @@ class AccountTest extends TestCase {
   }
 
   public function test_an_account_is_assigned_a_status_when_created() {
-    $status = factory(\App\Models\Business\AccountStatus::class)->create();
     $account = factory(\App\Models\Business\Account::class)->create();
-    $this->assertEquals($status->id, $account->account_status_id);
+    $this->assertNotNull($account->account_status_id);
   }
 }

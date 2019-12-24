@@ -11,6 +11,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class UnassignedTransactionTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unassigned_transaction_belongs_to_a_business() {
   	$business = factory(\App\Models\Business\Business::class)->create();
   	$unassignedTransaction = factory(\App\Models\Transaction\UnassignedTransaction::class)->create(['business_id' => $business->id]);

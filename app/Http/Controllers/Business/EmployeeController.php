@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Business;
 
+use Illuminate\Http\Request;
 use App\Models\Business\Business;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
 use App\Http\Resources\Business\EmployeeResource;
 
 class EmployeeController extends Controller {
@@ -13,8 +13,8 @@ class EmployeeController extends Controller {
   	$this->middleware('auth:business');
   }
 
-  public function index() {
+  public function index(Request $request) {
   	$business = Business::getAuthBusiness();
-  	return EmployeeResource::collection($business->employees()->paginate()->appends(Input::except('page')));
+  	return EmployeeResource::collection($business->employees()->paginate()->appends($request->except('page')));
   }
 }

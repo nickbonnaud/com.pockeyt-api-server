@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class NotificaitonTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+	public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_a_notification_belongs_to_a_transaction() {
 		$transaction = factory(\App\Models\Transaction\Transaction::class)->create();
 		$notification = factory(\App\Models\Transaction\TransactionNotification::class)->create(['transaction_id' => $transaction->id]);

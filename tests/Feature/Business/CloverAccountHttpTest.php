@@ -10,6 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class CloverAccountHttpTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_changing_customer_id_updates_order_on_clover() {
     $merchantId = 'RR9ACXMZ6AFA1';
     $orderId = '5J8SRR9Z5PKB8';

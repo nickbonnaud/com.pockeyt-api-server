@@ -5,7 +5,7 @@ namespace App\Models\Transaction;
 use Illuminate\Support\Arr;
 use App\Models\Business\ActiveItem;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Transaction\UnassignedTransactionPurchasedItem;
+use App\Models\Transaction\UnassignedPurchasedItem;
 
 class UnassignedTransaction extends Model {
 
@@ -21,7 +21,7 @@ class UnassignedTransaction extends Model {
 	}
 
 	public function purchasedItems() {
-		return $this->hasMany('App\Models\Transaction\UnassignedTransactionPurchasedItem');
+		return $this->hasMany('App\Models\Transaction\UnassignedPurchasedItem');
 	}
 
 	public function employee() {
@@ -71,7 +71,7 @@ class UnassignedTransaction extends Model {
 		}
 		foreach ($order['lineItems']['elements'] as $item) {
 			$activeItem = ActiveItem::findOrCreateItemClover($item, $business);
-			$this->purchasedItems()->save(new UnassignedTransactionPurchasedItem(['item_id' => $activeItem->id]));
+			$this->purchasedItems()->save(new UnassignedPurchasedItem(['item_id' => $activeItem->id]));
 		}
 	}
 

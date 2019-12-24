@@ -7,7 +7,6 @@ use App\Filters\RefundFilters;
 use App\Models\Business\Business;
 use App\Models\Refund\Refund;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
 use App\Http\Resources\Business\RefundResource;
 
 class RefundController extends Controller {
@@ -23,6 +22,6 @@ class RefundController extends Controller {
   			$q->where('business_id', $business->id);
   		})->orderBy('created_at', 'desc');
 
-    return RefundResource::collection($query->paginate(10)->appends(Input::except('page')));
+    return RefundResource::collection($query->paginate(10)->appends($request->except('page')));
   }
 }

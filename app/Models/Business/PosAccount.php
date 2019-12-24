@@ -15,6 +15,7 @@ class PosAccount extends Model {
   protected $fillable = ['business_id', 'type', 'takes_tips', 'allows_open_tickets'];
   protected $hidden = ['business_id', 'id', 'account_status_id', 'updated_at', 'created_at'];
   protected $uuidFieldName = 'identifier';
+  protected $casts = ['takes_tips' => 'boolean', 'allows_open_tickets' => 'boolean'];
 
   //////////////////// Routing ////////////////////
 
@@ -57,6 +58,10 @@ class PosAccount extends Model {
 	public static function createAccount($business, $posAccountData) {
 		$posAccountData['business_id'] = $business->id;
 		return self::create($posAccountData);
+	}
+
+	public function updateAccount($accountData) {
+		$this->update($accountData);
 	}
 
 	public function closePosBill($transaction) {

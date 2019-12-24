@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class EmployeeTest extends TestCase {
 	use WithFaker, RefreshDatabase;
 
+	public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
 	public function test_an_employee_belongs_to_a_business() {
 		$business = factory(\App\Models\Business\Business::class)->create();
 		$employee = factory(\App\Models\Business\Employee::class)->create(['business_id' => $business->id]);

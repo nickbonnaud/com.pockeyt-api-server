@@ -49,7 +49,7 @@ class Customer extends Authenticatable implements JWTSubject {
 		return $this->hasMany('App\Models\Transaction\Transaction');
 	}
 
-	public function ActiveLocations() {
+	public function activeLocations() {
 		return $this->hasMany('App\Models\Location\ActiveLocation');
 	}
 

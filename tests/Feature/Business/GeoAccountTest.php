@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class GeoAccountTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_auth_business_can_create_geo_account() {
     $business = factory(\App\Models\Business\Business::class)->create();
     $header = $this->businessHeaders($business);

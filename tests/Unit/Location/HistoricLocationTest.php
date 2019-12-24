@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class HistoricLocationTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_historic_location_belongs_to_a_customer() {
   	$customer = factory(\App\Models\Customer\Customer::class)->create();
   	$historicLocation = factory(\App\Models\Location\HistoricLocation::class)->create(['customer_id' => $customer->id]);

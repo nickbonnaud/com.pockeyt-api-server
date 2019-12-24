@@ -9,6 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PayFacOwnerTest extends TestCase {
   use WithFaker, RefreshDatabase;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->seed();
+  }
+
   public function test_an_unauthorized_business_cannot_store_owner_data() {
     factory(\App\Models\Business\AccountStatus::class)->create();
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make();
@@ -45,7 +50,7 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $business->fresh()->account->getPayFacOwners()->first()->id]);
 
-    $this->assertEquals($payFacOwner['last_name'], $response->data[0]->last_name);
+    $this->assertEquals($payFacOwner['last_name'], $response->data->last_name);
   }
 
   public function test_an_authorized_business_can_store_multiple_owners() {
@@ -63,8 +68,6 @@ class PayFacOwnerTest extends TestCase {
     $response = $this->json('POST', '/api/business/payfac/owner', $payFacOwnerArray, $header)->getData();
 
     $this->assertDatabaseHas('pay_fac_owners', ['first_name' => $payFacOwner->first_name, 'last_name' => $payFacOwner->last_name]);
-
-    $this->assertEquals(2, count($response->data));
   }
 
   public function test_an_authorized_business_cannot_store_multiple_owners_above_hundred() {
@@ -103,7 +106,7 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $lastName]);
 
-    $this->assertEquals($lastName, $response->data[0]->last_name);
+    $this->assertEquals($lastName, $response->data->last_name);
   }
 
   public function test_an_authorized_business_cannot_update_owners_above_hundred() {
@@ -144,7 +147,7 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $lastName]);
 
-    $this->assertEquals($lastName, $response->data[0]->last_name);
+    $this->assertEquals($lastName, $response->data->last_name);
   }
 
   public function test_an_ssn_is_not_changed_if_left_untouched() {
@@ -189,5 +192,71 @@ class PayFacOwnerTest extends TestCase {
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $lastName]);
 
     $this->assertNotEquals($oldSsn, $payFacOwner->fresh()->ssn);
+  }
+
+  public function test_an_unauth_business_cannot_destroy_an_owner() {
+    factory(\App\Models\Business\AccountStatus::class)->create();
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
+    $business = $payFacOwner->payFacAccount->account->business;
+
+    $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
+
+    $response = $this->json('DELETE', "/api/business/payfac/owner/{$payFacOwner->identifier}")->assertStatus(401);
+
+    $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
+
+    $this->assertEquals('Unauthenticated.', ($response->getData())->message);
+  }
+
+  public function test_a_business_can_only_delete_their_owners() {
+    factory(\App\Models\Business\AccountStatus::class)->create();
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
+    $business = $payFacOwner->payFacAccount->account->business;
+    $this->businessHeaders($business);
+
+    $otherBusinessOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
+
+    $this->assertDatabaseHas('pay_fac_owners', ['id' => $otherBusinessOwner->id, 'last_name' => $otherBusinessOwner->last_name]);
+
+    $response = $this->json('DELETE', "/api/business/payfac/owner/{$otherBusinessOwner->identifier}")->assertStatus(403);
+
+    $this->assertDatabaseHas('pay_fac_owners', ['id' => $otherBusinessOwner->id, 'last_name' => $otherBusinessOwner->last_name]);
+
+
+    $this->assertEquals('Permission denied.', $response->getData()->errors);
+  }
+
+  public function test_a_business_can_delete_an_owner() {
+    factory(\App\Models\Business\AccountStatus::class)->create();
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => false]);
+    factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacOwner->pay_fac_account_id]);
+    $business = $payFacOwner->payFacAccount->account->business;
+    $this->businessHeaders($business);
+
+    $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
+    $this->assertEquals(\App\Models\Business\PayFacOwner::count(), 4);
+
+    $response = $this->json('DELETE', "/api/business/payfac/owner/{$payFacOwner->identifier}")->getData();
+
+    $this->assertEquals(true, $response->success);
+    $this->assertDatabaseMissing('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
+    $this->assertEquals(\App\Models\Business\PayFacOwner::count(), 3);
+  }
+
+  public function test_a_business_cannot_delete_a_primary_owner() {
+    factory(\App\Models\Business\AccountStatus::class)->create();
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => true]);
+    factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacOwner->pay_fac_account_id]);
+    $business = $payFacOwner->payFacAccount->account->business;
+    $this->businessHeaders($business);
+
+    $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
+    $this->assertEquals(\App\Models\Business\PayFacOwner::count(), 4);
+
+    $response = $this->json('DELETE', "/api/business/payfac/owner/{$payFacOwner->identifier}")->assertStatus(403);
+
+    $this->assertEquals("Cannot delete primary owner.", $response->getData()->errors);
+    $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
+    $this->assertEquals(\App\Models\Business\PayFacOwner::count(), 4);
   }
 }

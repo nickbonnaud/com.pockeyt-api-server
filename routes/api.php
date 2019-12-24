@@ -22,6 +22,7 @@ Route::prefix('business')->group(function() {
 		Route::get('refresh', 'Business\AuthController@refresh');
 		Route::post('register', 'Business\AuthController@register');
 		Route::post('login', 'Business\AuthController@login');
+		Route::post('verify', 'Business\AuthController@verify');
 	});
 
 	// Business Self
@@ -40,8 +41,11 @@ Route::prefix('business')->group(function() {
 	Route::prefix('payfac')->group(function() {
 		Route::post('business', 'Business\PayFacBusinessController@store');
 		Route::patch('business/{pay_fac_business}', 'Business\PayFacBusinessController@update');
+
 		Route::post('owner', 'Business\PayFacOwnerController@store');
 		Route::patch('owner/{pay_fac_owner}', 'Business\PayFacOwnerController@update');
+		Route::delete('owner/{pay_fac_owner}', 'Business\PayFacOwnerController@destroy');
+
 		Route::post('bank', 'Business\PayFacBankController@store');
 		Route::patch('bank/{pay_fac_bank}', 'Business\PayFacBankController@update');
 	});
@@ -61,6 +65,7 @@ Route::prefix('business')->group(function() {
 	// Pos
 	Route::prefix('pos')->group(function() {
 		Route::post('account', 'Business\PosAccountController@store');
+		Route::patch('account/{pos_account}', 'Business\PosAccountController@update');
 		Route::get('account', 'Business\PosAccountController@index');
 
 		// Square
@@ -105,6 +110,15 @@ Route::prefix('business')->group(function() {
 
 	// Business Employees
 	Route::get('employees', 'Business\EmployeeController@index');
+
+	// Business Messages
+	Route::get('message', 'Business\MessageController@index');
+	Route::post('message', 'Business\MessageController@store');
+	Route::patch('message/{business_message}', 'Business\MessageController@update');
+
+	// Business Replies
+	Route::post('reply', 'Business\ReplyController@store');
+	Route::patch('reply/{business_message_reply}', 'Business\ReplyController@update');
 });
 
 // Customer
