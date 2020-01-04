@@ -26,19 +26,19 @@ class TransactionTest extends TestCase {
   }
 
   public function test_an_auth_business_can_request_transactions_base() {
-    $transaction = factory(\App\Models\Transaction\Transaction::class)->create();
+    $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()->id]);
     $numTransactions = 11;
-    factory(\App\Models\Transaction\Transaction::class, $numTransactions)->create(['business_id' => $transaction->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $numTransactions)->create(['business_id' => $transaction->business_id, 'customer_id' => $this->createCustomer()->id]);
     $headers = $this->businessHeaders($transaction->business);
     $response = $this->json('GET', '/api/business/transactions?recent=true')->getData();
     $this->assertEquals($response->meta->total, $numTransactions + 1);
   }
 
   public function test_an_auth_business_only_retrieves_its_transactions() {
-    $transaction = factory(\App\Models\Transaction\Transaction::class)->create();
+    $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()->id]);
     $numTransactions = 4;
-    factory(\App\Models\Transaction\Transaction::class, $numTransactions)->create(['business_id' => $transaction->business_id]);
-    factory(\App\Models\Transaction\Transaction::class, 6)->create();
+    factory(\App\Models\Transaction\Transaction::class, $numTransactions)->create(['business_id' => $transaction->business_id, 'customer_id' => $this->createCustomer()->id]);
+    factory(\App\Models\Transaction\Transaction::class, 6)->create(['customer_id' => $this->createCustomer()->id]);
 
     $headers = $this->businessHeaders($transaction->business);
     $response = $this->json('GET', '/api/business/transactions?recent=true')->getData();
@@ -46,11 +46,11 @@ class TransactionTest extends TestCase {
   }
 
   public function test_an_auth_business_can_request_transactions_order_by_recent() {
-    $transaction = factory(\App\Models\Transaction\Transaction::class)->create();
+    $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()->id]);
     $numTransactions = 15;
     $i = 1;
     while ($i < $numTransactions) {
-      $transactionLast = factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $transaction->business_id, 'created_at' => now()->subDays($i)]);
+      $transactionLast = factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $transaction->business_id, 'created_at' => now()->subDays($i), 'customer_id' => $this->createCustomer()->id]);
       $i++;
     }
     
@@ -70,14 +70,14 @@ class TransactionTest extends TestCase {
   public function test_an_auth_business_can_request_transactions_by_status() {
     Notification::fake();
     $openStatusId = TransactionStatus::where('code', 100)->first()->id;
-    $transactionOpen = factory(\App\Models\Transaction\Transaction::class)->create(['status_id' => $openStatusId]);
+    $transactionOpen = factory(\App\Models\Transaction\Transaction::class)->create(['status_id' => $openStatusId, 'customer_id' => $this->createCustomer()->id]);
 
     $numOpenTransactions = 12;
-    factory(\App\Models\Transaction\Transaction::class, $numOpenTransactions)->create(['status_id' => $openStatusId, 'business_id' => $transactionOpen->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $numOpenTransactions)->create(['status_id' => $openStatusId, 'business_id' => $transactionOpen->business_id, 'customer_id' => $this->createCustomer()->id]);
 
     $numClosedTransactions = 5;
     $closedStatusId =  TransactionStatus::where('code', 101)->first()->id;
-    factory(\App\Models\Transaction\Transaction::class, $numClosedTransactions)->create(['status_id' => $closedStatusId, 'business_id' => $transactionOpen->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $numClosedTransactions)->create(['status_id' => $closedStatusId, 'business_id' => $transactionOpen->business_id, 'customer_id' => $this->createCustomer()->id]);
 
     $this->businessHeaders($transactionOpen->business);
     $response = $this->json('GET', '/api/business/transactions?status=100')->getData();
@@ -85,12 +85,12 @@ class TransactionTest extends TestCase {
   }
 
   public function test_an_auth_business_can_request_transactions_by_customer() {
-    $customerTransaction = factory(\App\Models\Transaction\Transaction::class)->create();
+    $customerTransaction = factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()->id]);
     $numCustomerTransaction = 11;
     factory(\App\Models\Transaction\Transaction::class, $numCustomerTransaction)->create(['customer_id' => $customerTransaction->customer->id, 'business_id' => $customerTransaction->business_id]);
 
     $nonCustomerTransactions = 10;
-    factory(\App\Models\Transaction\Transaction::class, $nonCustomerTransactions)->create(['business_id' => $customerTransaction->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $nonCustomerTransactions)->create(['business_id' => $customerTransaction->business_id, 'customer_id' => $this->createCustomer()->id]);
 
     $this->businessHeaders($customerTransaction->business);
     $response = $this->json('GET', "/api/business/transactions?customer={$customerTransaction->customer->identifier}")->getData();
@@ -100,14 +100,14 @@ class TransactionTest extends TestCase {
   public function test_an_auth_business_can_request_transactions_by_date() {
     $startDate = urlencode(Carbon::now()->subDays(5)->toIso8601String());
     $endDate = urlencode(Carbon::now()->subDays(2)->toIso8601String());
-    $inDateTransaction = factory(\App\Models\Transaction\Transaction::class)->create(['created_at' => Carbon::now()->subDays(4)]);
+    $inDateTransaction = factory(\App\Models\Transaction\Transaction::class)->create(['created_at' => Carbon::now()->subDays(4), 'customer_id' => $this->createCustomer()->id]);
     $numInDateTransactionsFirst = 7;
-    factory(\App\Models\Transaction\Transaction::class, $numInDateTransactionsFirst)->create(['created_at' => Carbon::now()->subDays(4), 'business_id' => $inDateTransaction->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $numInDateTransactionsFirst)->create(['created_at' => Carbon::now()->subDays(4), 'business_id' => $inDateTransaction->business_id, 'customer_id' => $this->createCustomer()->id]);
 
     $numInDateTransactionsSecond = 8;
-    factory(\App\Models\Transaction\Transaction::class, $numInDateTransactionsSecond)->create(['created_at' => Carbon::now()->subDays(3), 'business_id' => $inDateTransaction->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $numInDateTransactionsSecond)->create(['created_at' => Carbon::now()->subDays(3), 'business_id' => $inDateTransaction->business_id, 'customer_id' => $this->createCustomer()->id]);
 
-    factory(\App\Models\Transaction\Transaction::class, 12)->create(['created_at' => Carbon::now()->subDays(1), 'business_id' => $inDateTransaction->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, 12)->create(['created_at' => Carbon::now()->subDays(1), 'business_id' => $inDateTransaction->business_id, 'customer_id' => $this->createCustomer()->id]);
 
     $this->businessHeaders($inDateTransaction->business);
     $response = $this->json('GET', "/api/business/transactions?date[]={$startDate}&date[]={$endDate}")->getData();
@@ -116,12 +116,12 @@ class TransactionTest extends TestCase {
 
   public function test_an_auth_business_can_request_transactions_by_employee() {
     $employeeId = 'cdb288y3';
-    $employeeTransaction = factory(\App\Models\Transaction\Transaction::class)->create(['employee_id' => $employeeId]);
+    $employeeTransaction = factory(\App\Models\Transaction\Transaction::class)->create(['employee_id' => $employeeId, 'customer_id' => $this->createCustomer()->id]);
     $numEmployeeTransaction = 17;
-    factory(\App\Models\Transaction\Transaction::class, $numEmployeeTransaction)->create(['employee_id' => $employeeId, 'business_id' => $employeeTransaction->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $numEmployeeTransaction)->create(['employee_id' => $employeeId, 'business_id' => $employeeTransaction->business_id, 'customer_id' => $this->createCustomer()->id]);
 
     $nonEmployeeTransactions = 10;
-    factory(\App\Models\Transaction\Transaction::class, $nonEmployeeTransactions)->create(['employee_id' => 'cdjnisjdijd3', 'business_id' => $employeeTransaction->business_id]);
+    factory(\App\Models\Transaction\Transaction::class, $nonEmployeeTransactions)->create(['employee_id' => 'cdjnisjdijd3', 'business_id' => $employeeTransaction->business_id, 'customer_id' => $this->createCustomer()->id]);
 
     $this->businessHeaders($employeeTransaction->business);
     $response = $this->json('GET', "/api/business/transactions?employee={$employeeId}")->getData();
@@ -134,14 +134,14 @@ class TransactionTest extends TestCase {
     $correctStatusId = TransactionStatus::where('code', 200)->first()->id;
     $incorrectStatusId = TransactionStatus::where('code', 100)->first()->id;
 
-    $correctTransaction = factory(\App\Models\Transaction\Transaction::class)->create(['created_at' => Carbon::now()->subDays(4), 'status_id' => $correctStatusId]);
+    $correctTransaction = factory(\App\Models\Transaction\Transaction::class)->create(['created_at' => Carbon::now()->subDays(4), 'status_id' => $correctStatusId, 'customer_id' => $this->createCustomer()->id]);
 
     $numCorrectTransactions = 5;
     factory(\App\Models\Transaction\Transaction::class, $numCorrectTransactions)->create(['created_at' => Carbon::now()->subDays(5), 'business_id' => $correctTransaction->business_id, 'customer_id' => $correctTransaction->customer_id, 'status_id' => $correctStatusId]);
 
     factory(\App\Models\Transaction\Transaction::class, 2)->create(['created_at' => Carbon::now()->subDays(5), 'business_id' => $correctTransaction->business_id, 'customer_id' => $correctTransaction->customer_id, 'status_id' => $incorrectStatusId]);
 
-    factory(\App\Models\Transaction\Transaction::class, 3)->create(['created_at' => Carbon::now()->subDays(5), 'business_id' => $correctTransaction->business_id, 'status_id' => $correctStatusId]);
+    factory(\App\Models\Transaction\Transaction::class, 3)->create(['created_at' => Carbon::now()->subDays(5), 'business_id' => $correctTransaction->business_id, 'status_id' => $correctStatusId, 'customer_id' => $this->createCustomer()->id]);
 
     factory(\App\Models\Transaction\Transaction::class, 6)->create(['created_at' => Carbon::now()->subDays(10), 'business_id' => $correctTransaction->business_id, 'customer_id' => $correctTransaction->customer_id, 'status_id' => $correctStatusId]);
 
@@ -353,7 +353,7 @@ class TransactionTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_transactions_by_customer_name() {
-    $transaction = factory(\App\Models\Transaction\Transaction::class)->create();
+    $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()->id]);
     $business = $transaction->business;
     $customer = $transaction->customer;
 
@@ -370,7 +370,7 @@ class TransactionTest extends TestCase {
   public function test_a_business_can_retrieve_transaction_by_identifier() {
     $business = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'other'])->business;
     $employee = factory(\App\Models\Business\Employee::class)->create(['business_id' => $business->id]);
-    $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'employee_id' => $employee->external_id]);
+    $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'employee_id' => $employee->external_id, 'customer_id' => $this->createCustomer()->id]);
     $purchasedItems = factory(\App\Models\Transaction\PurchasedItem::class, 4)->create(['transaction_id' => $transaction->id]);
 
     $business = $transaction->business;
@@ -385,5 +385,10 @@ class TransactionTest extends TestCase {
     $response = $this->json('GET', "/api/business/transactions?id={$transaction->identifier}")->getData();
     $this->assertEquals($transaction->identifier, $response->data[0]->transaction->identifier);
     $this->assertEquals(1, $response->meta->total);
+  }
+
+
+  private function createCustomer() {
+    return factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer;
   }
 }

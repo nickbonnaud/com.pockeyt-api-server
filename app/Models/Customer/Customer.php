@@ -5,6 +5,7 @@ namespace App\Models\Customer;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\Customer\ResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Customer extends Authenticatable implements JWTSubject {
@@ -131,5 +132,11 @@ class Customer extends Authenticatable implements JWTSubject {
 
 	public static function getByIdentifier($identifier) {
 		return self::where('identifier', $identifier)->first();
+	}
+
+	//////////////////// Inherited Overrides Methods ////////////////////
+
+	public function sendPasswordResetNotification($token){
+    $this->notify(new ResetPassword($token));
 	}
 }

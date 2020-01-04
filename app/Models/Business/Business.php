@@ -4,17 +4,20 @@ namespace App\Models\Business;
 
 use Carbon\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use App\Notifications\Business\ResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Business extends Authenticatable implements JWTSubject {
 	
 	//////////////////// Traits ////////////////////
 
+	use Notifiable;
 	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
 
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
-	protected $fillable = ['email', 'password'];
+	protected $fillable = ['email', 'password', 'remember_token'];
 	protected $hidden = ['password', 'remember_token', 'email_verified_at', 'id'];
 	protected $casts = ['email_verified_at' => 'datetime'];
 	protected $uuidFieldName = 'identifier';
@@ -135,5 +138,11 @@ class Business extends Authenticatable implements JWTSubject {
       'token_type' => 'bearer',
       'expiry' => $token ? Carbon::now()->addMinutes(auth('business')->factory()->getTTL())->timestamp : null
     ];
+	}
+
+	//////////////////// Inherited Overrides Methods ////////////////////
+
+	public function sendPasswordResetNotification($token){
+    $this->notify(new ResetPassword($token));
 	}
 }

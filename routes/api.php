@@ -23,11 +23,17 @@ Route::prefix('business')->group(function() {
 		Route::post('register', 'Business\AuthController@register');
 		Route::post('login', 'Business\AuthController@login');
 		Route::post('verify', 'Business\AuthController@verify');
+
+		Route::post('request-reset', 'Business\AuthResetPasswordController@requestReset');
+		Route::patch('reset-password', 'Business\AuthResetPasswordController@reset');
 	});
 
 	// Business Self
-	Route::get('me', 'Business\BusinessController@index');
-	Route::patch('me/{business}', 'Business\BusinessController@update');
+	Route::get('business', 'Business\BusinessController@index');
+	Route::patch('business/{business}', 'Business\BusinessController@update');
+
+	// Dashboard Business
+	Route::get('me', 'Business\DashboardBusinessController@index');
 
 	// Business Profile
 	Route::get('profile', 'Business\ProfileController@index');
@@ -130,6 +136,9 @@ Route::prefix('customer')->group(function() {
 		Route::get('refresh', 'Customer\AuthController@refresh');
 		Route::post('register', 'Customer\AuthController@register');
 		Route::post('login', 'Customer\AuthController@login');
+
+		Route::post('request-reset', 'Customer\AuthResetPasswordController@requestReset');
+		Route::patch('reset-password', 'Customer\AuthResetPasswordController@reset');
 	});
 
 	// Customer Self

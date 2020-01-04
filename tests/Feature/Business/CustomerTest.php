@@ -20,11 +20,9 @@ class CustomerTest extends TestCase {
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
-  public function test_a_business_can_retrieve_active_customers() {
-    $activeCustomer = factory(\App\Models\Location\ActiveLocation::class)->create();
-    $business = $activeCustomer->location->business;
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 12)->create(['location_id' => $business->location->id]);
-    $activeCustomers = $activeCustomers->push($activeCustomers, $activeCustomer);
+  public function test_an_auth_business_can_retrieve_active_customers() {
+    $business = $this->createPosAccount();
+    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 13)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $this->businessHeaders($business);
 
@@ -33,10 +31,8 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_historic_customers() {
-    $historicCustomer = factory(\App\Models\Location\HistoricLocation::class)->create();
-    $business = $historicCustomer->location->business;
-    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id]);
-    $historicCustomers = $historicCustomers->push($historicCustomers, $historicCustomer);
+    $business = $this->createPosAccount();
+    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $this->businessHeaders($business);
 
@@ -45,12 +41,12 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_can_only_retrieve_their_customers() {
-    $activeCustomer = factory(\App\Models\Location\ActiveLocation::class)->create();
-    $business = $activeCustomer->location->business;
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 9)->create(['location_id' => $business->location->id]);
-    $activeCustomers = $activeCustomers->push($activeCustomers, $activeCustomer);
+    $business = $this->createPosAccount();
 
-    factory(\App\Models\Location\ActiveLocation::class, 10)->create();
+    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 9)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
+
+    $otherBusiness = $this->createPosAccount();
+    factory(\App\Models\Location\ActiveLocation::class, 10)->create(['location_id' => $otherBusiness->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $this->businessHeaders($business);
 
@@ -59,10 +55,9 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_retrieves_customers_ordered_by_most_recent() {
-    $activeCustomer = factory(\App\Models\Location\ActiveLocation::class)->create(['created_at' => Carbon::now()->subDays(rand(1, 100))]);
-    $business = $activeCustomer->location->business;
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 12)->create(['location_id' => $business->location->id, 'created_at' => Carbon::now()->subDays(rand(1, 100))]);
-    $activeCustomers = $activeCustomers->push($activeCustomers, $activeCustomer);
+    $business = $this->createPosAccount();
+
+    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 12)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id, 'created_at' => Carbon::now()->subDays(rand(1, 100))]);
 
     $this->businessHeaders($business);
 
@@ -75,10 +70,9 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_customers_active_with_transaction() {
-    $activeCustomer = factory(\App\Models\Location\ActiveLocation::class)->create();
-    $business = $activeCustomer->location->business;
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 14)->create(['location_id' => $business->location->id]);
-    $activeCustomers = $activeCustomers->push($activeCustomers, $activeCustomer);
+    $business = $this->createPosAccount();
+
+    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 14)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $this->businessHeaders($business);
 
@@ -89,10 +83,9 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_customers_historic_with_transaction() {
-    $historicCustomer = factory(\App\Models\Location\HistoricLocation::class)->create();
-    $business = $historicCustomer->location->business;
-    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id]);
-    $historicCustomers = $historicCustomers->push($historicCustomers, $historicCustomer);
+    $business = $this->createPosAccount();
+
+    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $this->businessHeaders($business);
 
@@ -102,10 +95,8 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_active_customers_without_transaction() {
-    $activeCustomer = factory(\App\Models\Location\ActiveLocation::class)->create();
-    $business = $activeCustomer->location->business;
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 14)->create(['location_id' => $business->location->id]);
-    $activeCustomers = $activeCustomers->push($activeCustomers, $activeCustomer);
+    $business = $this->createPosAccount();
+    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 15)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $this->businessHeaders($business);
 
@@ -116,10 +107,8 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_customers_historic_without_transaction() {
-    $historicCustomer = factory(\App\Models\Location\HistoricLocation::class)->create();
-    $business = $historicCustomer->location->business;
-    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id]);
-    $historicCustomers = $historicCustomers->push($historicCustomers, $historicCustomer);
+    $business = $this->createPosAccount();
+    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 9)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $this->businessHeaders($business);
 
@@ -129,22 +118,28 @@ class CustomerTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_historic_with_date() {
+    $business = $this->createPosAccount();
+
     $startDate = urlencode(Carbon::now()->subDays(40)->toIso8601String());
     $endDate = urlencode(Carbon::now()->subDays(20)->toIso8601String());
 
-    $historicCustomer = factory(\App\Models\Location\HistoricLocation::class)->create(['created_at' => Carbon::now()->subDays(rand(21, 39))]);
-    $business = $historicCustomer->location->business;
-    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 12)->create(['location_id' => $business->location->id, 'created_at' => Carbon::now()->subDays(rand(21, 39))]);
+    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 13)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id, 'created_at' => Carbon::now()->subDays(rand(21, 39))]);
 
     factory(\App\Models\Location\HistoricLocation::class, 9)->create(['location_id' => $business->location->id, 'created_at' => Carbon::now()->subDays(rand(1, 19))]);
 
     factory(\App\Models\Location\HistoricLocation::class, 17)->create(['location_id' => $business->location->id, 'created_at' => Carbon::now()->subDays(rand(41, 67))]);
 
-    $historicCustomers = $historicCustomers->push($historicCustomers, $historicCustomer);
-
     $this->businessHeaders($business);
 
     $response = $this->json('GET', "/api/business/customers?status=historic&date[]={$startDate}&date[]={$endDate}")->getData();
     $this->assertEquals(count($historicCustomers), $response->meta->total);
+  }
+
+
+  private function createPosAccount() {
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'other']);
+    factory(\App\Models\Business\Location::class)->create(['business_id' => $posAccount->business_id]);
+
+    return $posAccount->business;
   }
 }
