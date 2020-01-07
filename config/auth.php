@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'api',
-        'passwords' => 'users',
+        'guard' => 'business',
+        'passwords' => 'businesses',
     ],
 
     /*
@@ -39,12 +39,6 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-        ],
-
-        'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
-            'hash' => false,
         ],
 
         'business' => [
@@ -106,11 +100,6 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => 'password_resets',
-            'expire' => 60,
-        ],
         'businesses' => [
             'provider' => 'businesses',
             'table' => 'password_resets',

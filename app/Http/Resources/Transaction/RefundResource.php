@@ -14,6 +14,7 @@ class RefundResource extends JsonResource {
   public function toArray($request)
   {
     return [
+      'identifier' => $this->identifier,
       'total' => $this->total,
       'status' => $this->status->name,
       'created_at' => $this->created_at->toDateTimeString()

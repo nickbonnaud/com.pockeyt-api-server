@@ -24,19 +24,23 @@ class RefundTest extends TestCase {
     $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()])->id]);
     $business = $refund->transaction->business;
 
-    $refunds = factory(\App\Models\Refund\Refund::class, 4)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
-    $refunds = $refunds->push($refunds, $refund);
+    $numRefunds = 7;
+    $i = 1;
+    while ($i < $numRefunds) {
+      $refunds = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
+      $i++;
+    }
 
     $this->businessHeaders($business);
     $response = $this->json('GET', '/api/business/refunds?recent=true')->getData();
-    $this->assertEquals(count($refunds), $response->meta->total);
+    $this->assertEquals($numRefunds, $response->meta->total);
   }
 
   public function test_a_business_can_only_retrieve_their_refunds() {
     $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()])->id]);
     $business = $refund->transaction->business;
 
-    $refunds = factory(\App\Models\Refund\Refund::class, 7)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
+    $refunds = factory(\App\Models\Refund\Refund::class, 14)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
     $refunds = $refunds->push($refunds, $refund);
 
     factory(\App\Models\Refund\Refund::class, 10)->create();
@@ -93,6 +97,26 @@ class RefundTest extends TestCase {
     $this->businessHeaders($business);
     $response = $this->json('GET', "/api/business/refunds?firstName={$customer->profile->first_name}&lastName={$customer->profile->last_name}")->getData();
     $this->assertEquals(count($refunds), $response->meta->total);
+  }
+
+  public function test_a_business_can_retrieve_a_refund_by_id() {
+    $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()])->id]);
+
+    $business = $refund->transaction->business;
+    $this->businessHeaders($business);
+    $response = $this->json('GET', "/api/business/refunds?id=14314314")->getData();
+    $this->assertEquals($refund->identifier, $response->data[0]->refund->identifier);
+  }
+
+  public function test_a_business_can_retrieve_a_refunds_by_transaction_id() {
+    $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()]);
+    $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => $transaction->id]);
+
+    $business = $transaction->business;
+    $this->businessHeaders($business);
+    $response = $this->json('GET', "/api/business/refunds?transactionId={$transaction->identifier}")->getData();
+    $this->assertEquals($refund->identifier, $response->data[0]->refund->identifier);
+    $this->assertEquals($transaction->identifier, $response->data[0]->transaction->identifier);
   }
 
   private function createCustomer() {

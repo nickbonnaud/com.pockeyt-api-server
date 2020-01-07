@@ -19,8 +19,8 @@ $factory->define(Refund\Refund::class, function (Faker $faker) {
 		'status_id' => function() {
 			return factory(Refund\RefundStatus::class)->create()->id;
 		},
-		'total' => 2035,
-		'pos_refund_id' => 'wjQNUotqMddUfHApqfn5S',
-		'payment_refund_id' => 'cnu982ru32fewy'
+		'total' => $faker->numberBetween($min = 500, $max = 1000),
+		'pos_refund_id' => $faker->bothify('###??#?##????#'),
+		'payment_refund_id' => $faker->bothify('??####?##????#?')
 	];
 });

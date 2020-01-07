@@ -13,17 +13,6 @@ $factory->define(Transaction\TransactionStatus::class, function (Faker $faker) {
 });
 
 $factory->define(Transaction\Transaction::class, function (Faker $faker) {
-	// $customerProfile = factory(Customer\CustomerProfilePhoto::class)->create()->profile;
-	// $customer = $customerProfile->customer;
-	// $business = factory(Business\Business::class)->create();
-	// factory(Business\AccountStatus::class)->create(['name' => 'incomplete']);
-	// $account = factory(Business\Account::class)->create(['business_id' => $business->id]);
-	// $payFacAccount = factory(Business\PayFacAccount::class)->create(['account_id' => $account->id]);
-	// factory(Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-	// $posAccount = factory(Business\PosAccount::class)->create(['business_id' => $business->id]);
-	// factory(Business\SquareAccount::class)->create(['pos_account_id' => $posAccount->id]);
-	// factory(Business\CloverAccount::class)->create(['pos_account_id' => $posAccount->id]);
-
 	$netSales = $faker->numberBetween($min = 500, $max = 10000);
 	$tax = round(0.075 * $netSales);
 	$tip = $faker->boolean ? round(($netSales + $tax) * ($faker->numberBetween($min = 5, $max = 25) / 100)) : 0;

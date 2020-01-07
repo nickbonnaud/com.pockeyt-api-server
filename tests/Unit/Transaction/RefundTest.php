@@ -14,6 +14,11 @@ class RefundTest extends TestCase {
     $this->seed();
   }
 
+  public function test_a_refund_generates_a_unique_identifier() {
+    $refund = factory(\App\Models\Refund\Refund::class)->create();
+    $this->assertNotNull($refund->identifier);
+  }
+
   public function test_a_refund_belongs_to_a_transaction() {
   	$transaction = factory(\App\Models\Transaction\Transaction::class)->create();
   	$refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => $transaction->id]);

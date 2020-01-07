@@ -15,6 +15,7 @@ class CreateRefundsTable extends Migration
     {
         Schema::create('refunds', function (Blueprint $table) {
             $table->increments('id');
+            $table->uuid('identifier')->unique();
             $table->unsignedInteger('transaction_id');
             $table->unsignedInteger('status_id');
             $table->integer('total');

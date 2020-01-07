@@ -8,10 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Transaction\Transaction;
 
 class Refund extends Model {
+
+	//////////////////// Traits ////////////////////
+
+	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
+
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
+	protected $guarded = ['identifier'];
 	protected $fillable = ['transaction_id', 'status_id', 'total', 'pos_refund_id'];
 	protected $hidden = [ 'id', 'transaction_id', 'status_id', 'payment_refund_id', 'pos_refund_id'];
+	protected $uuidFieldName = 'identifier';
+
+	//////////////////// Routing ////////////////////
+
+	public function getRouteKeyName() {
+		return 'identifier';
+	}
 
 	//////////////////// Relationships ////////////////////
 
