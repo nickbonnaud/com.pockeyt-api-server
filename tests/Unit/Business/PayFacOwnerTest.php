@@ -73,4 +73,14 @@ class PayFacOwnerTest extends TestCase {
 		$this->assertEquals($percentOwn, $owner->percent_ownership);
 		$this->assertNotEquals($percentOwn, $owner->getOriginal('percent_ownership'));
 	}
+
+	public function test_payfac_owners_must_have_a_primary_to_set_status_to_104() {
+		$owner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => false]);
+		$this->assertNotEquals(104, $owner->payFacAccount->account->status->code);
+	}
+
+	public function test_payfac_owners_with_a_primary_sets_status_to_104() {
+		$owner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => true]);
+		$this->assertEquals(104, $owner->payFacAccount->account->status->code);
+	}
 }

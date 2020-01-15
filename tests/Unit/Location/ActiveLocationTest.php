@@ -117,10 +117,8 @@ class ActiveLocationTest extends TestCase {
 
   private function createAccounts() {
     $geoAccount = factory(\App\Models\Business\GeoAccount::class)->create();
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $posStatus = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $posStatus->id, 'business_id' => $geoAccount->location->business_id]);
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $posAccount->business->id]);
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $geoAccount->location->business_id]);
+    $account = $geoAccount->location->business->account;
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);

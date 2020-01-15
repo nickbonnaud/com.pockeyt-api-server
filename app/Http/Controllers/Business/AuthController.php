@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\Business\StoreBusinessRequest;
 use App\Http\Requests\Business\LoginBusinessRequest;
+use App\Http\Resources\Business\DashboardBusinessResource;
 
 class AuthController extends Controller {
   
@@ -17,11 +18,13 @@ class AuthController extends Controller {
 
   public function register(StoreBusinessRequest $request) {
   	$business = Business::create($request->only('email', 'password'));
-  	return $this->formatResponse(Business::createToken($business));
+  	return $this->formatResponse(Business::createToken($business), $business);
   }
 
   public function login(LoginBusinessRequest $request) {
-    return $this->formatResponse(Business::login($request->only('email', 'password')));
+    $tokenData = Business::login($request->only('email', 'password'));
+    $business = Business::getAuthBusiness();
+    return $this->formatResponse($tokenData, $business);
   }
 
   public function logout() {
@@ -41,10 +44,11 @@ class AuthController extends Controller {
 
 
 
-  private function formatResponse($loginResult) {
+  private function formatResponse($loginResult, $business = null) {
     return response()->json([
       'data' => [
         'token' => $loginResult['token'],
+        'business' => $business != null ? new DashboardBusinessResource($business) : null
       ],
       'errors' => [
         'email' => array($loginResult['error']),

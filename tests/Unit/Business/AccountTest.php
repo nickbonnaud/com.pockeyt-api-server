@@ -21,9 +21,9 @@ class AccountTest extends TestCase {
   }
 
   public function test_an_account_status_has_many_accounts() {
-  	$status = \App\Models\Business\AccountStatus::first();
-  	$accountOne = factory(\App\Models\Business\Account::class)->create(['account_status_id' => $status->id]);
-  	$accountTwp = factory(\App\Models\Business\Account::class)->create(['account_status_id' => $status->id]);
+  	$business = factory(\App\Models\Business\Business::class)->create();
+    factory(\App\Models\Business\Business::class)->create();
+    $status = $business->account->status;
   	$this->assertEquals(2, $status->accounts->count());
   }
 

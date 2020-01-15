@@ -11,6 +11,12 @@ class GeoAccountObserver {
   	$geoAccount->identifier = $geoAccount->location->identifier;
   }
 
+  public function saved(GeoAccount $geoAccount) {
+  	if ($geoAccount->location->business->account->status->code == 105) {
+  		$geoAccount->location->business->account->setStatus(106);
+  	}
+  }
+
   public function created(GeoAccount $geoAccount) {
   	BeaconAccount::createAccount($geoAccount->location, $geoAccount->identifier);
   }

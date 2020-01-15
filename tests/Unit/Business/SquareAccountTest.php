@@ -34,10 +34,8 @@ class SquareAccountTest extends TestCase {
 
 
 	private function createRequiredAccounts() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $posStatus = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $posStatus->id]);
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $posAccount->business->id]);
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create();
+    $account = $posAccount->business->account;
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);

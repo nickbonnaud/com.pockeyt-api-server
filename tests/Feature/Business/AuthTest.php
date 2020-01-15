@@ -25,7 +25,6 @@ class AuthTest extends TestCase {
 
     $response = $this->json('POST', '/api/business/auth/register', $attributes)->getData();
     $business = \App\Models\Business\Business::first();
-
     $this->assertDatabaseHas('businesses', ['email' => $email]);
     $this->assertNotEmpty($response->data->token);
     $this->assertNull($response->errors->email[0]);

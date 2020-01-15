@@ -24,7 +24,7 @@ class StorePosAccountRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'required|string|in:square,clover,toast,none',
+            'type' => 'required|string|in:square,clover,lightspeed,shopify,vend,other',
             'takes_tips' => 'required|boolean',
             'allows_open_tickets' => 'required|boolean'
         ];

@@ -27,9 +27,11 @@ class PayFacBankTest extends TestCase {
   }
 
   public function test_an_authorized_business_can_store_bank_data() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $business->account->id]);
+
     $payFacBank = factory(\App\Models\Business\PayFacBank::class)->make();
-    $header = $this->businessHeaders($payFacBank->payFacAccount->account->business);
+    $header = $this->businessHeaders($business);
 
     $payFacBankArray = $payFacBank->toArray();
     $payFacBankArray['routing_number'] = $this->createFakeNumber();

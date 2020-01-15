@@ -20,7 +20,9 @@ class MasterTestSeeder extends Seeder {
     $profile->photos->banner()->associate(factory(\App\Models\Business\Photo::class)->create(['name' => 'banner-' . time() . Str::random(5) . '.png']))->save();
 
 
-    $account = factory(\App\Models\Business\Account::class)->create(['account_status_id' => \App\Models\Business\AccountStatus::where('code', 200)->first()->id, 'business_id' => $business->id]);
+    $account = $business->account;
+    $account->account_status_id = \App\Models\Business\AccountStatus::where('code', 200)->first()->id;
+    $account->save();
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount]);
     

@@ -19,8 +19,10 @@ class PhotoController extends Controller {
   	if ($profile->id != (Business::getAuthBusiness())->profile->id) {
   		return response()->json(['errors' => 'Permission denied.'], 403);
   	}
+    $request = $request->validated();
+    $request['is_logo'] = $request['is_logo'] === 'true';
 
-  	$photos = (new Photo)->createPhoto($request->validated(), $profile);
+  	$photos = (new Photo)->createPhoto($request, $profile);
   	return new ProfilePhotosResource($photos);
   }
 }

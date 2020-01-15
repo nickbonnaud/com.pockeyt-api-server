@@ -9,4 +9,8 @@ class PosAccountObserver {
 	public function creating(PosAccount $account) {
 		$account->pos_account_status_id = (PosAccountStatus::where('code', 100)->first())->id;
 	}
+
+	public function created(PosAccount $account) {
+		$account->business->account->setStatus(120);
+	}
 }

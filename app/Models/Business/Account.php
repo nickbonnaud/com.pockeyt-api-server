@@ -2,6 +2,7 @@
 
 namespace App\Models\Business;
 
+use App\Models\Business\AccountStatus;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Business\PayFacAccount;
 
@@ -32,10 +33,8 @@ class Account extends Model {
 
 	//////////////////// Core Methods ////////////////////
 
-	public static function createAccount($business, $entityType) {
-		$account = self::create(['business_id' => $business->id]);
-		PayFacAccount::createPayFacAccount($account->id, $entityType);
-		return $account;
+	public function createAccount($business, $entityType) {
+		PayFacAccount::createPayFacAccount($business->account->id, $entityType);
 	}
 
 	public function getPayFacBusiness() {
@@ -48,5 +47,10 @@ class Account extends Model {
 
 	public function getPayFacBank() {
 		return $this->payFacAccount->payFacBank;
+	}
+
+	public function setStatus($code) {
+		$this->account_status_id = AccountStatus::where('code', $code)->first()->id;
+		$this->save();
 	}
 }

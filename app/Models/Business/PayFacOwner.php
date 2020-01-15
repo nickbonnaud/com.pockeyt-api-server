@@ -3,6 +3,7 @@
 namespace App\Models\Business;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
@@ -43,6 +44,10 @@ class PayFacOwner extends Model {
 
 	public function setPercentOwnershipAttribute($value) {
 		$this->attributes['percent_ownership'] = $value * 100;
+	}
+
+	public function setDobAttribute($value) {
+		$this->attributes['dob'] = Carbon::parse($value);
 	}
 
 	//////////////////// Accessor Methods ////////////////////

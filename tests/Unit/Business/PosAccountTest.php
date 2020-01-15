@@ -48,4 +48,9 @@ class PosAccountTest extends TestCase {
   	$account = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
   	$this->assertInstanceOf('App\Models\Business\Business', $account->business);
   }
+
+  public function test_creating_a_pos_account_sets_account_status_to_120() {
+    $account = factory(\App\Models\Business\PosAccount::class)->create();
+    $this->assertEquals(120, $account->business->account->status->code);
+  }
 }

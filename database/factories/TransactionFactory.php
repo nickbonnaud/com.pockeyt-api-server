@@ -46,10 +46,8 @@ $factory->define(Transaction\PurchasedItem::class, function (Faker $faker) {
 });
 
 $factory->define(Transaction\UnassignedTransaction::class, function (Faker $faker) {
-	factory(Transaction\TransactionStatus::class)->create(['name' => 'open']);
 	$business = factory(Business\Business::class)->create();
-	factory(Business\AccountStatus::class)->create(['name' => 'incomplete']);
-	$account = factory(Business\Account::class)->create(['business_id' => $business->id]);
+	$account = $business->account;
 	$payFacAccount = factory(Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 	factory(Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 	$posAccount = factory(Business\PosAccount::class)->create(['business_id' => $business->id]);

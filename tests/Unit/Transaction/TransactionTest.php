@@ -29,8 +29,7 @@ class TransactionTest extends TestCase {
 		$customer = factory(\App\Models\Customer\Customer::class)->create();
 		$customerProfile = factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' =>$customer->id]);
 		$business = factory(\App\Models\Business\Business::class)->create();
-		factory(\App\Models\Business\AccountStatus::class)->create(['name' => 'incomplete']);
-		$account = factory(\App\Models\Business\Account::class)->create(['business_id' => $business->id]);
+		$account = $business->account;
 		$payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 		factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 		$posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
@@ -57,7 +56,7 @@ class TransactionTest extends TestCase {
 		$customerProfile = factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' =>$customer->id]);
 		$business = factory(\App\Models\Business\Business::class)->create();
 		factory(\App\Models\Business\AccountStatus::class)->create(['name' => 'incomplete']);
-		$account = factory(\App\Models\Business\Account::class)->create(['business_id' => $business->id]);
+		$account = $business->account;
 		$payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 		factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 		$posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);

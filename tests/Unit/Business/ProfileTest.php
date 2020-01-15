@@ -30,4 +30,9 @@ class ProfileTest extends TestCase {
     $profile = factory(\App\Models\Business\Profile::class)->create();
     $this->assertInstanceOf('App\Models\Business\ProfilePhotos', $profile->photos);
   }
+
+  public function test_creating_a_profile_changes_the_account_status_to_101() {
+    $profile = factory(\App\Models\Business\Profile::class)->create();
+    $this->assertEquals(101, $profile->business->account->fresh()->status->code);
+  }
 }

@@ -18,7 +18,8 @@ class PayFacBusinessController extends Controller {
 
   public function store(StorePayFacBusinessRequest $request) {
   	$business = Business::getAuthBusiness();
-  	$account = Account::createAccount($business, $request->entity_type);
+    $account = $business->account;
+  	$account->createAccount($business, $request->entity_type);
   	$account->payFacAccount->storeData($request->except('entity_type'), $type = 'business');
   	return new PayFacBusinessResource($account->getPayFacBusiness());
   }

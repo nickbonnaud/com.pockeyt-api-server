@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder {
   		AccountStatusesSeeder::class,
   		TransactionStatusesSeeder::class,
       RefundStatusesSeeder::class,
-      PosAccountStatusesSeeder::class
+      PosAccountStatusesSeeder::class,
+      RegionSeeder::class
   	]);
   }
 }

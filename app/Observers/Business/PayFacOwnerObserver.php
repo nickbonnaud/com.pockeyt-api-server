@@ -12,6 +12,12 @@ class PayFacOwnerObserver {
 		AchOwner::storeData($this->scrubAchOwnerData($payFacOwner));
 	}
 
+	public function created(PayFacOwner $payFacOwner) {
+		if ($payFacOwner->payFacAccount->payFacOwners()->where('primary', true)->exists()) {
+			$payFacOwner->payFacAccount->account->setStatus(104);
+		}
+	}
+
 	public function updating(PayFacOwner $payFacOwner) {
 		$owners = $this->getAchAccount($payFacOwner)->achOwners;
 		$owners->where('identifier', $payFacOwner->identifier)->first()->updateData($this->scrubAchOwnerData($payFacOwner));

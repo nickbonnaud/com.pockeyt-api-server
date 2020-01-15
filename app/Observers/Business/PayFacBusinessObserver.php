@@ -13,6 +13,10 @@ class PayFacBusinessObserver {
 		AchBusiness::storeData($this->scrubAchBusinessData($payFacBusiness));
 	}
 
+	public function created(PayFacBusiness $payFacBusiness) {
+		$payFacBusiness->payFacAccount->account->setStatus(103);
+	}
+
 	public function updating(PayFacBusiness $payFacBusiness) {
 		$this->getAchAccount($payFacBusiness)->achBusiness->updateData($this->scrubAchBusinessData($payFacBusiness));
 	}

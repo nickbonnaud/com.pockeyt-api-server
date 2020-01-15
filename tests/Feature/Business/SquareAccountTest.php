@@ -19,9 +19,10 @@ class SquareAccountTest extends TestCase {
   }
 
   public function test_an_unauth_request_cannot_store_square_data() {
-    $status = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
 
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
     $code = 'temp_token';
     $state = JWTAuth::fromUser($account->business);
 
@@ -29,8 +30,10 @@ class SquareAccountTest extends TestCase {
   }
 
   public function test_an_auth_request_must_have_square_code() {
-    $status = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
 
     $code = 'temp_token';
     $state = JWTAuth::fromUser($account->business);
@@ -39,8 +42,10 @@ class SquareAccountTest extends TestCase {
   }
 
   public function test_a_request_must_have_correct_state_square_redirect() {
-    $status = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $account = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $status->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
 
     $code = 'temp_token';
     $state = JWTAuth::fromUser($account->business);
@@ -49,7 +54,6 @@ class SquareAccountTest extends TestCase {
   }
 
   public function test_an_auth_request_can_store_square_data() {
-    $status = factory(\App\Models\Business\PosAccountStatus::class)->create();
     $account = $this->createRequiredAccounts();
 
     $code = 'temp_token';
@@ -61,10 +65,10 @@ class SquareAccountTest extends TestCase {
   }
 
   public function test_storing_square_data_fetches_location_id_single_location() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $posStatus = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $posStatus->id]);
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $posAccount->business->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 
@@ -78,10 +82,10 @@ class SquareAccountTest extends TestCase {
   }
 
   public function test_storing_square_data_fetches_location_id_multiple_locations() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $posStatus = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $posStatus->id]);
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $posAccount->business->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'address' => '321 Broad St']);
     
@@ -95,10 +99,10 @@ class SquareAccountTest extends TestCase {
   }
 
   public function test_creating_square_account_fetches_and_stores_inventory() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $posStatus = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $posStatus->id]);
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $posAccount->business->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'address' => '321 Broad St']);
     
@@ -119,10 +123,10 @@ class SquareAccountTest extends TestCase {
   }
 
   private function createRequiredAccounts() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $posStatus = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $posStatus->id]);
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $posAccount->business->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);

@@ -15,7 +15,6 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_unauthorized_business_cannot_store_owner_data() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make();
     $payFacOwner['ssn'] = $this->faker->ssn;
 
@@ -24,7 +23,6 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_authorized_business_must_have_less_than_equal_to_100_ownership() {
-  	factory(\App\Models\Business\AccountStatus::class)->create();
   	$payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make(['percent_ownership' => 101]);
   	$business = $payFacOwner->payFacAccount->account->business;
   	$header = $this->businessHeaders($business);
@@ -40,12 +38,13 @@ class PayFacOwnerTest extends TestCase {
   public function test_an_authorized_business_can_store_owner_data() {
     factory(\App\Models\Business\AccountStatus::class)->create();
     $business = factory(\App\Models\Business\Business::class)->create();
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $business->id]);
+    $account = $business->account;
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make();
     $header = $this->businessHeaders($business);
     $payFacOwner = $payFacOwner->toArray();
-    $payFacOwner['ssn'] = $this->faker->ssn;
+    $payFacOwner['ssn'] = $this->faker->numerify('#########');
+    $payFacOwner['dob'] = '10/24/1987';
     $response = $this->json('POST', '/api/business/payfac/owner', $payFacOwner, $header)->getData();
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $business->fresh()->account->getPayFacOwners()->first()->id]);
@@ -54,9 +53,8 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_authorized_business_can_store_multiple_owners() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
     $business = factory(\App\Models\Business\Business::class)->create();
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $business->id]);
+    $account = $business->account;
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 25]);
 
@@ -71,9 +69,8 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_authorized_business_cannot_store_multiple_owners_above_hundred() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
     $business = factory(\App\Models\Business\Business::class)->create();
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $business->id]);
+    $account = $business->account;
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 75]);
 
@@ -89,9 +86,11 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_authorized_business_can_update_their_owner_data() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $header = $this->businessHeaders($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
@@ -110,10 +109,13 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_authorized_business_cannot_update_owners_above_hundred() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['percent_ownership' => 50]);
-    factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacOwner->payFacAccount->id, 'percent_ownership' => 50]);
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 50]);
+
+    factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 50]);
     $header = $this->businessHeaders($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
@@ -130,9 +132,11 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_ssn_authorized_business_can_update_their_owner_data() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $header = $this->businessHeaders($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
@@ -151,9 +155,11 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_ssn_is_not_changed_if_left_untouched() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $header = $this->businessHeaders($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
@@ -173,9 +179,11 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_ssn_is_changed_if_changed() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $header = $this->businessHeaders($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
@@ -195,9 +203,11 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_an_unauth_business_cannot_destroy_an_owner() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
 
@@ -209,9 +219,11 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_a_business_can_only_delete_their_owners() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $this->businessHeaders($business);
 
     $otherBusinessOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
@@ -227,10 +239,13 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_a_business_can_delete_an_owner() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => false]);
-    factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacOwner->pay_fac_account_id]);
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'primary' => false]);
+
+    factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $this->businessHeaders($business);
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
@@ -244,10 +259,13 @@ class PayFacOwnerTest extends TestCase {
   }
 
   public function test_a_business_cannot_delete_a_primary_owner() {
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => true]);
-    factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacOwner->pay_fac_account_id]);
-    $business = $payFacOwner->payFacAccount->account->business;
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+    $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'primary' => true]);
+
+    factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $this->businessHeaders($business);
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);

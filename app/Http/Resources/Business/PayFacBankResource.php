@@ -25,7 +25,7 @@ class PayFacBankResource extends JsonResource {
       'last_name' => $this->last_name,
       'routing_number' => str_repeat('X', strlen($this->routing_number) - 4) . substr($this->routing_number, -4),
       'account_number' => str_repeat('X', strlen($this->account_number) - 4) . substr($this->account_number, -4),
-      'type' => $this->account_type
+      'account_type' => $this->account_type
     ];
   }
 }

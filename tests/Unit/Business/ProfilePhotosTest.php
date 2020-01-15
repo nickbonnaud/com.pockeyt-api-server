@@ -51,4 +51,25 @@ class ProfilePhotosTest extends TestCase {
   	$photos = factory(\App\Models\Business\ProfilePhotos::class)->create(['banner_id' => $photo->id]);
   	$this->assertInstanceOf('App\Models\Business\Photo', $photos->banner);
   }
+
+  public function test_creating_a_logo_and_not_banner_does_not_change_status_to_102() {
+    $photo = factory(\App\Models\Business\Photo::class)->create();
+    $photos = factory(\App\Models\Business\ProfilePhotos::class)->create(['logo_id' => $photo->id, 'banner_id' => null]);
+    $this->assertNotEquals(102, $photos->profile->business->account->fresh()->status->code);
+  }
+
+  public function test_creating_a_banner_and_not_logo_does_not_change_status_to_102() {
+    $photo = factory(\App\Models\Business\Photo::class)->create();
+    $photos = factory(\App\Models\Business\ProfilePhotos::class)->create(['banner_id' => $photo->id, 'logo_id' => null]);
+    $this->assertNotEquals(102, $photos->profile->business->account->fresh()->status->code);
+  }
+
+  public function test_creating_a_banner_and_logo_changes_status_to_102() {
+    $photoBanner = factory(\App\Models\Business\Photo::class)->create();
+    $photoLogo = factory(\App\Models\Business\Photo::class)->create();
+    $photos = factory(\App\Models\Business\ProfilePhotos::class)->create(['banner_id' => $photoBanner->id, 'logo_id' => $photoLogo->id]);
+    $this->assertEquals(102, $photos->profile->business->account->fresh()->status->code);
+  }
+
+
 }

@@ -48,7 +48,6 @@ class PayFacBusinessTest extends TestCase {
 	}
 
 	public function test_an_ein_is_not_required_if_business_a_sole_prop() {
-		factory(\App\Models\Business\AccountStatus::class)->create();
 		$payFacBusiness = Arr::except((factory(\App\Models\Business\PayFacBusiness::class)->make())->toArray(), ['ein']);
 		$payFacBusiness['entity_type'] = 'soleProprietorship';
 		$business = factory(\App\Models\Business\Business::class)->create();
@@ -85,9 +84,10 @@ class PayFacBusinessTest extends TestCase {
 	}
 
 	public function test_auth_business_can_update_their_pay_fac_data() {
-		factory(\App\Models\Business\AccountStatus::class)->create();
-		$payFacBusiness = factory(\App\Models\Business\PayFacBusiness::class)->create();
-		$business = $payFacBusiness->payFacAccount->account->business;
+		$business = factory(\App\Models\Business\Business::class)->create();
+		$payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $business->account->id]);
+
+		$payFacBusiness = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 		$header = $this->businessHeaders($business);
 
 		$payFacBusiness = $payFacBusiness->toArray();
@@ -102,9 +102,10 @@ class PayFacBusinessTest extends TestCase {
 	}
 
 	public function test_auth_business_can_update_their_entity_type() {
-		factory(\App\Models\Business\AccountStatus::class)->create();
-		$payFacBusiness = factory(\App\Models\Business\PayFacBusiness::class)->create();
-		$business = $payFacBusiness->payFacAccount->account->business;
+		$business = factory(\App\Models\Business\Business::class)->create();
+		$payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $business->account->id]);
+
+		$payFacBusiness = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 		$header = $this->businessHeaders($business);
 
 		$this->assertDatabaseHas('pay_fac_accounts', ['id' => $payFacBusiness->payFacAccount->id, 'entity_type' => $payFacBusiness->payFacAccount->entity_type]);

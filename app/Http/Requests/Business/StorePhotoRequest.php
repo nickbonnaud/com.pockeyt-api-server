@@ -28,18 +28,18 @@ class StorePhotoRequest extends FormRequest
       'photo' => ['required', 'file', 'mimes:jpg,jpeg,png', function($attribute, $value, $fail) {
         if (is_file($value)) {
           list($width, $height) = getimagesize($value);
-          if ($this->input('is_logo')) {
-            if ($width < 400 || $height < 400) {
-              return $fail('Logo must be larger than 400x400 pixels.');
+          if ($this->input('is_logo') == 'true') {
+            if ($width < 150 || $height < 150) {
+              return $fail('Logo must be larger than 150x150 pixels.');
             }
           } else {
-            if ($width < 1000 || $height < 720) {
-              return $fail('Banner must be larger than 1000x720 pixels.');
+            if ($width < 320 || $height < 100) {
+              return $fail('Banner must be larger than 320x100 pixels.');
             }
           }
         }
       }],
-      'is_logo' =>'required|boolean'
+      'is_logo' =>'required|string|in:true,false'
     ];
   }
 }

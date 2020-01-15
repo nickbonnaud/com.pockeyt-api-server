@@ -138,6 +138,7 @@ class SquareTest extends TestCase {
 
     $this->assertEquals(1, \App\Models\Business\Employee::count());
     $response = $this->json('POST', $url, $attributes, $headers)->getData();
+
     $transaction = \App\Models\Transaction\Transaction::first();
     $status = \App\Models\Transaction\TransactionStatus::where(['name' => 'paid'])->first();
     $transaction->update(['status_id' => $status->id]);
@@ -175,17 +176,16 @@ class SquareTest extends TestCase {
 
   private function createRequiredAccounts($customer) {
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
-    factory(\App\Models\Business\AccountStatus::class)->create();
-    $posStatus = factory(\App\Models\Business\PosAccountStatus::class)->create();
-    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['pos_account_status_id' => $posStatus->id]);
-    $account = factory(\App\Models\Business\Account::class)->create(['business_id' => $posAccount->business->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    $account = $business->account;
+    $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id, 'type' => 'square']);
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
     $squareAccount = factory(\App\Models\Business\SquareAccount::class)->create(['pos_account_id' => $posAccount->id]);
-    $location = factory(\App\Models\Business\Location::class)->create(['business_id' => $posAccount->business->id]);
+    $location = factory(\App\Models\Business\Location::class)->create(['business_id' => $business->id]);
     factory(\App\Models\Location\ActiveLocation::class)->create(['location_id' => $location->id, 'customer_id' => $customer->id]);
     factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
-    $profile = factory(\App\Models\Business\Profile::class)->create(['business_id' => $posAccount->business->id]);
+    $profile = factory(\App\Models\Business\Profile::class)->create(['business_id' => $business->id]);
     $profile->photos->logo_id = factory(\App\Models\Business\Photo::class)->create()->id;
     $profile->photos->save();
     return $posAccount;

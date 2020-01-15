@@ -67,4 +67,9 @@ class PayFacBankTest extends TestCase {
 		$payFacBank = factory(\App\Models\Business\PayFacBank::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
 		$this->assertInstanceOf('App\Models\Business\PayFacAccount', $payFacBank->payFacAccount);
 	}
+
+	public function test_creating_a_payfac_bank_sets_status_to_105() {
+		$payFacBank = factory(\App\Models\Business\PayFacBank::class)->create();
+		$this->assertEquals(105, $payFacBank->payFacAccount->account->status->code);
+	}
 }

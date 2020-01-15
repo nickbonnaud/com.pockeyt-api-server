@@ -100,11 +100,12 @@ class RefundTest extends TestCase {
   }
 
   public function test_a_business_can_retrieve_a_refund_by_id() {
-    $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()])->id]);
+    $business = factory(\App\Models\Business\Business::class)->create();
+    factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
+    $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer(), 'business_id' => $business->id])->id]);
 
-    $business = $refund->transaction->business;
     $this->businessHeaders($business);
-    $response = $this->json('GET', "/api/business/refunds?id=14314314")->getData();
+    $response = $this->json('GET', "/api/business/refunds?id={$refund->identifier}")->getData();
     $this->assertEquals($refund->identifier, $response->data[0]->refund->identifier);
   }
 

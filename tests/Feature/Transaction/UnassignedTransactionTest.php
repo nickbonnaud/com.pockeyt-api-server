@@ -18,7 +18,6 @@ class UnassignedTransactionTest extends TestCase {
   }
 
   public function test_deleting_an_unassigned_transaction_creates_transaction_an_purchased_items() {
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
     $unassignedTransaction = factory(\App\Models\Transaction\UnassignedTransaction::class)->create();
