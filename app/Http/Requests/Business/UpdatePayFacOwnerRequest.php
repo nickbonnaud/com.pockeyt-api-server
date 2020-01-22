@@ -30,7 +30,7 @@ class UpdatePayFacOwnerRequest extends FormRequest
       'address' => 'required|string',
       'address_secondary' => 'string|nullable',
       'dob' => 'required|date',
-      'ssn' => ['required', 'string', 'numeric', 'digits:9'],
+      'ssn' => ['required', 'alpha_num', 'size:9'],
       'last_name' => 'required|string',
       'first_name' => 'required|string',
       'title' => 'required|string',

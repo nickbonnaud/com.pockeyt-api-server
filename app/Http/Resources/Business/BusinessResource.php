@@ -18,8 +18,7 @@ class BusinessResource extends JsonResource
 
         return [
             'identifier' => $this->identifier,
-            'email' => $this->email,
-            'token' => Business::formatToken($this->token)
+            'email' => $this->email
         ];
     }
 }

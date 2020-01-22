@@ -22,7 +22,7 @@ class UpdatePayFacBusinessRequest extends FormRequest {
    */
   public function rules(){
     return [
-      'ein' => ['required', 'regex:/^\d{2}\-?\d{7}$/'],
+      'ein' => ['required_unless:entity_type,soleProprietorship', 'regex:/^\d{2}\-?\d{7}$/'],
       'business_name' => 'required|string|min:2',
       'state' => 'required|string|alpha|size:2',
       'zip' => 'required|numeric|digits:5',

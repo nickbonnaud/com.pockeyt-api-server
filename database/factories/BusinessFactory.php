@@ -78,7 +78,6 @@ $factory->define(Business\PayFacBusiness::class, function(Faker $faker) {
 		'pay_fac_account_id' => function() {
 			return factory(Business\PayFacAccount::class)->create()->id;
 		},
-		'ein' => $faker->ein,
 		'business_name' => $faker->company,
 		'state' => $region->state,
 		'city' => $region->city,

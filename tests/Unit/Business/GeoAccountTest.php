@@ -27,7 +27,12 @@ class GeoAccountTest extends TestCase {
 	}
 
 	public function test_creating_a_geo_account_sets_status_to_106() {
-		$geoAccount = factory(\App\Models\Business\GeoAccount::class)->create();
-		$this->assertEquals(106, $geoAccount->location->business->account->status->code);
+		$statusId = \App\Models\Business\AccountStatus::where('code', 105)->first()->id;
+		$account = factory(\App\Models\Business\Business::class)->create()->account;
+		$account->account_status_id = $statusId;
+		$account->save();
+		$location = factory(\App\Models\Business\Location::class)->create(['business_id' => $account->business_id]);
+		$geoAccount = factory(\App\Models\Business\GeoAccount::class)->create(['location_id' => $location->id]);
+		$this->assertEquals(106, $geoAccount->fresh()->location->business->account->status->code);
 	}
 }

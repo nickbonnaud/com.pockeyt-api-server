@@ -61,7 +61,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make(['percent_ownership' => 25]);
     $header = $this->businessHeaders($business);
     $payFacOwnerArray = $payFacOwner->toArray();
-    $payFacOwnerArray['ssn'] = $this->faker->ssn;
+    $payFacOwnerArray['ssn'] = $this->faker->numerify("#########");
 
     $response = $this->json('POST', '/api/business/payfac/owner', $payFacOwnerArray, $header)->getData();
 
@@ -142,7 +142,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacOwnerArray = $payFacOwner->toArray();
     $lastName = "Newname";
     $payFacOwnerArray['last_name'] = $lastName;
-    $payFacOwnerArray['ssn'] = 'XXX-XX-'. substr($payFacOwner->ssn, -4);
+    $payFacOwnerArray['ssn'] = 'XXXXX'. substr($payFacOwner->ssn, -4);
     $payFacOwnerArray['title'] = 'CEO';
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
@@ -166,7 +166,7 @@ class PayFacOwnerTest extends TestCase {
     $lastName = "Newname";
     $payFacOwnerArray['last_name'] = $lastName;
     $oldSsn = $payFacOwner->ssn;
-    $payFacOwnerArray['ssn'] = 'XXX-XX-'. substr($payFacOwner->ssn, -4);
+    $payFacOwnerArray['ssn'] = 'XXXXX'. substr($payFacOwner->ssn, -4);
     $payFacOwnerArray['title'] = 'CEO';
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
@@ -190,7 +190,7 @@ class PayFacOwnerTest extends TestCase {
     $lastName = "Newname";
     $payFacOwnerArray['last_name'] = $lastName;
     $oldSsn = $payFacOwner->ssn;
-    $payFacOwnerArray['ssn'] = $this->faker->ssn;
+    $payFacOwnerArray['ssn'] = $this->faker->numerify("#########");
     $payFacOwnerArray['title'] = 'CEO';
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);

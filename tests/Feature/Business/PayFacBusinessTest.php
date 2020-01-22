@@ -56,8 +56,11 @@ class PayFacBusinessTest extends TestCase {
 	}
 
 	public function test_an_authorized_business_can_store_pay_fac_business_data() {
-		factory(\App\Models\Business\AccountStatus::class)->create();
 		$payFacBusiness = (factory(\App\Models\Business\PayFacBusiness::class)->make())->toArray();
+		$payFacBusiness['city'] = "Chapel Hill";
+		$payFacBusiness['state'] = "NC";
+		$payFacBusiness['zip'] = '27514';
+
 		$payFacBusiness['entity_type'] = 'soleProprietorship';
 		$business = factory(\App\Models\Business\Business::class)->create();
 		$header = $this->businessHeaders($business);
@@ -112,6 +115,8 @@ class PayFacBusinessTest extends TestCase {
 
 		$payFacBusinessArray = $payFacBusiness->toArray();
 		$payFacBusinessArray['entity_type'] = 'partnership';
+		$payFacBusinessArray['ein'] = '11-2222222';
+
 
 		$response = $this->json('PATCH', "/api/business/payfac/business/{$payFacBusiness['identifier']}", $payFacBusinessArray, $header)->getData();
 

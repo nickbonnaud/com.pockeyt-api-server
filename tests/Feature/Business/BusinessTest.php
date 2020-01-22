@@ -29,8 +29,8 @@ class BusinessTest extends TestCase {
     $response = $this->json('GET', '/api/business/business', $headers)->assertStatus(201);
     $response = $response->getData();
 
-    $this->assertNotNull($response->data->token);
-    $this->assertNotEquals($headers['Authorization'], $response->data->token->value);
+    $this->assertNotNull($response->data->email);
+    $this->assertEquals($business->identifier, $response->data->identifier);
   }
 
   public function test_an_unauthorized_business_cannot_update_their_data() {

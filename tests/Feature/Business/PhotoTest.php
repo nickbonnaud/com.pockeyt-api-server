@@ -24,7 +24,7 @@ class PhotoTest extends TestCase {
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-  		'is_logo' => true
+  		'is_logo' => 'true'
   	];
 
   	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(401);
@@ -39,7 +39,7 @@ class PhotoTest extends TestCase {
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-  		'is_logo' => true
+  		'is_logo' => 'true'
   	];
 
   	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes, $header)->assertStatus(403);
@@ -53,7 +53,7 @@ class PhotoTest extends TestCase {
 
   	$attributes = [
   		'photo' => 'not a photo',
-  		'is_logo' => true
+  		'is_logo' => 'true'
   	];
 
   	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
@@ -69,7 +69,7 @@ class PhotoTest extends TestCase {
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.gif', 1000, 720),
-  		'is_logo' => true
+  		'is_logo' => 'true'
   	];
 
   	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
@@ -93,48 +93,48 @@ class PhotoTest extends TestCase {
   	$this->assertEquals('The is logo field is required.', ($response->getData())->errors->is_logo[0]);
   }
 
-  public function test_a_profile_cannot_store_a_photo_if_is_logo_attribute_is_not_boolean() {
+  public function test_a_profile_cannot_store_a_photo_if_is_logo_attribute_is_not_string() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
   	$header = $this->businessHeaders($profile->business);
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-  		'is_logo' => 'not boolean'
+  		'is_logo' => true
   	];
 
   	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
 
   	$this->assertEquals('The given data was invalid.', ($response->getData())->message);
-  	$this->assertEquals('The is logo field must be true or false.', ($response->getData())->errors->is_logo[0]);
+  	$this->assertEquals('The is logo must be a string.', ($response->getData())->errors->is_logo[0]);
   }
 
-  public function test_logo_must_be_larger_than_400_x_400() {
+  public function test_logo_must_be_larger_than_150_x_150() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
     $header = $this->businessHeaders($profile->business);
 
     $attributes = [
-      'photo' => $file = UploadedFile::fake()->image('logo.jpg', 200, 200),
-      'is_logo' => true
+      'photo' => $file = UploadedFile::fake()->image('logo.jpg', 100, 100),
+      'is_logo' => 'true'
     ];
 
     $response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
-    $this->assertEquals('Logo must be larger than 400x400 pixels.', ($response->getData())->errors->photo[0]);
+    $this->assertEquals('Logo must be larger than 150x150 pixels.', ($response->getData())->errors->photo[0]);
   }
 
-  public function test_banner_must_be_larger_than_1000_x_720() {
+  public function test_banner_must_be_larger_than_320_x_100() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
     $header = $this->businessHeaders($profile->business);
 
     $attributes = [
-      'photo' => $file = UploadedFile::fake()->image('banner.jpg', 600, 450),
-      'is_logo' => false
+      'photo' => $file = UploadedFile::fake()->image('banner.jpg', 300, 90),
+      'is_logo' => 'false'
     ];
 
     $response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
-    $this->assertEquals('Banner must be larger than 1000x720 pixels.', ($response->getData())->errors->photo[0]);
+    $this->assertEquals('Banner must be larger than 320x100 pixels.', ($response->getData())->errors->photo[0]);
   }
 
   public function test_an_authorized_profile_can_store_a_logo() {
@@ -144,7 +144,7 @@ class PhotoTest extends TestCase {
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-  		'is_logo' => true
+  		'is_logo' => 'true'
   	];
 
   	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -164,8 +164,8 @@ class PhotoTest extends TestCase {
   	$header = $this->businessHeaders($profile->business);
 
   	$attributes = [
-  		'photo' => $file = UploadedFile::fake()->image('banner.jpg', 1000, 720),
-  		'is_logo' => false
+  		'photo' => $file = UploadedFile::fake()->image('banner.jpg', 320, 100),
+  		'is_logo' => 'false'
   	];
 
   	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -187,7 +187,7 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-      'is_logo' => true
+      'is_logo' => 'true'
     ];
 
     $responseOld = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -201,7 +201,7 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileNew = UploadedFile::fake()->image('new_logo.jpg', 1000, 720),
-      'is_logo' => true
+      'is_logo' => 'true'
     ];
 
     $responseNew = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -224,7 +224,7 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('banner.jpg', 1000, 720),
-      'is_logo' => false
+      'is_logo' => 'false'
     ];
 
     $responseOld = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -238,7 +238,7 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileNew = UploadedFile::fake()->image('new_banner.jpg', 1000, 720),
-      'is_logo' => false
+      'is_logo' => 'false'
     ];
 
     $responseNew = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -261,14 +261,14 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('banner.jpg', 1000, 720),
-      'is_logo' => false
+      'is_logo' => 'false'
     ];
 
     $responseBanner = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-      'is_logo' => true
+      'is_logo' => 'true'
     ];
 
     $responseLogo = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -291,14 +291,14 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('banner.jpg', 1000, 720),
-      'is_logo' => false
+      'is_logo' => 'false'
     ];
 
     $responseBanner = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-      'is_logo' => true
+      'is_logo' => 'true'
     ];
 
     $responseLogo = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
@@ -307,7 +307,7 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('new_logo.jpg', 1000, 720),
-      'is_logo' => true
+      'is_logo' => 'true'
     ];
 
     $newResponseLogo = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();    

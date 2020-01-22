@@ -23,7 +23,7 @@ class PayFacOwnerResource extends JsonResource
         'zip' => $this->zip,
       ],
       'dob' => $this->dob->format('m/d/Y'),
-      'ssn' => str_repeat('X', strlen($this->ssn) - 6) . substr($this->ssn, -4),
+      'ssn' => str_repeat('X', strlen($this->ssn) - 4) . substr($this->ssn, -4),
       'last_name' => $this->last_name,
       'first_name' => $this->first_name,
       'title' => $this->title,

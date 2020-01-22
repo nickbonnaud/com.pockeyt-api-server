@@ -14,7 +14,9 @@ class PayFacOwnerObserver {
 
 	public function created(PayFacOwner $payFacOwner) {
 		if ($payFacOwner->payFacAccount->payFacOwners()->where('primary', true)->exists()) {
-			$payFacOwner->payFacAccount->account->setStatus(104);
+			if ($payFacOwner->payFacAccount->account->status->code == 103) {
+				$payFacOwner->payFacAccount->account->setStatus(104);
+			}
 		}
 	}
 

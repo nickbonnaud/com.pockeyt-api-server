@@ -80,7 +80,13 @@ class PayFacOwnerTest extends TestCase {
 	}
 
 	public function test_payfac_owners_with_a_primary_sets_status_to_104() {
-		$owner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => true]);
-		$this->assertEquals(104, $owner->payFacAccount->account->status->code);
+		$statusId = \App\Models\Business\AccountStatus::where('code', 103)->first()->id;
+		$account = factory(\App\Models\Business\Business::class)->create()->account;
+		$account->account_status_id = $statusId;
+		$account->save();
+		$payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
+
+		$owner = factory(\App\Models\Business\PayFacOwner::class)->create(['primary' => true, 'pay_fac_account_id' => $payFacAccount->id]);
+		$this->assertEquals(104, $owner->fresh()->payFacAccount->account->status->code);
 	}
 }

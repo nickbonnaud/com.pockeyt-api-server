@@ -15,8 +15,8 @@ class RegionSeeder extends Seeder {
   	DB::table('regions')->insert([
   		[
   			'identifier' => $faker->uuid,
-        'city' => 'Chapel Hill',
-  			'state' => 'NC',
+        'city' => 'chapel hill',
+  			'state' => 'nc',
   			'zip' => '27514',
   			'center_lat' => '35.9006208',
   			'center_lng' => '-79.0306816'

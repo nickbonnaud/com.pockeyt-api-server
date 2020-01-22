@@ -24,7 +24,6 @@ class BusinessController extends Controller
       return response()->json(['errors' => 'Permission denied.'], 403);
     }
   	$business->update($request->only('password', 'email'));
-  	$business['token'] = Business::refreshToken();
   	return new BusinessResource($business);
   }
 }

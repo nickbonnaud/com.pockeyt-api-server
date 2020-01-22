@@ -35,12 +35,11 @@ class ProfileTest extends TestCase {
 
     $attributes = [
       'name' => $name,
-      'website' => 'www.pockeyt.com',
+      'website' => $website,
       'description' => $this->faker->paragraph($nbSentences = 3, $variableNbSentences = true),
     ];
 
     $response = $this->json('POST', '/api/business/profile', $attributes, $header)->getData();
-    dd($response);
     $this->assertEquals($name, ($response->data->name));
     $this->assertEquals($website, ($response->data->website));
     $this->assertDatabaseHas('profiles', ['business_id' => $business->id]);
