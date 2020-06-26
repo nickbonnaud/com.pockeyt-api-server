@@ -55,7 +55,7 @@ class PayFacOwnerTest extends TestCase {
 		$ssn = $this->faker->ssn;
 		$owner = factory(\App\Models\Business\PayFacOwner::class)->create(['ssn' => $ssn]);
 		$this->assertEquals($ssn, $owner->ssn);
-		$this->assertNotEquals($ssn, $owner->getOriginal('ssn'));
+		$this->assertNotEquals($ssn, $owner->getRawOriginal('ssn'));
 	}
 
 	public function test_owner_percent_ownership_is_auto_multiplied_by_hundred() {
@@ -71,7 +71,7 @@ class PayFacOwnerTest extends TestCase {
 		$percentOwn = 85;
 		$owner = factory(\App\Models\Business\PayFacOwner::class)->create(['percent_ownership' => $percentOwn]);
 		$this->assertEquals($percentOwn, $owner->percent_ownership);
-		$this->assertNotEquals($percentOwn, $owner->getOriginal('percent_ownership'));
+		$this->assertNotEquals($percentOwn, $owner->getRawOriginal('percent_ownership'));
 	}
 
 	public function test_payfac_owners_must_have_a_primary_to_set_status_to_104() {

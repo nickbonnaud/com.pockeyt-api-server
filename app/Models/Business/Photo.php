@@ -59,8 +59,8 @@ class Photo extends Model {
 	}
 
 	public function createPhotos($file, $isLogo) {
-		$largeUrlDimensions = $isLogo ? [400, 400] : [1000, 720];
-		$smalllUrlDimensions = $isLogo ? [200, 200] : [500, 360];
+		$largeUrlDimensions = $isLogo ? [400, 400] : [1000, 650];
+		$smalllUrlDimensions = $isLogo ? [200, 200] : [500, 325];
 		$fileName = $this->createFileName($file, $isLogo);
 
 		$urlPathName = 'lg-' . $fileName;

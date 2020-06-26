@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Customer\ProfileResource;
 
 class ProfileResource extends JsonResource
 {
@@ -14,6 +15,8 @@ class ProfileResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $profile = parent::toArray($request);
+        $profile['photos'] = new ProfilePhotoResource($this->photo);
+        return $profile;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models\Customer;
 
 use Carbon\Carbon;
+use App\Models\Customer\CustomerStatus;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\Customer\ResetPassword;
@@ -18,7 +19,7 @@ class Customer extends Authenticatable implements JWTSubject {
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
 	protected $fillable = ['email', 'password'];
-	protected $hidden = ['password', 'remember_token', 'email_verified_at', 'id'];
+	protected $hidden = ['password', 'remember_token', 'email_verified_at', 'id', 'customer_status_id'];
 	protected $casts = ['email_verified_at' => 'datetime'];
 	protected $uuidFieldName = 'identifier';
 
@@ -28,7 +29,15 @@ class Customer extends Authenticatable implements JWTSubject {
 		return 'identifier';
 	}
 
+	public function routeNotificationForOneSignal() {
+    return ['include_external_user_ids' => [$this->identifier]];
+	}
+
 	//////////////////// Relationships ////////////////////
+
+	public function status() {
+		return $this->belongsTo('App\Models\Customer\CustomerStatus', 'customer_status_id');
+	}
 
 	public function profile() {
 		return $this->hasOne('App\Models\Customer\CustomerProfile');
@@ -119,6 +128,11 @@ class Customer extends Authenticatable implements JWTSubject {
 
 	public static function getAuthCustomer() {
 		return auth('customer')->user();
+	}
+
+	public function setStatus($code) {
+		$this->customer_status_id = CustomerStatus::where('code', $code)->first()->id;
+		$this->save();
 	}
 
 	//////////////////// Formatting Methods ////////////////////

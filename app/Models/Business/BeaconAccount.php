@@ -21,11 +21,13 @@ class BeaconAccount extends Model {
 	//////////////////// Core Methods ////////////////////
 
 	public static function createAccount($location, $identifier) {
+		$major = self::latest()->first();
+		$major = $major == null ? 0 : $major->id + 1;
 		self::create([
 			'location_id' => $location->id,
 			'identifier' => $identifier,
-			'major' => $location->business->identifier,
-			'minor' => null
+			'major' => $major,
+			'minor' => $major + 1
 		]);
 	}
 }

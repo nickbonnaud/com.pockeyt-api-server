@@ -5,13 +5,6 @@ use App\Models\Customer;
 use App\Models\Business;
 use Faker\Generator as Faker;
 
-$factory->define(Transaction\TransactionStatus::class, function (Faker $faker) {
-	return [
-		'name' => 'open',
-		'code' => 0
-	];
-});
-
 $factory->define(Transaction\Transaction::class, function (Faker $faker) {
 	$netSales = $faker->numberBetween($min = 500, $max = 10000);
 	$tax = round(0.075 * $netSales);
@@ -24,7 +17,7 @@ $factory->define(Transaction\Transaction::class, function (Faker $faker) {
 		'business_id' => function() {
 			return factory(Business\PosAccount::class)->create()->business_id;
 		},
-		'status_id' => Transaction\TransactionStatus::first()->id,
+		'status_id' => Transaction\TransactionStatus::where('code', 100)->first()->id,
 		'pos_transaction_id' => 'vcbdsigy72r2oibfw9ibf',
 		'tax' => $tax,
 		'tip' => $tip,
@@ -46,20 +39,18 @@ $factory->define(Transaction\PurchasedItem::class, function (Faker $faker) {
 });
 
 $factory->define(Transaction\UnassignedTransaction::class, function (Faker $faker) {
-	$business = factory(Business\Business::class)->create();
-	$account = $business->account;
-	$payFacAccount = factory(Business\PayFacAccount::class)->create(['account_id' => $account->id]);
-	factory(Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-	$posAccount = factory(Business\PosAccount::class)->create(['business_id' => $business->id]);
-	factory(Business\SquareAccount::class)->create(['pos_account_id' => $posAccount->id]);
-	factory(Business\CloverAccount::class)->create(['pos_account_id' => $posAccount->id]);
+	$netSales = $faker->numberBetween($min = 500, $max = 10000);
+	$tax = round(0.075 * $netSales);
 
 	return [
-		'business_id' => $business->id,
+		'business_id' => function() {
+			return factory(Business\PosAccount::class)->create()->business_id;
+		},
+		'status_id' => Transaction\TransactionStatus::first()->id,
 		'pos_transaction_id' => 'vcbdsigy72r2oibfw9ibf',
-		'tax' => 35,
-		'net_sales' => 2000,
-		'total' => 2035,
+		'tax' => $tax,
+		'net_sales' => $netSales,
+		'total' => $netSales + $tax,
 	];
 });
 
@@ -82,6 +73,18 @@ $factory->define(Transaction\TransactionNotification::class, function (Faker $fa
 		'last' => 'auto_pay_sent',
 		'auto_pay_sent' => true,
 		'time_auto_pay_sent' => now()
+	];
+});
+
+$factory->define(Transaction\TransactionIssue::class, function (Faker $faker) {
+	return [
+		'transaction_id' => function() {
+			return factory(Transaction\Transaction::class)->create()->id;
+		},
+		'type' => 'wrong_bill',
+		'issue' => $faker->sentence,
+		'resolved' => false,
+		'prior_status_code' => 100
 	];
 });
 

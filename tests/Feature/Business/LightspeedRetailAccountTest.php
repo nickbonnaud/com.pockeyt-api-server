@@ -88,7 +88,6 @@ class LightspeedRetailAccountTest extends TestCase {
 
   public function test_a_lightspeed_retail_pos_can_assign_a_customer_to_a_sale() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'lightspeed_retail']);
@@ -106,7 +105,6 @@ class LightspeedRetailAccountTest extends TestCase {
 
   public function test_a_lightspeed_pos_transaction_has_correct_tax_sub_and_total() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'lightspeed_retail']);
@@ -129,7 +127,6 @@ class LightspeedRetailAccountTest extends TestCase {
 
   public function test_a_lightspeed_pos_transaction_stores_purchased_items() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'lightspeed_retail']);
@@ -163,7 +160,7 @@ class LightspeedRetailAccountTest extends TestCase {
     $response = $this->json('POST', '/api/business/pos/lsr/transaction', $body, $headers);
 
     $transaction = Transaction::first();
-    $status = \App\Models\Transaction\TransactionStatus::where(['name' => 'paid'])->first();
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $transaction->update(['status_id' => $status->id]);
     $this->assertDatabaseHas('employees', ['external_id' => $externalEmployeeId]);
   }
@@ -187,14 +184,13 @@ class LightspeedRetailAccountTest extends TestCase {
     $response = $this->json('POST', '/api/business/pos/lsr/transaction', $body, $headers);
 
     $transaction = Transaction::first();
-    $status = \App\Models\Transaction\TransactionStatus::where(['name' => 'paid'])->first();
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $transaction->update(['status_id' => $status->id]);
     $this->assertEquals(1, \App\Models\Business\Employee::count());
   }
 
   public function test_a_lightspeed_access_token_is_refreshed_automatically_if_expired() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'lightspeed_retail']);
@@ -208,7 +204,7 @@ class LightspeedRetailAccountTest extends TestCase {
   public function test_a_lightspeed_sale_can_be_refunded() {
     Notification::fake();
     factory(\App\Models\Refund\RefundStatus::class)->create(['name' => 'refund_pending']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'lightspeed_retail']);
     $lightspeedAccount = factory(\App\Models\Business\LightspeedRetailAccount::class)->create(['refresh_token' => 'refund', 'pos_account_id' => $posAccount->id]);
@@ -230,7 +226,7 @@ class LightspeedRetailAccountTest extends TestCase {
 
   public function test_a_lightspeed_retail_account_can_delete_transaction_if_not_paid_already() {
     Notification::fake();
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'closed')->first();
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'lightspeed_retail']);
     $lightspeedAccount = factory(\App\Models\Business\LightspeedRetailAccount::class)->create(['refresh_token' => 'refund', 'pos_account_id' => $posAccount->id]);

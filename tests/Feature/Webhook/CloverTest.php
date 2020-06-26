@@ -145,7 +145,6 @@ class CloverTest extends TestCase {
     $headers = $this->cloverWebhookHeader();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'clover']);
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'pos_account_id' => $posAccount->id]);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
 
@@ -175,7 +174,6 @@ class CloverTest extends TestCase {
     $headers = $this->cloverWebhookHeader();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'clover']);
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'pos_account_id' => $posAccount->id]);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
 
@@ -206,7 +204,6 @@ class CloverTest extends TestCase {
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'clover']);
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'pos_account_id' => $posAccount->id]);
 
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
 
@@ -239,7 +236,6 @@ class CloverTest extends TestCase {
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'clover']);
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'pos_account_id' => $posAccount->id]);
 
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\CustomerProfile::class)->create(['customer_id' => $customer->id]);
 
@@ -392,7 +388,6 @@ class CloverTest extends TestCase {
   /////////////////////////////////// assigned ////////////////////////////////////
 
   public function test_a_clover_webhook_update_deletes_transaction_if_paid_full_not_tender() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadInitialNotTender();
     $headers = $this->cloverWebhookHeader();
@@ -417,7 +412,6 @@ class CloverTest extends TestCase {
   }
 
   public function test_a_clover_webhook_update_partial_updates_partial_paid_amount() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadInitialNotTender();
     $headers = $this->cloverWebhookHeader();
@@ -442,7 +436,6 @@ class CloverTest extends TestCase {
   }
 
   public function test_a_clover_webhook_update_partial_full_not_tender_deletes_transaction() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadPartial();
     $headers = $this->cloverWebhookHeader();
@@ -471,7 +464,6 @@ class CloverTest extends TestCase {
   }
 
   public function test_a_clover_webhook_update_does_not_change_transaction_if_relevant_fields_not_changed() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadToStore();
     $headers = $this->cloverWebhookHeader();
@@ -496,7 +488,6 @@ class CloverTest extends TestCase {
   }
 
   public function test_clover_update_paid_full_with_tender_does_not_delete_transaction() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadInitialNotTender();
     $headers = $this->cloverWebhookHeader();
@@ -522,7 +513,6 @@ class CloverTest extends TestCase {
   }
 
   public function test_a_clover_webhook_update_partial_full_tender_not_deletes_transaction() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadPartial();
     $headers = $this->cloverWebhookHeader();
@@ -552,8 +542,6 @@ class CloverTest extends TestCase {
   }
   
   public function test_a_clover_webhook_delete_removes_transaction() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadInitialNotTender();
     $headers = $this->cloverWebhookHeader();
@@ -578,8 +566,7 @@ class CloverTest extends TestCase {
   }
 
   public function test_a_clover_webhook_delete_not_remove_transaction_if_status_paid() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
-    $paidStatus = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $paidStatus = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadInitialNotTender();
     $headers = $this->cloverWebhookHeader();
@@ -609,7 +596,7 @@ class CloverTest extends TestCase {
 
   public function test_a_clover_webhook_refund_full_creates_refund() {
     factory(\App\Models\Refund\RefundStatus::class)->create(['name' => 'refund_pending']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'clover']);
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'tender_id' => 'fake_tender_id', 'pos_account_id' => $posAccount->id]);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
@@ -632,7 +619,7 @@ class CloverTest extends TestCase {
 
   public function test_a_clover_webhook_refund_partial_creates_refund() {
     factory(\App\Models\Refund\RefundStatus::class)->create(['name' => 'refund_pending']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'clover']);
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => 'XYZVJT2ZRRRSC', 'tender_id' => 'fake_tender_id', 'pos_account_id' => $posAccount->id]);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
@@ -654,7 +641,6 @@ class CloverTest extends TestCase {
   }
 
   public function test_a_clover_account_transaction_with_an_employee_creates_employee_if_not_stored() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadInitialNotTender();
     $headers = $this->cloverWebhookHeader();
@@ -674,13 +660,12 @@ class CloverTest extends TestCase {
     $this->assertDatabaseMissing('employees', ['external_id' => $externalEmployeeId]);
     $this->json('POST', $url, $attributes, $headers);
     $transaction = \App\Models\Transaction\Transaction::first();
-    $status = \App\Models\Transaction\TransactionStatus::where(['name' => 'paid'])->first();
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $transaction->update(['status_id' => $status->id]);
     $this->assertDatabaseHas('employees', ['external_id' => $externalEmployeeId]);
   }
 
   public function test_a_clover_account_transaction_with_an_employee_does_not_create_employee_if_stored() {
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'open']);
     $url = "/api/webhook/clover";
     $attributes = $this->createPayLoadInitialNotTender();
     $headers = $this->cloverWebhookHeader();
@@ -700,7 +685,7 @@ class CloverTest extends TestCase {
     factory(\App\Models\Business\Employee::class)->create(['external_id' => $externalEmployeeId, 'business_id' => $posAccount->business_id]);
     $this->json('POST', $url, $attributes, $headers);
     $transaction = \App\Models\Transaction\Transaction::first();
-    $status = \App\Models\Transaction\TransactionStatus::where(['name' => 'paid'])->first();
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $this->assertEquals(1, \App\Models\Business\Employee::count());
     $transaction->update(['status_id' => $status->id]);
     $this->assertEquals(1, \App\Models\Business\Employee::count());

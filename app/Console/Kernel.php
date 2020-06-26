@@ -2,41 +2,58 @@
 
 namespace App\Console;
 
+use App\Tasks\SendWarning;
+use App\Tasks\SendAutoPayFix;
+use App\Tasks\SendAutoPay;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-class Kernel extends ConsoleKernel
-{
-    /**
-     * The Artisan commands provided by your application.
-     *
-     * @var array
-     */
-    protected $commands = [
-        //
-    ];
+class Kernel extends ConsoleKernel {
+  /**
+   * The Artisan commands provided by your application.
+   *
+   * @var array
+   */
+  protected $commands = [
+      //
+  ];
 
-    /**
-     * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
-     */
-    protected function schedule(Schedule $schedule)
-    {
-        // $schedule->command('inspire')
-        //          ->hourly();
-    }
+  /**
+   * Define the application's command schedule.
+   *
+   * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+   * @return void
+   */
+  protected function schedule(Schedule $schedule) {
+    $schedule->command('notifications:send_closed')
+      ->everyFiveMinutes()
+      ->withoutOverlapping(5)
+      ->runInBackground();
 
-    /**
-     * Register the commands for the application.
-     *
-     * @return void
-     */
-    protected function commands()
-    {
-        $this->load(__DIR__.'/Commands');
+    $schedule->command('notifications:send_auto')
+      ->everyFiveMinutes()
+      ->withoutOverlapping(5)
+      ->runInBackground();
 
-        require base_path('routes/console.php');
-    }
+    $schedule->command('notifications:send_auto_issue')
+      ->everyTenMinutes()
+      ->withoutOverlapping(10)
+      ->runInBackground();
+
+    $schedule->command('notifications:send_fix')
+      ->everyTenMinutes()
+      ->withoutOverlapping(10)
+      ->runInBackground();
+  }
+
+  /**
+   * Register the commands for the application.
+   *
+   * @return void
+   */
+  protected function commands() {
+    $this->load(__DIR__.'/Commands');
+
+    require base_path('routes/console.php');
+  }
 }

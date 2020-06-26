@@ -40,12 +40,18 @@ use App\Observers\Business\VendAccountObserver;
 
 
 use App\Models\Customer\Customer;
+use App\Models\Customer\CustomerAccount;
 use App\Models\Customer\AchCustomer;
 use App\Models\Customer\CardCustomer;
+use App\Models\Customer\CustomerProfile;
+use App\Models\Customer\CustomerProfilePhoto;
 
 use App\Observers\Customer\CustomerObserver;
+use App\Observers\Customer\CustomerAccountObserver;
 use App\Observers\Customer\AchCustomerObserver;
 use App\Observers\Customer\CardCustomerObserver;
+use App\Observers\Customer\CustomerProfileObserver;
+use App\Observers\Customer\CustomerProfilePhotoObserver;
 
 
 use App\Models\Transaction\UnassignedTransaction;
@@ -93,11 +99,14 @@ class AppServiceProvider extends ServiceProvider
         LightspeedRetailAccount::observe(LightspeedRetailAccountObserver::class);
         ShopifyAccount::observe(ShopifyAccountObserver::class);
         VendAccount::observe(VendAccountObserver::class);
+        ActiveItem::observe(ActiveItemObserver::class);
 
         Customer::observe(CustomerObserver::class);
+        CustomerAccount::observe(CustomerAccountObserver::class);
         AchCustomer::observe(AchCustomerObserver::class);
         CardCustomer::observe(CardCustomerObserver::class);
-        ActiveItem::observe(ActiveItemObserver::class);
+        CustomerProfile::observe(CustomerProfileObserver::class);
+        CustomerProfilePhoto::observe(CustomerProfilePhotoObserver::class);
 
         UnassignedTransaction::observe(UnassignedTransactionObserver::class);
         Transaction::observe(TransactionObserver::class);

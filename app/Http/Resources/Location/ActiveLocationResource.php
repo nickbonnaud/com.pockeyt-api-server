@@ -16,6 +16,7 @@ class ActiveLocationResource extends JsonResource
     {
       return [
         'active_location_id' => $this->identifier,
+        'beacon_identifier' => $this->location->beaconAccount->identifier,
         'transaction_id' => optional($this->transaction)->identifier,
         'last_notification' => optional($this->notification)->last
       ];

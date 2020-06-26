@@ -48,8 +48,8 @@ class AchOwnerTest extends TestCase {
 		factory(\App\Models\Business\AccountStatus::class)->create();
 		$ssn = $this->faker->ssn;
 		$owner = factory(\App\Models\Business\AchOwner::class)->create(['ssn' => $ssn]);
-		$this->assertEquals($ssn, $owner->ssn);
-		$this->assertNotEquals($ssn, $owner->getOriginal('ssn'));
+		$this->assertSame($ssn, $owner->ssn);
+		$this->assertNotEquals($ssn, $owner->getRawOriginal('ssn'));
 	}
 
 }

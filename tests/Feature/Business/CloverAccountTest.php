@@ -81,7 +81,7 @@ class CloverAccountTest extends TestCase {
 	}
 
   public function test_a_paid_transaction_closes_order_in_clover() {
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $transaction = factory(\App\Models\Transaction\Transaction::class)->create([
       'pos_transaction_id' => 'close_full_bill',
     ]);
@@ -110,7 +110,7 @@ class CloverAccountTest extends TestCase {
     ];
 
     $response = $this->json('PATCH', '/api/business/pos/clover/transaction', $body, $header)->getData();
-    $this->assertDatabaseHas('transactions', ['pos_transaction_id' => '67890', 'customer_id' => $customer->id, 'locked' => true]);
+    $this->assertDatabaseHas('transactions', ['pos_transaction_id' => '67890', 'customer_id' => $customer->id, 'locked' => false]);
     $this->assertEquals(1, UnassignedTransaction::count());
   }
 

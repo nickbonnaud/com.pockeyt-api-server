@@ -6,6 +6,7 @@ use App\Models\Customer\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Customer\CustomerProfile;
 use App\Http\Resources\Customer\ProfileResource;
+use App\Http\Resources\Customer\CustomerResource;
 use App\Http\Requests\Customer\StoreProfileRequest;
 
 class ProfileController extends Controller {
@@ -21,8 +22,8 @@ class ProfileController extends Controller {
 
   public function store(StoreProfileRequest $request) {
   	$customer = Customer::getAuthCustomer();
-  	$profile = $customer->storeProfile(new CustomerProfile($request->validated()));
-  	return new ProfileResource($profile);
+  	$customer->storeProfile(new CustomerProfile($request->validated()));
+  	return new CustomerResource($customer->fresh());
   }
 
   public function update(CustomerProfile $customerProfile, StoreProfileRequest $request) {

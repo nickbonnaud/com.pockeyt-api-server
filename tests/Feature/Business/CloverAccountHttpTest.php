@@ -19,8 +19,6 @@ class CloverAccountHttpTest extends TestCase {
     $merchantId = 'RR9ACXMZ6AFA1';
     $orderId = '5J8SRR9Z5PKB8';
 
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid_clover']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'clover']);
     $cloverAccount = factory(\App\Models\Business\CloverAccount::class)->create(['merchant_id' => $merchantId, 'pos_account_id' => $posAccount->id, 'access_token' => env('CLOVER_SANDBOX_TOKEN')]);
     $customerProfile = factory(\App\Models\Customer\CustomerProfile::class)->create();

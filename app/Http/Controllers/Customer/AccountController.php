@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Models\Customer\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Customer\CustomerAccount;
-use App\Http\Resources\Customer\CustomerAccountResource;
+use App\Http\Resources\Customer\CustomerResource;
 use App\Http\requests\Customer\UpdateCustomerAccountRequest;
 
 class AccountController extends Controller {
@@ -19,6 +19,6 @@ class AccountController extends Controller {
   		return response()->json(['errors' => 'Permission denied.'], 403);
   	}
   	$customerAccount->update($request->validated());
-  	return new CustomerAccountResource($customerAccount);
+  	return new CustomerResource($customerAccount->fresh()->customer);
   }
 }

@@ -12,7 +12,7 @@ class Profile extends Model {
 
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
-	protected $fillable = ['name', 'website', 'description', 'google_place_id'];
+	protected $fillable = ['name', 'website', 'description', 'google_place_id', 'phone', 'hours'];
 	protected $hidden = ['id', 'business_id'];
 	protected $uuidFieldName = 'identifier';
 
@@ -30,5 +30,17 @@ class Profile extends Model {
 
 	public function photos() {
 		return $this->hasOne('App\Models\Business\ProfilePhotos');
+	}
+
+	//////////////////// Mutator Methods ////////////////////
+
+	public function setHoursAttribute($value) {
+		$this->attributes['hours'] = json_encode($value); 
+	}
+
+	//////////////////// Accessor Methods ////////////////////
+
+	public function getHoursAttribute($value) {
+		return json_decode($value);
 	}
 }

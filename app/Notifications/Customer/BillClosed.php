@@ -2,18 +2,19 @@
 
 namespace App\Notifications\Customer;
 
-use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
 use App\Channels\PushChannel;
 use Illuminate\Notifications\Notification;
 use App\Models\Transaction\Transaction;
+use App\Models\Transaction\TransactionNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
 class BillClosed extends Notification implements ShouldQueue {
   use Queueable;
 
-  public $transaction;
-  public $business;
+  private $transaction;
 
   /**
    * Create a new notification instance.
@@ -22,7 +23,7 @@ class BillClosed extends Notification implements ShouldQueue {
    */
   public function __construct(Transaction $transaction) {
     $this->transaction = $transaction;
-    $this->business = $transaction->business;
+    $this->setTransactioNotification($transaction);
   }
 
   /**
@@ -32,7 +33,7 @@ class BillClosed extends Notification implements ShouldQueue {
    * @return array
    */
   public function via($notifiable) {
-    return [PushChannel::class];
+    return [OneSignalChannel::class];
   }
 
   /**
@@ -41,49 +42,34 @@ class BillClosed extends Notification implements ShouldQueue {
    * @param  mixed  $notifiable
    * @return array
    */
-  public function toPush($notifiable) {
-    $title = env('BUSINESS_NAME') . 'Payments';
-    $body = "Pay $" . $this->transaction->formatMoney($this->transaction->total) . " to " . Str::title($this->business->profile->name) . "?";
-    $category = "bill_closed";
-    $transactionId = $this->transaction->identifier;
-    $businessId = $this->business->identifier;
-    $logo = $this->business->profile->photos->logo->small_url;
+  public function toOneSignal($notifiable) {
+    $appName = env('BUSINESS_NAME');
+    $businessName = $this->transaction->business->profile->name;
+    return OneSignalMessage::create()
+      ->subject("You're bill from {$businessName}.")
+      ->body("You will be charged {$this->transaction->formatMoney($this->transaction->total)}.")
+      ->setData('transaction_identifier', $this->transaction->identifier)
+      ->setData('business_identifier', $this->transaction->business->identifier)
+      ->setData("type", 'bill_closed')
+      ->setParameter('ios_category', 'bill_closed');
+  }
 
-    if (strtolower($notifiable->pushToken->device) == "ios") {
-      return [
-        'notification' => [
-          'title' => $title,
-          'body' => $body,
-          'click-action' => $category,
-          'sound' => 'default'
-        ],
-        'data' => [
-          'transaction_id' => $transactionId,
-          'business_id' => $businessId,
-          'category' => $category,
-          'logo_url' => $logo,
-          'notId' => 1
-        ],
-        'priority' => 'high'
-      ];
-    } else {
-      return [
-        'data' => [
-          'customTitle' => $title,
-          'customMessage' => $body,
-          'sound' => 'default',
-          'category' => $category,
-          'force-start' => 1,
-          'content-available' => 1,
-          'no-cache' => 1,
-          'custom' => [
-            'transaction_id' => $transactionId,
-            'business_id' => $businessId,
-            'category' => $category,
-            'logo_url' => $logo,
-          ]
-        ]
-      ];
-    }
+  /**
+   * Get the array representation of the notification.
+   *
+   * @param  mixed  $notifiable
+   * @return array
+   */
+  public function toArray($notifiable) {
+    return [
+      'type' => 'bill_closed',
+      'customer_id' => $notifiable->id,
+      'business_id' => $this->transaction->business->id,
+      'transaction_id' => $this->transaction->id
+    ];
+  }
+
+  private function setTransactioNotification(Transaction $transaction) {
+    TransactionNotification::storeNewNotification($transaction->identifier, 'bill_closed');
   }
 }

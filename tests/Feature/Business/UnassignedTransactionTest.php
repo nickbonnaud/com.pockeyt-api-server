@@ -36,7 +36,7 @@ class UnassignedTransactionTest extends TestCase {
 
     $storedTrans = \App\Models\Transaction\UnassignedTransaction::orderBy('created_at', 'desc')->get();
     foreach ($storedTrans as $key => $tran) {
-      $this->assertEquals($tran->created_at->toDateTimeString(), $response->data[$key]->transaction->created_at);
+      $this->assertSame($tran->created_at->toJson(), $response->data[$key]->transaction->created_at);
     }
   }
 
@@ -62,7 +62,7 @@ class UnassignedTransactionTest extends TestCase {
     $unassignedBiz = factory(\App\Models\Transaction\UnassignedTransaction::class)->create(['created_at' => Carbon::now()->subDays(rand(9,15))]);
     $numTrans = 9;
     $unassigned = factory(\App\Models\Transaction\UnassignedTransaction::class, $numTrans)
-      ->create(['business_id' => $unassignedBiz->business_id, 'created_at' => Carbon::now()->subDays(rand(9,15))]);
+      ->create(['business_id' => $unassignedBiz->business_id, 'created_at' => Carbon::now()->subDays(rand(10,14))]);
     $unassigned = $unassigned->push($unassignedBiz);
 
     factory(\App\Models\Transaction\UnassignedTransaction::class, 3)

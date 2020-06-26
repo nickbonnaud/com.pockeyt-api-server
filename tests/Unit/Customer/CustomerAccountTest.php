@@ -14,6 +14,11 @@ class CustomerAccountTest extends TestCase {
     $this->seed();
   }
 
+	public function test_creating_customer_creates_customer_account() {
+		$customer = factory(\App\Models\Customer\Customer::class)->create();
+		$this->assertInstanceOf('App\Models\Customer\CustomerAccount', $customer->account);
+	}
+
 	public function test_a_customer_account_creates_an_identifier() {
 		$account = factory(\App\Models\Customer\CustomerAccount::class)->create();
 		$this->assertNotNull($account->identifier);

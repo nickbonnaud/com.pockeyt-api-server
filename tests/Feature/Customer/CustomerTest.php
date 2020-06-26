@@ -23,14 +23,13 @@ class CustomerTest extends TestCase {
   }
 
   public function test_an_authenticated_customer_can_retrieve_their_own_data() {
+    // $photo = factory(\App\Models\Customer\CustomerProfilePhoto::class)->create();
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $headers = $this->customerHeaders($customer);
 
-    $response = $this->json('GET', '/api/customer/me', $headers)->assertStatus(201);
-    $response = $response->getData();
-
+    $response = $this->json('GET', '/api/customer/me', $headers)->getData();
     $this->assertNotNull($response->data->token);
-    $this->assertNotEquals($headers['Authorization'], $response->data->token->value);
+    $this->assertNotEquals($headers['Authorization'], $response->data->token);
   }
 
   public function test_an_unauthorized_customer_cannot_update_their_data() {

@@ -35,4 +35,37 @@ class ProfileTest extends TestCase {
     $profile = factory(\App\Models\Business\Profile::class)->create();
     $this->assertEquals(101, $profile->business->account->fresh()->status->code);
   }
+
+  public function test_business_hours_are_automatically_json_encoded_on_save() {
+    $rawHours = [
+      'monday' => "Monday: 11:00 AM – 10:00 PM",
+      'tuesday' => "Tuesday: 11:00 AM – 10:00 PM",
+      'wednesday' => "Wednesday: 11:00 AM – 10:00 PM",
+      'thursday' => "Thursday: 11:00 AM – 10:00 PM",
+      'friday' => "Friday: 11:00 AM – 10:30 PM",
+      'saturday' => "Saturday: 11:00 AM – 10:30 PM",
+      'sunday' => "Sunday: 10:30 AM – 9:00 PM",
+    ];
+    $profile = factory(\App\Models\Business\Profile::class)->create([
+      'hours' => $rawHours
+    ]);
+    $this->assertDatabaseHas('profiles', ['hours' => json_encode($rawHours)]);
+  }
+
+  public function test_business_hours_are_auto_json_decoded_on_retrieve() {
+    $rawHours = [
+      'monday' => "Monday: 11:00 AM – 10:00 PM",
+      'tuesday' => "Tuesday: 11:00 AM – 10:00 PM",
+      'wednesday' => "Wednesday: 11:00 AM – 10:00 PM",
+      'thursday' => "Thursday: 11:00 AM – 10:00 PM",
+      'friday' => "Friday: 11:00 AM – 10:30 PM",
+      'saturday' => "Saturday: 11:00 AM – 10:30 PM",
+      'sunday' => "Sunday: 10:30 AM – 9:00 PM",
+    ];
+    $profile = factory(\App\Models\Business\Profile::class)->create([
+      'hours' => $rawHours
+    ]);
+    $this->assertSame('object', gettype($profile->hours));
+    $this->assertSame('string', gettype($profile->getRawOriginal('hours')));
+  }
 }

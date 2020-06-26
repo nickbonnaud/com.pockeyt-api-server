@@ -24,8 +24,9 @@ class UpdateCustomerAccountRequest extends FormRequest
     public function rules()
     {
         return [
-            'tip_rate' => 'integer|min:0|max:50|required_without:primary',
-            'primary' => 'string|in:ach,card|required_without:tip_rate'
+            'tip_rate' => 'integer|min:0|max:30',
+            'quick_tip_rate' => 'integer|min:0|max:30',
+            'primary' => 'string|in:ach,card'
         ];
     }
 }

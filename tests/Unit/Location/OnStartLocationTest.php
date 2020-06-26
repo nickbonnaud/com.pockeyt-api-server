@@ -49,22 +49,4 @@ class OnStartLocationTest extends TestCase {
   	$onStartLocation = factory(\App\Models\Location\OnStartLocation::class)->create(['region_id' => $region->id]);
   	$this->assertInstanceOf('App\Models\Location\Region', $onStartLocation->region);
   }
-
-  public function test_an_on_start_location_belongs_to_a_location() {
-  	$location = factory(\App\Models\Business\Location::class)->create();
-  	$onStartLocation = factory(\App\Models\Location\OnStartLocation::class)->create(['location_id' => $location->id]);
-  	$this->assertInstanceOf('App\Models\Location\OnStartLocation', $location->onStartLocations->first());
-  }
-
-  public function test_a_location_has_many_on_start_locations() {
-  	$location = factory(\App\Models\Business\Location::class)->create();
-  	$onStartLocation = factory(\App\Models\Location\OnStartLocation::class, 4)->create(['location_id' => $location->id]);
-  	$this->assertEquals(4, $location->onStartLocations->count());
-  }
-
-  public function test_an_on_start_location_has_one_location() {
-  	$location = factory(\App\Models\Business\Location::class)->create();
-  	$onStartLocation = factory(\App\Models\Location\OnStartLocation::class)->create(['location_id' => $location->id]);
-  	$this->assertInstanceOf('App\Models\Business\Location', $onStartLocation->location);
-  }
 }

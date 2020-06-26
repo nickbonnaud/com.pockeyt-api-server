@@ -26,7 +26,7 @@ class PayFacBankTest extends TestCase {
 		$payFacBank = factory(\App\Models\Business\PayFacBank::class)->create(['routing_number' => $routingNumber]);
 		$this->assertDatabaseHas('pay_fac_banks', ['state' => $payFacBank->state, 'address' => $payFacBank->address]);
 		$this->assertDatabaseMissing('pay_fac_banks', ['state' => $payFacBank->state, 'address' => $payFacBank->address, 'routing_number' => $routingNumber]);
-		$this->assertNotEquals($routingNumber, $payFacBank->getOriginal('routing_number'));
+		$this->assertNotEquals($routingNumber, $payFacBank->getRawOriginal('routing_number'));
 	}
 
 	public function test_a_pay_fac_routing_number_is_auto_decrypted() {
@@ -34,7 +34,7 @@ class PayFacBankTest extends TestCase {
 		$routingNumber = $this->faker->randomNumber($nbDigits = 9, $strict = true);
 		$payFacBank = factory(\App\Models\Business\PayFacBank::class)->create(['routing_number' => $routingNumber]);
 		$this->assertEquals($routingNumber, $payFacBank->routing_number);
-		$this->assertNotEquals($routingNumber, $payFacBank->getOriginal('routing_number'));
+		$this->assertNotEquals($routingNumber, $payFacBank->getRawOriginal('routing_number'));
 	}
 
 	public function test_a_pay_fac_bank_account_number_is_encrypted() {
@@ -43,7 +43,7 @@ class PayFacBankTest extends TestCase {
 		$payFacBank = factory(\App\Models\Business\PayFacBank::class)->create(['account_number' => $accountNumber]);
 		$this->assertDatabaseHas('pay_fac_banks', ['state' => $payFacBank->state, 'address' => $payFacBank->address]);
 		$this->assertDatabaseMissing('pay_fac_banks', ['state' => $payFacBank->state, 'address' => $payFacBank->address, 'account_number' => $accountNumber]);
-		$this->assertNotEquals($accountNumber, $payFacBank->getOriginal('account_number'));
+		$this->assertNotEquals($accountNumber, $payFacBank->getRawOriginal('account_number'));
 	}
 
 	public function test_a_pay_fac_account_number_is_auto_decrypted() {
@@ -51,7 +51,7 @@ class PayFacBankTest extends TestCase {
 		$accountNumber = $this->faker->randomNumber($nbDigits = 9, $strict = true);
 		$payFacBank = factory(\App\Models\Business\PayFacBank::class)->create(['account_number' => $accountNumber]);
 		$this->assertEquals($accountNumber, $payFacBank->account_number);
-		$this->assertNotEquals($accountNumber, $payFacBank->getOriginal('account_number'));
+		$this->assertNotEquals($accountNumber, $payFacBank->getRawOriginal('account_number'));
 	}
 
 	public function test_a_pay_fac_bank_belongs_to_a_pay_fac_account() {

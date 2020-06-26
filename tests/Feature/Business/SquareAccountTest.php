@@ -129,7 +129,6 @@ class SquareAccountTest extends TestCase {
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     return $posAccount;
   }
 }

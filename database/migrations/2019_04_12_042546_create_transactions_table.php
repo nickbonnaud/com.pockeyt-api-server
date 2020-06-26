@@ -27,7 +27,7 @@ class CreateTransactionsTable extends Migration
             $table->integer('net_sales');
             $table->integer('total');
             $table->integer('partial_payment')->default(0);
-            $table->boolean('locked')->default(true);
+            $table->boolean('locked')->default(false);
             $table->timestamp('bill_created_at');
             $table->timestamps();
 

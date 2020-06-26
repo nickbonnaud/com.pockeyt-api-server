@@ -24,7 +24,7 @@ class StorePhotoRequest extends FormRequest
     public function rules()
     {
         return [
-            'avatar' => 'required|file|mimes:jpg,jpeg,png|dimensions:min_width=500,min_height=500'
+            'avatar' => 'required|file|mimes:jpg,jpeg,png|dimensions:min_width=250,min_height=250'
         ];
     }
 }

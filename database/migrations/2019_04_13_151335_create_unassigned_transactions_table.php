@@ -15,6 +15,7 @@ class CreateUnassignedTransactionsTable extends Migration
     {
         Schema::create('unassigned_transactions', function (Blueprint $table) {
             $table->increments('id');
+            $table->uuid('identifier')->unique();
             $table->unsignedInteger('business_id');
             $table->unsignedInteger('customer_id')->nullable();
             $table->unsignedInteger('status_id')->nullable();

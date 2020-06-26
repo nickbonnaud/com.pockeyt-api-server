@@ -83,7 +83,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_with_correct_customer_creates_transaction() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $body['domain_prefix']]);
@@ -109,7 +108,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_webhook_creates_inventory_item_if_not_stored() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $body['domain_prefix']]);
@@ -131,7 +129,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_webhook_does_not_create_inventory_item_if_already_stored() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $body['domain_prefix']]);
@@ -169,7 +166,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_webhook_creates_inventory_items_not_stored() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $body['domain_prefix']]);
@@ -203,7 +199,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_webhook_stores_quantity_of_purchased_items() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $body['domain_prefix']]);
@@ -226,7 +221,8 @@ class VendTest extends TestCase {
 
   public function test_a_vend_refund_webhook_creates_refund_if_status_is_paid_full() {
     factory(\App\Models\Refund\RefundStatus::class)->create(['name' => 'refund_pending']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeFullReturnWebhook($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $body['domain_prefix']]);
@@ -256,7 +252,7 @@ class VendTest extends TestCase {
 
   public function test_a_vend_refund_webhook_creates_refund_if_status_is_paid_partial() {
     factory(\App\Models\Refund\RefundStatus::class)->create(['name' => 'refund_pending']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakePartialReturnWebhook($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $body['domain_prefix']]);
@@ -286,8 +282,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_refund_webhook_adjusts_transaction_if_status_not_paid_partial() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
 
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
@@ -344,8 +338,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_refund_webhook_deletes_transaction_if_status_not_paid_full() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
 
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeFullReturnWebhookInitial($customer->identifier);
@@ -389,7 +381,7 @@ class VendTest extends TestCase {
 
   public function test_a_vend_account_does_not_double_refund() {
     factory(\App\Models\Refund\RefundStatus::class)->create(['name' => 'refund_pending']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $bodyFirst = TestHelpers::fakeDoubleReturnFirst($customer->identifier);
     $vendAccount = factory(\App\Models\Business\VendAccount::class)->create(['domain_prefix' => $bodyFirst['domain_prefix']]);
@@ -422,7 +414,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_webhook_transaction_with_employee_creates_employee_if_employee_not_stored() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'vend']);
@@ -445,7 +436,6 @@ class VendTest extends TestCase {
 
   public function test_a_vend_webhook_transaction_with_employee_does_not_create_employee_if_already_stored() {
     Notification::fake();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $body = TestHelpers::fakeReceiveWebhookCustomer($customer->identifier);
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'vend']);

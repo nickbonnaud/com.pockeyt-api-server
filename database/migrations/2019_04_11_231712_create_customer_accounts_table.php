@@ -18,6 +18,7 @@ class CreateCustomerAccountsTable extends Migration
             $table->uuid('identifier')->unique();
             $table->unsignedInteger('customer_id');
             $table->integer('tip_rate')->default(15);
+            $table->integer('quick_tip_rate')->default(5);
             $table->string('primary')->default('ach');
             $table->timestamps();
 

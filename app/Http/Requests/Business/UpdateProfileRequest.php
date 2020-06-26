@@ -26,7 +26,9 @@ class UpdateProfileRequest extends FormRequest
     return [
       'name' => 'min:2',
       'website' => 'url',
-      'description' => 'min:25'
+      'description' => 'min:25',
+      'phone' => ['string', 'numeric', 'digits:10'],
+      'hours' => 'array'
     ];
   }
 }

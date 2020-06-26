@@ -89,7 +89,6 @@ class ShopifyTest extends TestCase {
   public function test_a_shopify_account_webhook_with_note_attributes_creates_a_transaction() {
     Notification::fake();
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
 
     $url = "/api/webhook/shopify";
     $body = ShopifyTestHelpers::fakeReceiveWebhook();
@@ -118,7 +117,6 @@ class ShopifyTest extends TestCase {
   public function test_a_shopify_account_webhook_for_a_transaction_creates_inventory_items_if_not_stored() {
     Notification::fake();
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
 
     $url = "/api/webhook/shopify";
     $body = ShopifyTestHelpers::fakeReceiveWebhook();
@@ -154,8 +152,6 @@ class ShopifyTest extends TestCase {
   public function test_a_shopify_account_webhook_for_a_transaction_does_not_create_inventory_items_if_already_stored() {
     Notification::fake();
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create();
-
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
 
     $url = "/api/webhook/shopify";
     $body = ShopifyTestHelpers::fakeReceiveWebhook();
@@ -195,7 +191,6 @@ class ShopifyTest extends TestCase {
   public function test_a_shopify_webhook_correctly_stores_quantity_of_purchased_items() {
     Notification::fake();
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create();
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
 
     $url = "/api/webhook/shopify";
     $body = ShopifyTestHelpers::fakeReceiveWebhook();
@@ -216,7 +211,7 @@ class ShopifyTest extends TestCase {
 
   public function test_a_shopify_refund_webhook_creates_a_refund_if_status_is_paid() {
     factory(\App\Models\Refund\RefundStatus::class)->create(['name' => 'refund_pending']);
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'paid')->first();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'shopify']);
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create(['pos_account_id' => $posAccount->id]);
     
@@ -253,11 +248,9 @@ class ShopifyTest extends TestCase {
 
   public function test_a_shopify_refund_webhook_adjusts_transaction_if_status_is_not_paid_refund_not_full() {
     Notification::fake();
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'bill_sent']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'notification sent')->first();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'shopify']);
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create(['pos_account_id' => $posAccount->id]);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
 
     $url = "/api/webhook/shopify";
     $bodyPayWebhook = ShopifyTestHelpers::fakeReceiveWebhook();
@@ -308,11 +301,9 @@ class ShopifyTest extends TestCase {
 
   public function test_a_shopify_refund_webhook_deletes_transaction_if_status_is_not_paid_refund_full() {
     Notification::fake();
-    $status = factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'bill_sent']);
+    $status = \App\Models\Transaction\TransactionStatus::where('name', 'notification sent')->first();
     $posAccount = factory(\App\Models\Business\PosAccount::class)->create(['type' => 'shopify']);
     $shopifyAccount = factory(\App\Models\Business\ShopifyAccount::class)->create(['pos_account_id' => $posAccount->id]);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'paid']);
 
     $url = "/api/webhook/shopify";
     $bodyPayWebhook = ShopifyTestHelpers::fakeReceiveWebhook();

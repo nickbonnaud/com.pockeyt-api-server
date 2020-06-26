@@ -12,7 +12,7 @@ class CustomerAccount extends Model {
 
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
-	protected $fillable = ['tip_rate', 'primary'];
+	protected $fillable = ['tip_rate', 'primary', 'quick_tip_rate'];
 	protected $hidden = ['id', 'customer_id', 'created_at', 'updated_at'];
 	protected $uuidFieldName = 'identifier';
 
@@ -34,5 +34,15 @@ class CustomerAccount extends Model {
 
 	public function card() {
 		return $this->hasOne('App\Models\Customer\CardCustomer');
+	}
+
+	//////////////////// Core Methods ////////////////////
+
+	public function payTransaction($transaction) {
+		if ($this->primary == 'ach') {
+			$this->ach->pay($transaction);
+		} else {
+			$this->card->pay($transaction);
+		}
 	}
 }

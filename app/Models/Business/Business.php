@@ -130,6 +130,10 @@ class Business extends Authenticatable implements JWTSubject {
 		return auth('business')->user();
 	}
 
+	public function scopeFilter($query, $filters) {
+		return $filters->apply($query);
+	}
+
 	//////////////////// Formatting Methods ////////////////////
 
 	public static function formatToken($token = null) {

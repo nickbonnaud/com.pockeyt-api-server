@@ -106,11 +106,7 @@ $factory->define(Location\OnStartLocation::class, function (Faker $faker) {
 		'region_id' => function() {
 			return factory(Location\Region::class)->create()->id;
 		},
-		'location_id' => function() {
-			return factory(Business\Location::class)->create()->id;
-		},
 		'lat' => $faker->latitude,
 		'lng' => $faker->longitude,
-		'beacon_start' => false
 	];
 });

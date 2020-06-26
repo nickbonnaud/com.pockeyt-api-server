@@ -138,7 +138,7 @@ class BusinessMessageReplyTest extends TestCase {
     $this->assertEquals($message->fresh()->updated_at->toDateTimeString(), $createdDate->toDateTimeString());
     $response = $this->json('POST', '/api/business/reply', $formData)->getData();
     $this->assertNotEquals($message->fresh()->updated_at->toDateTimeString(), $createdDate->toDateTimeString());
-    $this->assertEquals($message->fresh()->updated_at->toDateTimeString(), $response->data->created_at);
+    $this->assertEquals($message->fresh()->updated_at->toJson(), $response->data->created_at);
   }
 
   public function test_adding_a_reply_to_a_business_message_not_from_business_sets_unread_reply_to_true() {

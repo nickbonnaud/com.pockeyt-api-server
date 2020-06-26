@@ -36,4 +36,22 @@ class CardCustomerTest extends TestCase {
   	$cardCustomer = factory(\App\Models\Customer\CardCustomer::class)->create(['customer_account_id' => $account->id]);
   	$this->assertEquals('card', $account->fresh()->primary);
   }
+
+  public function test_creating_card_customer_sets_customer_status_to_correct_value() {
+    $account = factory(\App\Models\Customer\CustomerAccount::class)->create(['primary' => 'ach']);
+    $customer = $account->customer;
+    $customer->customer_status_id = \App\Models\Customer\CustomerStatus::where('code', 103)->first()->id;
+    $customer->save();
+    $cardCustomer = factory(\App\Models\Customer\CardCustomer::class)->create(['customer_account_id' => $account->id]);
+    $this->assertEquals(120, $customer->fresh()->status->code);
+  }
+
+  public function test_creating_card_customer_does_not_change_status_if_already_has_payment_source() {
+    $account = factory(\App\Models\Customer\CustomerAccount::class)->create(['primary' => 'ach']);
+    $customer = $account->customer;
+    $customer->customer_status_id = \App\Models\Customer\CustomerStatus::where('code', 200)->first()->id;
+    $customer->save();
+    $cardCustomer = factory(\App\Models\Customer\CardCustomer::class)->create(['customer_account_id' => $account->id]);
+    $this->assertEquals(200, $customer->fresh()->status->code);
+  }
 }

@@ -121,7 +121,6 @@ class ActiveLocationTest extends TestCase {
     $account = $geoAccount->location->business->account;
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacBusinessAccount = factory(\App\Models\Business\PayFacBusiness::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    factory(\App\Models\Transaction\TransactionStatus::class)->create(['name' => 'closed']);
     factory(\App\Models\Business\SquareAccount::class)->create(['pos_account_id' => $posAccount->id]);
     return $geoAccount;
   }

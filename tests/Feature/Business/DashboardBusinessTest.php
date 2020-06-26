@@ -5,6 +5,7 @@ namespace Tests\Feature\Business;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Notification;
 
 class DashboardBusinessTest extends TestCase {
 
@@ -18,6 +19,7 @@ class DashboardBusinessTest extends TestCase {
 
 
   public function test_an_unauth_business_cannot_retrieve_business_resource() {
+    Notification::fake();
     $business = \App\Models\Business\Business::first();
 
     $response = $this->json('GET', '/api/business/me')->assertStatus(401);

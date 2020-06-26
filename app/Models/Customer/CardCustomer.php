@@ -21,4 +21,8 @@ class CardCustomer extends Model {
 	public function account() {
 		return $this->belongsTo('App\Models\Customer\CustomerAccount', 'customer_account_id');
 	}
+
+	public function pay($transaction) {
+		
+	}
 }

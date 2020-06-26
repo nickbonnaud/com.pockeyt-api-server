@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Business\ActiveItem;
 use App\Models\Transaction\TransactionStatus;
 use App\Models\Transaction\PurchasedItem;
+use App\Models\Transaction\TransactionIssue;
+use App\Notifications\Customer\BillClosed;
+use App\Notifications\Customer\ExitBusiness;
 
 class Transaction extends Model {
   
@@ -20,6 +23,7 @@ class Transaction extends Model {
 	protected $guarded = ['identifier'];
 	protected $hidden = [ 'id', 'customer_id', 'business_id', 'status_id', 'payment_transaction_id', 'pos_transaction_id', 'created_at'];
 	protected $uuidFieldName = 'identifier';
+	protected $casts = ['locked' => 'boolean'];
 
 	//////////////////// Routing ////////////////////
 
@@ -65,6 +69,10 @@ class Transaction extends Model {
   	return $this->hasOne('App\Models\Location\HistoricLocation');
   }
 
+  public function issue() {
+  	return $this->hasOne('App\Models\Transaction\TransactionIssue');
+  }
+
 	//////////////////// Core Methods ////////////////////
 
 	public static function createTransaction($unassignedTransaction) {
@@ -82,8 +90,7 @@ class Transaction extends Model {
 	}
 
 	public static function createTransactionFromSquare($activeLocation, $paymentResponse, $transactionResponse, $squareAccount) {
-		
-		return self::create([
+		$transaction = self::create([
 			'customer_id' => $activeLocation->customer_id,
 			'business_id' => $activeLocation->location->business_id,
 			'pos_transaction_id' => $transactionResponse['transaction']['id'],
@@ -92,9 +99,10 @@ class Transaction extends Model {
 			'tip' => $squareAccount->posAccount->takes_tips ? $paymentResponse['tip_money']['amount'] : 0,
 			'net_sales' => $paymentResponse['net_sales_money']['amount'],
 			'total' => $paymentResponse['net_total_money']['amount'],
-			'bill_created_at' => $paymentResponse['created_at'],
-			'status_id' => (TransactionStatus::where('name', 'closed')->first())->id
+			'bill_created_at' => $paymentResponse['created_at']
 		]);
+		$transaction->updateStatus(101);
+		return $transaction;
 	}
 
 	public function storePurchasedItemsSquare($paymentResponse, $business) {
@@ -126,7 +134,7 @@ class Transaction extends Model {
 	}
 
 	public static function createTransactionFromLightspeedRetail($lightspeedSale, $customer, $business) {
-		return self::create([
+		$transaction = self::create([
 			'customer_id' => $customer->id,
 			'business_id' => $business->id,
 			'pos_transaction_id' => $lightspeedSale['saleID'],
@@ -135,8 +143,10 @@ class Transaction extends Model {
 			'net_sales' => $lightspeedSale['totalDue'] - ($lightspeedSale['calcTax1'] + $lightspeedSale['calcTax2']),
 			'total' => $lightspeedSale['totalDue'],
 			'bill_created_at' => $lightspeedSale['createTime'],
-			'status_id' => (TransactionStatus::where('name', 'closed')->first())->id
 		]);
+
+		$transaction->updateStatus(101);
+		return $transaction;
 	}
 
 	public function storePurchasedItemsLightspeedRetail($lightspeedSale, $business) {
@@ -164,7 +174,7 @@ class Transaction extends Model {
 	}
 
 	public static function createTransactionFromShopify($customer, $orderData, $businessId) {
-		return self::create([
+		$transaction = self::create([
 			'customer_id' => $customer->id,
 			'business_id' => $businessId,
 			'pos_transaction_id' => $orderData['id'],
@@ -173,8 +183,9 @@ class Transaction extends Model {
 			'tip' => $orderData['total_tip_received'] * 100,
 			'total' => $orderData['total_price'] * 100,
 			'bill_created_at' => $orderData['created_at'],
-			'status_id' => (TransactionStatus::where('name', 'closed')->first())->id
 		]);
+		$transaction->updateStatus(101);
+		return $transaction;
 	}
 
 	public function storePurchasedItemsShopify($orderData, $business) {
@@ -217,7 +228,7 @@ class Transaction extends Model {
 	}
 
 	public static function createTransactionFromVend($customer, $saleData, $businessId) {
-		return self::create([
+		$transaction = self::create([
 			'customer_id' => $customer->id,
 			'business_id' => $businessId,
 			'pos_transaction_id' => $saleData->id,
@@ -226,8 +237,10 @@ class Transaction extends Model {
 			'net_sales' => $saleData->totals->total_price * 100,
 			'total' => $saleData->totals->total_payment * 100,
 			'bill_created_at' => $saleData->created_at,
-			'status_id' => (TransactionStatus::where('name', 'closed')->first())->id
 		]);
+
+		$transaction->updateStatus(101);
+		return $transaction;
 	}
 
 	public function updateTransactionVend($saleData) {
@@ -259,6 +272,89 @@ class Transaction extends Model {
 				}
 				$i++;
 			}
+		}
+	}
+
+	public function formattedPurchashedItems() {
+		$purchasedItems = $this->purchasedItems->map(function($item, $k) {
+			return $item->getInventoryItem();
+		});
+		$uniquePurchasedItems = $purchasedItems->unique(function($item) {
+			return $item['main_id'].$item['sub_id'];
+		});
+		return $uniquePurchasedItems->map(function($item, $k) use ($purchasedItems) {
+			$item['quantity'] = $purchasedItems
+				->where('main_id', $item->main_id)
+				->where('sub_id', $item->sub_id)
+				->count();
+			return $item;
+		});
+	}
+
+	public function updateStatus($statusCode) {
+		$status = TransactionStatus::where('code', $statusCode)->first();
+		$this->status()->associate($status);
+		$this->save();
+		switch ($statusCode) {
+			case 100:
+				$this->locked ? $this->update(['locked' => false]) : null;
+				break;
+			case 101:
+				$this->update(['locked' => true]);
+				$this->customer->notify(new BillClosed($this));
+				break;
+			case 104:
+				$this->customer->account->payTransaction($this);
+				break;
+			case 105:
+				$this->customer->notify(new ExitBusiness($this));
+				break;
+			case 200:
+				$this->business->posAccount->closePosBill($this);
+				$this->closeIssues();
+				break;
+		}
+		return $this;
+	}
+
+	public function closeBill() {
+		return $this->updateStatus(101);
+	}
+
+	public function createIssue($issueData) {
+		$issueData['prior_status_code'] = $this->status->code;
+		$this->issue()->save(new TransactionIssue($issueData));
+		$this->updateErrorStatus($issueData['type']);
+		return $this;
+	}
+
+	public function updateIssue($issueData) {
+		$this->issue->update($issueData);
+		$this->updateErrorStatus($issueData['type']);
+		return $this;
+	}
+
+	public function deleteIssue() {
+		$this->updateStatus($this->issue->prior_status_code);
+		$this->issue->delete();
+		return $this->fresh();
+	}
+
+	public function closeIssue() {
+		$this->issue->update(['resolved' => true]);
+	}
+
+	public function updateErrorStatus($type) {
+		switch ($type) {
+			case 'wrong_bill':
+				$this->updateStatus(500);
+				break;
+			case 'error_in_bill':
+				$this->updateStatus(501);
+				break;
+			case 'other':
+				$this->updateStatus(503);
+				break;
 		}
 	}
 

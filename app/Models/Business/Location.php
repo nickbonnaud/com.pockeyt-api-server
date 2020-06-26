@@ -51,10 +51,6 @@ class Location extends Model {
 		return $this->hasMany('App\Models\Location\HistoricLocation');
 	}
 
-	public function onStartLocations() {
-		return $this->hasMany('App\Models\Location\OnStartLocation');
-	}
-
 	//////////////////// Core Methods ////////////////////
 
 	public static function createLocation($coords, $business) {

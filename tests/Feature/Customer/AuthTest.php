@@ -5,6 +5,7 @@ namespace Tests\Feature\Customer;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 
 class AuthTest extends TestCase {
   use WithFaker, RefreshDatabase;
@@ -25,8 +26,21 @@ class AuthTest extends TestCase {
 
     $response = $this->json('POST', '/api/customer/auth/register', $attributes)->getData();
     $this->assertDatabaseHas('customers', ['email' => $email]);
-    $this->assertNotEmpty($response->data->token->value);
+    $this->assertNotEmpty($response->data->customer->token);
     $this->assertNull($response->errors->email[0]);
+  }
+
+  public function test_creating_a_customer_sets_sets_correct_status() {
+    $email = $this->faker->email;
+    $password = $this->faker->password;
+    $attributes = [
+      'email' => $email,
+      'password' => $password,
+      'password_confirmation' => $password
+    ];
+
+    $response = $this->json('POST', '/api/customer/auth/register', $attributes)->getData();
+    $this->assertEquals(100, $response->data->customer->status->code);
   }
 
   public function test_registering_a_new_customer_requires_email_and_password() {
@@ -101,7 +115,7 @@ class AuthTest extends TestCase {
     ];
 
     $response = $this->json('POST', '/api/customer/auth/login', $attributes)->getData();
-    $this->assertNotEmpty($response->data->token->value);
+    $this->assertNotEmpty($response->data->customer->token);
     $this->assertNull($response->errors->email[0]);
   }
 
@@ -133,7 +147,7 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/customer/auth/logout', $headers)->assertStatus(200);
     $response = $response->getData();
-    $this->assertNull($response->data->token->value);
+    $this->assertNull($response->data->customer);
 
     $response = $this->json('GET', '/api/customer/auth/logout', $headers)->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
@@ -152,8 +166,8 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/customer/auth/refresh', $headers)->assertStatus(200);
     $response = $response->getData();
-    $this->assertNotNull($response->data->token->value);
-    $this->assertNotEquals($headers['Authorization'], $response->data->token->value);
+    $this->assertNotNull($response->data->customer->token);
+    $this->assertNotEquals($headers['Authorization'], $response->data->customer->token);
 
     $response = $this->json('GET', '/api/customer/auth/refresh', $headers)->assertStatus(500);
     $this->assertEquals('The token has been blacklisted', ($response->getData())->message);
@@ -164,5 +178,61 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/customer/auth/logout')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
+  }
+
+  public function test_a_customer_can_request_password_reset() {
+    Mail::fake();
+    $customer = factory(\App\Models\Customer\Customer::class)->create();
+
+    $attributes = [
+      'email' => $customer->email,
+    ];
+
+    $response = $this->json('POST', '/api/customer/auth/request-reset', $attributes)->getData();
+    $this->assertTrue($response->data->email_sent);
+  }
+
+  public function test_a_customer_must_provide_correct_email_to_reset_password() {
+    Mail::fake();
+    $customer = factory(\App\Models\Customer\Customer::class)->create();
+
+    $attributes = [
+      'email' => 'fake@gmail.com',
+    ];
+
+    $response = $this->json('POST', '/api/customer/auth/request-reset', $attributes)->getData();
+    $this->assertEquals('The selected email is invalid.', $response->errors->email[0]);
+  }
+
+  public function test_an_unauth_customer_cannot_check_password() {
+    $customer = factory(\App\Models\Customer\Customer::class)->create();
+    $attributes = [
+      'password' => 'password',
+    ];
+
+    $response = $this->json('POST', '/api/customer/auth/password-check', $attributes)->assertStatus(401);
+    $this->assertEquals('Unauthenticated.', ($response->getData())->message);
+  }
+
+  public function test_an_auth_customer_can_check_password() {
+    $password = 'p@ssw0rd!';
+    $customer = factory(\App\Models\Customer\Customer::class)->create(['password' => $password]);
+    $attributes = [
+      'password' => $password,
+    ];
+    $this->customerHeaders($customer);
+    $response = $this->json('POST', '/api/customer/auth/password-check', $attributes)->getData();
+    $this->assertTrue($response->data->password_verified);
+  }
+
+  public function test_a_customer_with_wrong_password_is_returned_false() {
+    $password = 'p@ssw0rd!';
+    $customer = factory(\App\Models\Customer\Customer::class)->create(['password' => $password]);
+    $attributes = [
+      'password' => 'not_password',
+    ];
+    $this->customerHeaders($customer);
+    $response = $this->json('POST', '/api/customer/auth/password-check', $attributes)->getData();
+    $this->assertFalse($response->data->password_verified);
   }
 }

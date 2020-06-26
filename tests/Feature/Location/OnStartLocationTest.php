@@ -16,34 +16,38 @@ class OnStartLocationTest extends TestCase {
 
   public function test_an_unauth_customer_cannot_create_on_start_location() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
-    $region = factory(\App\Models\Location\Region::class, 20)->create();
+    $lat = $this->faker->latitude;
+    $lng = $this->faker->longitude;
+    $region = factory(\App\Models\Location\Region::class)->create(['center_lat' => $lat, 'center_lng' => $lng]);
+    $locations = factory(\App\Models\Business\Location::class, 9)->create(['region_id' => $region->id]);
 
-    $attributes = [
-      'lat' => $this->faker->latitude,
-      'lng' => $this->faker->longitude,
-      'beacon_start' => false
+    $body = [
+      'lat' => $lat,
+      'lng' => $lng,
+      'start_location' => true
     ];
 
-    $response = $this->json('POST', "/api/customer/start", $attributes)->assertStatus(401);
+    $response = $this->json('POST', 'api/customer/geo-location', $body)->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
-  public function test_an_auth_cutomer_can_create_an_on_start_location_no_region_no_location() {
+  public function test_an_auth_cutomer_can_create_an_on_start_location_no_region() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
-    $regions = factory(\App\Models\Location\Region::class, 20)->create();
-    $headers = $this->customerHeaders($customer);
-
     $lat = $this->faker->latitude;
     $lng = $this->faker->longitude;
-    $attributes = [
+    $region = factory(\App\Models\Location\Region::class)->create(['center_lat' => $this->faker->latitude, 'center_lng' => $this->faker->longitude]);
+    $locations = factory(\App\Models\Business\Location::class, 9)->create(['region_id' => $region->id]);
+    $headers = $this->customerHeaders($customer);
+
+    $body = [
       'lat' => $lat,
       'lng' => $lng,
-      'beacon_start' => false
+      'start_location' => true
     ];
 
-    $response = $this->json('POST', "/api/customer/start", $attributes, $headers)->assertStatus(200);
-    $this->assertDatabaseHas('on_start_locations', ['customer_id' => $customer->id, 'lat' => $lat, 'lng' => $lng, 'region_id' => null, 'location_id' => null]);
-    $this->assertEquals(0, count($response->getData()->data));
+    $response = $this->json('POST', 'api/customer/geo-location', $body, $headers)->getData();
+    $this->assertDatabaseHas('on_start_locations', ['customer_id' => $customer->id, 'lat' => $lat, 'lng' => $lng, 'region_id' => null]);
+    $this->assertEquals(0, count($response->data));
   }
 
   public function test_an_auth_cutomer_can_create_an_on_start_location_no_location() {
@@ -59,40 +63,30 @@ class OnStartLocationTest extends TestCase {
     $attributes = [
       'lat' => $lat,
       'lng' => $lng,
-      'beacon_start' => false
+      'start_location' => true
     ];
 
-    $response = $this->json('POST', "/api/customer/start", $attributes, $headers)->assertStatus(200);
-    $this->assertDatabaseHas('on_start_locations', ['customer_id' => $customer->id, 'lat' => $lat, 'lng' => $lng, 'region_id' => $inRegion->id, 'location_id' => null]);
+    $response = $this->json('POST', 'api/customer/geo-location', $attributes, $headers)->getData();
+    $this->assertDatabaseHas('on_start_locations', ['customer_id' => $customer->id, 'lat' => $lat, 'lng' => $lng, 'region_id' => $inRegion->id]);
+    $this->assertEquals(0, count($response->data));
   }
 
   public function test_a_customer_can_create_on_start_and_is_returned_all_locations_in_region() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
-
     $lat = $this->faker->latitude;
     $lng = $this->faker->longitude;
-    $inRegion = factory(\App\Models\Location\Region::class)->create(['center_lat' => $lat, 'center_lng' => $lng]);
-    $inLocation = factory(\App\Models\Business\Location::class)->create(['region_id' => $inRegion->id]);
-    factory(\App\Models\Business\GeoAccount::class)->create(['location_id' => $inLocation->id]);
-
-    $otherLocationsInRegion = factory(\App\Models\Business\Location::class, 9)->create(['region_id' => $inRegion->id]);
-
-    $locationsNotInRegion = factory(\App\Models\Business\Location::class, 5)->create();
-
-    $regions = factory(\App\Models\Location\Region::class, 19)->create();
+    $region = factory(\App\Models\Location\Region::class)->create(['center_lat' => $lat, 'center_lng' => $lng]);
+    $locations = factory(\App\Models\Business\Location::class, 9)->create(['region_id' => $region->id]);
     $headers = $this->customerHeaders($customer);
 
-    $attributes = [
+    $body = [
       'lat' => $lat,
       'lng' => $lng,
-      'location_identifier' => $inLocation->identifier,
-      'beacon_start' => true
+      'start_location' => true
     ];
 
-    $response = $this->json('POST', "/api/customer/start", $attributes, $headers)->getData();
-    $this->assertEquals(10, count($response->data));
-    $this->assertNotNull($response->data[0]->geo_coords);
-    $this->assertNotNull($response->data[0]->beacon);
-    $this->assertDatabaseHas('on_start_locations', ['customer_id' => $customer->id, 'lat' => $lat, 'lng' => $lng, 'region_id' => $inRegion->id, 'location_id' => $inLocation->id]);
+    $response = $this->json('POST', 'api/customer/geo-location', $body, $headers)->getData();
+    $this->assertDatabaseHas('on_start_locations', ['customer_id' => $customer->id, 'lat' => $lat, 'lng' => $lng, 'region_id' => $region->id]);
+    $this->assertEquals(9, count($response->data));
   }
 }

@@ -12,6 +12,13 @@ class TransactionNotification extends Model {
   protected $guarded = [];
   protected $hidden = ['id'];
 
+  protected $casts = [
+    'exit_sent' => 'boolean',
+    'bill_closed_sent' => 'boolean',
+    'auto_pay_sent' => 'boolean',
+    'fix_bill_sent' => 'boolean',
+  ];
+
   //////////////////// Relationships ////////////////////
 
   public function transaction() {
@@ -40,5 +47,13 @@ class TransactionNotification extends Model {
       $name => true,
       $timeName => now(),
     ]);
+  }
+
+  public function addWarningSent() {
+    $this->update(['number_times_fix_bill_sent' => $this->number_times_fix_bill_sent + 1]);
+  }
+
+  public function resetWarnings() {
+    $this->update(['fix_bill_sent' => false, 'time_fix_bill_sent' => null, 'number_times_fix_bill_sent' => 0]);
   }
 }

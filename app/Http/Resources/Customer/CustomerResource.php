@@ -3,6 +3,8 @@
 namespace App\Http\Resources\Customer;
 
 use App\Models\Customer\Customer;
+use App\Http\Resources\Customer\ProfileResource;
+use App\Http\Resources\Customer\CustomerAccountResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CustomerResource extends JsonResource
@@ -18,7 +20,10 @@ class CustomerResource extends JsonResource
     return [
       'identifier' => $this->identifier,
       'email' => $this->email,
-      'token' => Customer::formatToken($this->token)
+      'token' => $this->token,
+      'profile' => new ProfileResource($this->profile),
+      'account' => new CustomerAccountResource($this->account),
+      'status' => $this->status
     ];
   }
 }

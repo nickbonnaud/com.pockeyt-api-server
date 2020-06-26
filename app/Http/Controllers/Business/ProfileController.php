@@ -9,6 +9,8 @@ use App\Http\Resources\Business\ProfileResource;
 use App\Http\Requests\Business\StoreProfileRequest;
 use App\Http\Requests\Business\UpdateProfileRequest;
 
+use Illuminate\Support\Facades\Log;
+
 class ProfileController extends Controller {
   
   public function __construct() {

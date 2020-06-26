@@ -26,7 +26,9 @@ class StoreProfileRequest extends FormRequest {
       'name' => 'required|min:2',
       'website' => 'required|url',
       'description' => 'required|min:25',
-      'google_place_id' => 'string|nullable'
+      'phone' => ['required', 'string', 'numeric', 'digits:10'],
+      'google_place_id' => 'string|nullable',
+      'hours' => 'required|array'
     ];
   }
 }

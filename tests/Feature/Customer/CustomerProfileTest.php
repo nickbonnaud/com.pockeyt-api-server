@@ -38,9 +38,25 @@ class CustomerProfileTest extends TestCase {
     ];
 
     $response = $this->json('POST', '/api/customer/profile', $attributes, $headers)->getData();
-    $this->assertEquals($firstName, $response->data->first_name);
-    $this->assertEquals($lastName, $response->data->last_name);
-    $this->assertDatabaseHas('customer_profiles', ['identifier' => $response->data->identifier]);
+    $this->assertEquals($firstName, $response->data->profile->first_name);
+    $this->assertEquals($lastName, $response->data->profile->last_name);
+    $this->assertEquals(101, $response->data->status->code);
+    $this->assertDatabaseHas('customer_profiles', ['identifier' => $response->data->profile->identifier]);
+  }
+
+  public function test_creating_a_profile_sets_correct_customer_status() {
+    $customer = factory(\App\Models\Customer\Customer::class)->create();
+    $headers = $this->customerHeaders($customer);
+    $firstName = $this->faker->firstName;
+    $lastName = $this->faker->lastName;
+
+    $attributes = [
+      'first_name' => $firstName,
+      'last_name' => $lastName
+    ];
+
+    $response = $this->json('POST', '/api/customer/profile', $attributes, $headers)->getData();
+    $this->assertEquals(101, $customer->fresh()->status->code);
   }
 
   public function test_an_auth_customer_must_submit_correct_data() {

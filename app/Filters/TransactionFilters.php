@@ -4,7 +4,7 @@ namespace App\Filters;
 
 class TransactionFilters extends Filters {
 
-	protected $filters = ['recent', 'status', 'customer', 'employee', 'date', 'customerFirst', 'customerLast', 'id'];
+	protected $filters = ['recent', 'status', 'customer', 'employee', 'date', 'customerFirst', 'customerLast', 'id', 'business', 'open'];
 
 	protected function recent($value) {
 		return $this->builder;
@@ -44,5 +44,17 @@ class TransactionFilters extends Filters {
 
 	protected function id($identifier) {
 		return $this->builder->where('identifier', $identifier); 
+	}
+
+	protected function business($identifier) {
+		return $this->builder->whereHas('business', function($q) use ($identifier) {
+			$q->where('identifier', $identifier);
+		}); 
+	}
+
+	protected function open() {
+		return $this->builder->whereHas('status', function($q) {
+			$q->whereNotIn('code', [200]);
+		});
 	}
 }

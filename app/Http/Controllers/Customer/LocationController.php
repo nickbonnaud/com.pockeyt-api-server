@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Models\Customer\Customer;
-use App\Models\Business\Location;
+use App\Models\Business\BeaconAccount;
 use App\Models\Location\ActiveLocation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreLocationRequest;
@@ -15,28 +15,21 @@ class LocationController extends Controller {
   	$this->middleware('auth:customer');
   }
 
-  public function store(Location $location, StoreLocationRequest $request) {
+  public function store(StoreLocationRequest $request) {
   	$customer = Customer::getAuthCustomer();
-  	$activeLocation = ActiveLocation::createLocation($customer, $location, $request->validated());
+    $beaconAccount = BeaconAccount::where('identifier', $request->beacon_identifier)->first();
+    $activeLocation = ActiveLocation::createLocation($customer, $beaconAccount->location);
   	return new ActiveLocationResource($activeLocation);
   }
 
-  public function update(ActiveLocation $activeLocation, StoreLocationRequest $request) {
+  public function destroy(ActiveLocation $activeLocation) {
   	if ((Customer::getAuthCustomer())->id != $activeLocation->customer_id) {
   		return response()->json(['errors' => 'Permission denied.'], 403);
   	}
-  	$activeLocation->updateLocation($request->validated());
-  	return new ActiveLocationResource($activeLocation);
-  }
-
-  public function destroy(ActiveLocation $activeLocation, StoreLocationRequest $request) {
-  	if ((Customer::getAuthCustomer())->id != $activeLocation->customer_id) {
-  		return response()->json(['errors' => 'Permission denied.'], 403);
-  	}
-  	$activeLocation->destroyLocation($request->validated());
+  	$activeLocation->destroyLocation();
   	if ($activeLocation = $activeLocation->fresh()) {
-  		return new ActiveLocationResource($activeLocation);
+      return response()->json(['data' => ['deleted' => false]], 200);
   	}
-  	return response()->json(['data' => ['success' => 'Location removed.']], 200);
+  	return response()->json(['data' => ['deleted' => true]], 200);
   }
 }

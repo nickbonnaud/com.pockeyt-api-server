@@ -9,7 +9,6 @@ class HistoricLocation extends Model {
   //////////////////// Attribute Mods/Helpers ////////////////////
 
   protected $guarded = [];
-  protected $visible = [];
 
   //////////////////// Relationships ////////////////////
 

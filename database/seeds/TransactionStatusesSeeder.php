@@ -20,13 +20,21 @@ class TransactionStatusesSeeder extends Seeder {
     		'code' => 101
     	],
     	[
-    		'name' => 'notification pending',
-    		'code' => 102
-    	],
-    	[
     		'name' => 'payment processing',
     		'code' => 103
     	],
+        [
+            'name' => 'customer approved',
+            'code' => 104
+        ],
+        [
+            'name' => 'keep open notification sent',
+            'code' => 105
+        ],
+        [
+            'name' => 'customer request keep open',
+            'code' => 106
+        ],
     	[
     		'name' => 'paid',
     		'code' => 200

@@ -16,6 +16,7 @@ class TransactionResource extends JsonResource {
     $transaction['status'] = $this->status->name;
     $transaction['purchased_items'] = PurchasedItemResource::collection($this->purchasedItems);
     $transaction['refunds'] = RefundResource::collection($this->refunds);
+    $transaction['issue'] = $this->issue;
     return [
       'transaction' => $transaction,
       'customer' => new CustomerResource($this->customer),

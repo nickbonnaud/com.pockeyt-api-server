@@ -19,6 +19,16 @@ $factory->define(Business\Profile::class, function (Faker $faker) {
 		'name' => $faker->company,
 		'website' => $faker->domainName,
 		'description' => $faker->paragraph($nbSentences = 3, $variableNbSentences = true),
+		'phone' => $faker->numerify('##########'),
+		'hours' => [
+      'monday' => "Monday: 11:00 AM – 10:00 PM",
+      'tuesday' => "Tuesday: 11:00 AM – 10:00 PM",
+      'wednesday' => "Wednesday: 11:00 AM – 10:00 PM",
+      'thursday' => "Thursday: 11:00 AM – 10:00 PM",
+      'friday' => "Friday: 11:00 AM – 10:30 PM",
+      'saturday' => "Saturday: 11:00 AM – 10:30 PM",
+      'sunday' => "Sunday: 10:30 AM – 9:00 PM",
+    ],
 		'business_id' => function() {
 			return factory(Business\Business::class)->create()->id;
 		}
@@ -182,7 +192,7 @@ $factory->define(Business\LoyaltyProgram::class, function(Faker $faker) {
 $factory->define(Business\Location::class, function(Faker $faker) {
 	return [
 		'business_id' => function() {
-			return factory(Business\Business::class)->create()->id;
+			return factory(Business\Profile::class)->create()->business->id;
 		},
 		'region_id' => function() {
 			return factory(Location\Region::class)->create()->id;
@@ -208,8 +218,8 @@ $factory->define(Business\BeaconAccount::class, function(Faker $faker) {
 			return factory(Business\Location::class)->create()->id;
 		},
 		'identifier' => $faker->uuid,
-		'major' => $faker->word,
-		'minor' => $faker->word
+		'major' => $faker->numberBetween($min = 0, $max = 9000),
+		'minor' => $faker->numberBetween($min = 0, $max = 10000)
 	];
 });
 

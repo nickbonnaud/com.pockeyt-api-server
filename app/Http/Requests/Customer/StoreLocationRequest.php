@@ -24,9 +24,7 @@ class StoreLocationRequest extends FormRequest
     public function rules()
     {
         return [
-            'action' => 'required|string|alpha|in:enter,exit,static',
-            'lat' => 'required|numeric|min:-90|max:90',
-            'lng' => 'required|numeric|min:-180|max:180'
+            'beacon_identifier' => 'required|uuid',
         ];
     }
 }

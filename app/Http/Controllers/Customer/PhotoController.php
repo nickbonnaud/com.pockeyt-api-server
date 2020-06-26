@@ -7,7 +7,7 @@ use App\Models\Customer\Customer;
 use App\Models\Customer\CustomerPhoto;
 use App\Models\Customer\CustomerProfile;
 use App\Http\Requests\Customer\StorePhotoRequest;
-use App\Http\Resources\Customer\ProfilePhotoResource;
+use App\Http\Resources\Customer\CustomerResource;
 
 class PhotoController extends Controller {
 
@@ -21,6 +21,6 @@ class PhotoController extends Controller {
   	}
 
   	$avatar = (new CustomerPhoto)->createPhoto($request->validated(), $customerProfile);
-  	return new ProfilePhotoResource($avatar);
+  	return new CustomerResource($customerProfile->fresh()->customer);
   }
 }

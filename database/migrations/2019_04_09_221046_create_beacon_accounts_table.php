@@ -17,8 +17,8 @@ class CreateBeaconAccountsTable extends Migration
             $table->increments('id');
             $table->uuid('identifier')->unique();
             $table->unsignedInteger('location_id');
-            $table->string('major');
-            $table->string('minor')->nullable();
+            $table->integer('major');
+            $table->integer('minor');
             $table->timestamps();
 
             $table->foreign('location_id')

@@ -9,10 +9,21 @@ use App\Models\Transaction\UnassignedPurchasedItem;
 
 class UnassignedTransaction extends Model {
 
+	//////////////////// Traits ////////////////////
+
+	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
+
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
-	protected $guarded = [];
-	protected $hidden = [ 'id', 'updated_at'];
+	protected $guarded = ['identifier'];
+	protected $hidden = [ 'id'];
+	protected $uuidFieldName = 'identifier';
+
+	//////////////////// Routing ////////////////////
+
+	public function getRouteKeyName() {
+		return 'identifier';
+	}
 
 	//////////////////// Relationships ////////////////////
 
@@ -84,5 +95,21 @@ class UnassignedTransaction extends Model {
 
 	public function scopeFilter($query, $filters) {
 		return $filters->apply($query);
+	}
+
+	public function formattedPurchashedItems() {
+		$purchasedItems = $this->purchasedItems->map(function($item, $k) {
+			return $item->getInventoryItem();
+		});
+		$uniquePurchasedItems = $purchasedItems->unique(function($item) {
+			return $item['main_id'].$item['sub_id'];
+		});
+		return $uniquePurchasedItems->map(function($item, $k) use ($purchasedItems) {
+			$item['quantity'] = $purchasedItems
+				->where('main_id', $item->main_id)
+				->where('sub_id', $item->sub_id)
+				->count();
+			return $item;
+		});
 	}
 }

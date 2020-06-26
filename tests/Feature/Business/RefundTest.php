@@ -40,8 +40,8 @@ class RefundTest extends TestCase {
     $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()])->id]);
     $business = $refund->transaction->business;
 
-    $refunds = factory(\App\Models\Refund\Refund::class, 14)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
-    $refunds = $refunds->push($refunds, $refund);
+    $refunds = factory(\App\Models\Refund\Refund::class, 2)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
+    $refunds->push($refund);
 
     factory(\App\Models\Refund\Refund::class, 10)->create();
 
@@ -55,7 +55,7 @@ class RefundTest extends TestCase {
     $business = $refund->transaction->business;
 
     $refunds = factory(\App\Models\Refund\Refund::class, 7)->create(['created_at' => Carbon::now()->subDays(rand(1, 100)), 'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
-    $refunds = $refunds->push($refunds, $refund);
+    $refunds->push($refund);
 
     $this->businessHeaders($business);
     $response = $this->json('GET', '/api/business/refunds?recent=true')->getData();
@@ -79,7 +79,7 @@ class RefundTest extends TestCase {
 
     factory(\App\Models\Refund\Refund::class, 14)->create(['created_at' => Carbon::now()->subDays(rand(31, 60)), 'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
 
-    $refunds = $refunds->push($refunds, $refund);
+    $refunds->push($refund);
 
     $this->businessHeaders($business);
     $response = $this->json('GET', "/api/business/refunds?date[]={$startDate}&date[]={$endDate}")->getData();
@@ -92,7 +92,7 @@ class RefundTest extends TestCase {
     $customer = $refund->transaction->customer;
 
     $refunds = factory(\App\Models\Refund\Refund::class, 9)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id]);
-    $refunds = $refunds->push($refunds, $refund);
+    $refunds->push($refund);
 
     $this->businessHeaders($business);
     $response = $this->json('GET', "/api/business/refunds?firstName={$customer->profile->first_name}&lastName={$customer->profile->last_name}")->getData();

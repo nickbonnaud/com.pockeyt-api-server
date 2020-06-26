@@ -136,6 +136,7 @@ Route::prefix('customer')->group(function() {
 		Route::get('refresh', 'Customer\AuthController@refresh');
 		Route::post('register', 'Customer\AuthController@register');
 		Route::post('login', 'Customer\AuthController@login');
+		Route::post('password-check', 'Customer\AuthController@check');
 
 		Route::post('request-reset', 'Customer\AuthResetPasswordController@requestReset');
 		Route::patch('reset-password', 'Customer\AuthResetPasswordController@reset');
@@ -160,12 +161,30 @@ Route::prefix('customer')->group(function() {
 	Route::patch('account/{customer_account}', 'Customer\AccountController@update');
 
 	// Location
-	Route::post('location/{location}', 'Customer\LocationController@store');
-	Route::patch('location/{active_location}', 'Customer\LocationController@update');
+	Route::post('location', 'Customer\LocationController@store');
 	Route::delete('location/{active_location}', 'Customer\LocationController@destroy');
 
-	// On Start
-	Route::post('start', 'Customer\OnStartController@store');
+	// Business Geo Locations
+	Route::post('geo-location', 'Customer\GeoLocationController@store');
+
+	// Customer transactions
+	Route::get('transaction', 'Customer\TransactionController@index');
+	Route::patch('transaction/{transaction}', 'Customer\TransactionController@update');
+
+	// Customer Unassigned transactions
+	Route::get('unassigned-transaction', 'Customer\UnassignedTransactionController@index');
+	Route::patch('unassigned-transaction/{unassigned_transaction}', 'Customer\UnassignedTransactionController@update');
+
+	// Customer refunds
+	Route::get('refund', 'Customer\RefundController@index');
+
+	// Fetch Businesses
+	Route::get('business', 'Customer\BusinessController@index');
+
+	// Customer Transaction Issues
+	Route::post('transaction-issue', 'Customer\TransactionIssueController@store');
+	Route::patch('transaction-issue/{transaction_issue}', 'Customer\TransactionIssueController@update');
+	Route::delete('transaction-issue/{transaction_issue}', 'Customer\TransactionIssueController@destroy');
 });
 
 // Webhooks

@@ -18,6 +18,8 @@ class ProfileResource extends JsonResource
       'name' => $this->name,
       'website' => $this->website,
       'description' => $this->description,
+      'phone' => $this->phone,
+      'hours' => $this->hours,
       'google_place_id' => $this->google_place_id
     ];
   }

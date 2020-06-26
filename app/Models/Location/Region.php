@@ -16,7 +16,7 @@ class Region extends Model {
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
 	protected $guarded = ['identifier'];
-	protected $hidden = [ 'id'];
+	protected $hidden = [ 'id', 'created_at', 'updated_at', 'center_lat', 'center_lng'];
 	protected $uuidFieldName = 'identifier';
 
 	//////////////////// Routing ////////////////////

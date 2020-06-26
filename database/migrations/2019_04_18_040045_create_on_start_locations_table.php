@@ -17,10 +17,8 @@ class CreateOnStartLocationsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('customer_id');
             $table->unsignedInteger('region_id')->nullable();
-            $table->unsignedInteger('location_id')->nullable();
             $table->string('lat');
             $table->string('lng');
-            $table->boolean('beacon_start')->default(false);
             $table->timestamps();
 
             $table->foreign('customer_id')
@@ -30,10 +28,6 @@ class CreateOnStartLocationsTable extends Migration
             $table->foreign('region_id')
                 ->references('id')
                 ->on('regions');
-
-            $table->foreign('location_id')
-                ->references('id')
-                ->on('locations');
         });
     }
 
