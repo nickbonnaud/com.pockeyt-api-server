@@ -7,6 +7,7 @@ use App\Models\Transaction\Transaction;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use NotificationChannels\OneSignal\OneSignalChannel;
 use NotificationChannels\OneSignal\OneSignalMessage;
+use NotificationChannels\OneSignal\OneSignalButton;
 use App\Models\Transaction\TransactionNotification;
 use Illuminate\Notifications\Notification;
 
@@ -51,7 +52,15 @@ class AutoPay extends Notification implements ShouldQueue {
       ->setData('transaction_identifier', $this->transaction->identifier)
       ->setData('business_identifier', $this->transaction->business->identifier)
       ->setData("type", 'auto_pay')
-      ->setParameter('ios_category', 'auto_pay');
+      ->setParameter('ios_category', 'auto_pay')
+      ->button(
+        OneSignalButton::create('view_bill')
+          ->text("View Bill")
+      )
+      ->button(
+        OneSignalButton::create('pay')
+          ->text('Pay')
+      );
   }
 
   /**

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use App\Models\Transaction\Transaction;
 use App\Models\Transaction\TransactionNotification;
+use NotificationChannels\OneSignal\OneSignalButton;
 use NotificationChannels\OneSignal\OneSignalChannel;
 use NotificationChannels\OneSignal\OneSignalMessage;
 use App\Jobs\PayTransaction;
@@ -52,8 +53,20 @@ class FixBill extends Notification implements ShouldQueue {
       ->setData('transaction_identifier', $this->transaction->identifier)
       ->setData('business_identifier', $this->transaction->business->identifier)
       ->setData("type", 'fix_bill')
-      ->setData("number_warnings_left", $this->warningsLeft)
-      ->setParameter('ios_category', 'fix_bill');
+      ->setData("warnings_left", $this->warningsLeft)
+      ->setParameter('ios_category', 'fix_bill')
+      ->button(
+        OneSignalButton::create('view_bill')
+          ->text("View Bill")
+      )
+      ->button(
+        OneSignalButton::create('pay')
+          ->text('Pay')
+      )
+      ->button(
+        OneSignalButton::create('call')
+          ->text("Call Business")
+      );
   }
 
   /**

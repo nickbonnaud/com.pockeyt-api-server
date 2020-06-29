@@ -7,6 +7,7 @@ use App\Models\Transaction\Transaction;
 use Illuminate\Notifications\Notification;
 use App\Models\Transaction\TransactionNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use NotificationChannels\OneSignal\OneSignalButton;
 use NotificationChannels\OneSignal\OneSignalChannel;
 use NotificationChannels\OneSignal\OneSignalMessage;
 
@@ -49,7 +50,19 @@ class ExitBusiness extends Notification implements ShouldQueue {
       ->setData('transaction_identifier', $this->transaction->identifier)
       ->setData('business_identifier', $this->transaction->business->identifier)
       ->setData("type", 'exit')
-      ->setParameter('ios_category', 'exit');
+      ->setParameter('ios_category', 'exit')
+      ->button(
+        OneSignalButton::create('view_bill')
+          ->text("View Bill")
+      )
+      ->button(
+        OneSignalButton::create('keep_open')
+          ->text("Keep Open")
+      )
+      ->button(
+        OneSignalButton::create('pay')
+          ->text('Pay')
+      );
   }
 
   /**
