@@ -64,6 +64,17 @@ class Location extends Model {
 		$this->update(['region_id' => $region->id]);
 	}
 
+	public function getDistance($lat2, $lng2) {
+		$lat1 = $this->geoAccount->lat;
+		$lng1 = $this->geoAccount->lng;
+		$R = 6371; // Radius of the earth in km
+	  $dLat = $this->deg2rad($lat2 - $lat1);  // deg2rad below
+	  $dLng = $this->deg2rad($lng2 - $lng1); 
+	  $a = sin($dLat / 2) * sin($dLat / 2) + cos($this->deg2rad($lat1)) * cos($this->deg2rad($lat2)) * sin($dLng / 2) * sin($dLng / 2); 
+	  $c = 2 * atan2(sqrt($a), sqrt(1 - $a)); 
+	  return $R * $c; // Distance in km
+	}
+
 	public static function getRegion($coords) {
 		return Region::closestRegion($coords);
 	}
@@ -74,5 +85,9 @@ class Location extends Model {
 
 	public static function getLocationsFromAttribute($attribute, $value) {
 		return self::where($attribute, $value)->get();
+	}
+
+	private function deg2rad($deg) {
+		return $deg * (pi() / 180);
 	}
 }

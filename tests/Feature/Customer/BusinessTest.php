@@ -49,4 +49,17 @@ class BusinessTest extends TestCase {
     $response = $this->json('GET', "api/customer/business?name=fake_name")->getData();
     $this->assertEquals(0, count($response->data));
   }
+
+  public function test_an_auth_customer_can_fetch_business_by_beacon_id() {
+    $customer = factory(\App\Models\Customer\Customer::class)->create();
+    $headers = $this->customerHeaders($customer);
+
+    $geoAccount = factory(\App\Models\Business\GeoAccount::class)->create();
+    $beaconAccount = $geoAccount->location->beaconAccount;
+    $profile = factory(\App\Models\Business\Profile::class)->create(['business_id' => $beaconAccount->location->business->id]);
+
+    $response = $this->json('GET', "api/customer/business?beacon={$beaconAccount->identifier}")->getData();
+
+    $this->assertEquals($response->data[0]->location->beacon->identifier, $beaconAccount->location->identifier);
+  }
 }

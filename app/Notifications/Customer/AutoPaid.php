@@ -11,7 +11,7 @@ use NotificationChannels\OneSignal\OneSignalButton;
 use App\Models\Transaction\TransactionNotification;
 use Illuminate\Notifications\Notification;
 
-class AutoPay extends Notification implements ShouldQueue {
+class AutoPaid extends Notification implements ShouldQueue {
   use Queueable;
 
   private $transaction;
@@ -51,15 +51,11 @@ class AutoPay extends Notification implements ShouldQueue {
       ->body("You're bill of {$billTotal} has been automatically paid.")
       ->setData('transaction_identifier', $this->transaction->identifier)
       ->setData('business_identifier', $this->transaction->business->identifier)
-      ->setData("type", 'auto_pay')
-      ->setParameter('ios_category', 'auto_pay')
+      ->setData("type", 'auto_paid')
+      ->setParameter('ios_category', 'auto_paid')
       ->button(
         OneSignalButton::create('view_bill')
           ->text("View Bill")
-      )
-      ->button(
-        OneSignalButton::create('pay')
-          ->text('Pay')
       );
   }
 
@@ -71,7 +67,7 @@ class AutoPay extends Notification implements ShouldQueue {
    */
   public function toArray($notifiable) {
     return [
-      'type' => 'auto_pay',
+      'type' => 'auto_paid',
       'customer_id' => $notifiable->id,
       'business_id' => $this->transaction->business->id,
       'transaction_id' => $this->transaction->id
@@ -79,6 +75,6 @@ class AutoPay extends Notification implements ShouldQueue {
   }
 
   private function setTransactioNotification(Transaction $transaction) {
-    TransactionNotification::storeNewNotification($transaction->identifier, 'auto_pay');
+    TransactionNotification::storeNewNotification($transaction->identifier, 'auto_paid');
   }
 }

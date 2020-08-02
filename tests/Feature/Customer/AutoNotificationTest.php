@@ -7,7 +7,7 @@ use App\Services\AutoPaidWithIssueNotifications;
 use App\Services\AutoPaidNotifications;
 use App\Services\AutoBillClosedNotifications;
 use App\Notifications\Customer\FixBill;
-use App\Notifications\Customer\AutoPay;
+use App\Notifications\Customer\AutoPaid;
 use App\Notifications\Customer\BillClosed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -98,7 +98,7 @@ class AutoNotificationTest extends TestCase {
     
     Notification::assertSentTo(
       [$transaction->customer],
-      AutoPay::class
+      AutoPaid::class
     );
 
     $this->assertEquals(103, $transaction->fresh()->status->code);
@@ -135,7 +135,7 @@ class AutoNotificationTest extends TestCase {
 
     Notification::assertSentTo(
       [$transaction->customer],
-      AutoPay::class
+      AutoPaid::class
     );
 
     $this->assertEquals(103, $transaction->fresh()->status->code);
@@ -172,7 +172,7 @@ class AutoNotificationTest extends TestCase {
 
     Notification::assertSentTo(
       [$customer],
-      AutoPay::class
+      AutoPaid::class
     );
 
     $this->assertEquals(103, $transaction->fresh()->status->code);

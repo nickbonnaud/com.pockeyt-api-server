@@ -70,9 +70,9 @@ $factory->define(Transaction\TransactionNotification::class, function (Faker $fa
 		'transaction_id' => function() {
 			return factory(Transaction\Transaction::class)->create()->id;
 		},
-		'last' => 'auto_pay_sent',
-		'auto_pay_sent' => true,
-		'time_auto_pay_sent' => now()
+		'last' => 'auto_paid_sent',
+		'auto_paid_sent' => true,
+		'time_auto_paid_sent' => now()
 	];
 });
 

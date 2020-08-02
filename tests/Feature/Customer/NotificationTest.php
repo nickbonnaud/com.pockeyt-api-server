@@ -9,7 +9,7 @@ use App\Notifications\Customer\EnterBusiness;
 use App\Notifications\Customer\ExitBusiness;
 use App\Notifications\Customer\BillClosed;
 use App\Notifications\Customer\FixBill;
-use App\Notifications\Customer\AutoPay;
+use App\Notifications\Customer\AutoPaid;
 use Illuminate\Support\Facades\Notification;
 
 class NotificationTest extends TestCase {
@@ -115,7 +115,7 @@ class NotificationTest extends TestCase {
     $this->assertDatabaseHas('transaction_notifications', ['transaction_id' => $transaction->id, 'fix_bill_sent' => true]);
   }
 
-  public function test_an_auto_pay_notification() {
+  public function test_an_auto_paid_notification() {
     Notification::fake();
 
     $customer = factory(\App\Models\Customer\Customer::class)->create(['identifier' => 'fake_identifier_new']);
@@ -125,13 +125,13 @@ class NotificationTest extends TestCase {
     $transaction->identifier = 'fake_open_transaction';
     $transaction->save();
 
-    $transaction->customer->notify(new AutoPay($transaction));
+    $transaction->customer->notify(new AutoPaid($transaction));
 
     Notification::assertSentTo(
       [$customer],
-      AutoPay::class
+      AutoPaid::class
     );
 
-    $this->assertDatabaseHas('transaction_notifications', ['transaction_id' => $transaction->id, 'auto_pay_sent' => true]);
+    $this->assertDatabaseHas('transaction_notifications', ['transaction_id' => $transaction->id, 'auto_paid_sent' => true]);
   }
 }

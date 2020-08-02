@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Transaction\Transaction;
-use App\Notifications\Customer\AutoPay;
+use App\Notifications\Customer\AutoPaid;
 
 class AutoPaidNotifications {
 
@@ -21,7 +21,7 @@ class AutoPaidNotifications {
 		})->get();
 
 		foreach ($transactions as $transaction) {
-			$transaction->customer->notify(new AutoPay($transaction));
+			$transaction->customer->notify(new AutoPaid($transaction));
 			$transaction->updateStatus(104);
 		}
 	}

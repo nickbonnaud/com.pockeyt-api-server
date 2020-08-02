@@ -15,8 +15,7 @@ class BusinessController extends Controller {
   }
 
   public function index(Request $request, BusinessFilters $filters) {
-  	$businesses = Business::filter($filters)
-  		->get();
+  	$businesses = Business::filter($filters)->get();
   	return BusinessResource::collection($businesses);
   }
 }

@@ -1,4 +1,4 @@
-[2020-06-29 20:25:37] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
+[2020-07-01 12:57:06] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
 [stacktrace]
 #0 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php(128): Tymon\\JWTAuth\\Manager->decode()
 #1 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/JWT.php(106): Tymon\\JWTAuth\\Manager->refresh()
@@ -57,7 +57,7 @@
 #54 /home/vagrant/Code/com.pockeyt-api/vendor/phpunit/phpunit/phpunit(61): PHPUnit\\TextUI\\Command::main()
 #55 {main}
 "} 
-[2020-06-29 20:26:49] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
+[2020-07-01 12:58:11] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
 [stacktrace]
 #0 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php(128): Tymon\\JWTAuth\\Manager->decode()
 #1 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/JWT.php(106): Tymon\\JWTAuth\\Manager->refresh()
@@ -116,7 +116,7 @@
 #54 /home/vagrant/Code/com.pockeyt-api/vendor/phpunit/phpunit/phpunit(61): PHPUnit\\TextUI\\Command::main()
 #55 {main}
 "} 
-[2020-06-29 21:16:43] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
+[2020-07-01 13:05:23] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
 [stacktrace]
 #0 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php(128): Tymon\\JWTAuth\\Manager->decode()
 #1 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/JWT.php(106): Tymon\\JWTAuth\\Manager->refresh()
@@ -175,7 +175,7 @@
 #54 /home/vagrant/Code/com.pockeyt-api/vendor/phpunit/phpunit/phpunit(61): PHPUnit\\TextUI\\Command::main()
 #55 {main}
 "} 
-[2020-06-29 21:17:36] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
+[2020-07-01 13:06:16] testing.ERROR: The token has been blacklisted {"userId":1,"exception":"[object] (Tymon\\JWTAuth\\Exceptions\\TokenBlacklistedException(code: 0): The token has been blacklisted at /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php:109)
 [stacktrace]
 #0 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/Manager.php(128): Tymon\\JWTAuth\\Manager->decode()
 #1 /home/vagrant/Code/com.pockeyt-api/vendor/tymon/jwt-auth/src/JWT.php(106): Tymon\\JWTAuth\\Manager->refresh()

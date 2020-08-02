@@ -2,9 +2,6 @@
 
 namespace App\Console;
 
-use App\Tasks\SendWarning;
-use App\Tasks\SendAutoPayFix;
-use App\Tasks\SendAutoPay;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 

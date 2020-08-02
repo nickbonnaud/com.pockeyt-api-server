@@ -66,7 +66,6 @@ class TransactionIssueTest extends TestCase {
 
     $this->customerHeaders($transaction->customer);
     $response = $this->json('POST', '/api/customer/transaction-issue', $body)->getData();
-
     $this->assertDatabaseHas('transaction_issues', ['issue' => $body['issue']]);
     $this->assertSame($body['issue'], $response->data->issue->issue);
   }

@@ -5,6 +5,7 @@ namespace App\Http\Resources\Customer;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Customer\PurchasedItemResource;
 use App\Http\Resources\Transaction\RefundResource;
+use App\Http\Resources\Transaction\IssueResource;
 use App\Http\Resources\Customer\BusinessResource;
 
 class TransactionResource extends JsonResource {
@@ -16,7 +17,7 @@ class TransactionResource extends JsonResource {
       'transaction' => $transaction,
       'business' => new BusinessResource($this->business),
       'refund' => RefundResource::collection($this->refunds),
-      'issue' => $this->issue
+      'issue' => new IssueResource($this->issue)
     ];
   }
 }

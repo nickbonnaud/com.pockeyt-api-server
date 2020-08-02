@@ -77,6 +77,9 @@ class OnStartLocationTest extends TestCase {
     $lng = $this->faker->longitude;
     $region = factory(\App\Models\Location\Region::class)->create(['center_lat' => $lat, 'center_lng' => $lng]);
     $locations = factory(\App\Models\Business\Location::class, 9)->create(['region_id' => $region->id]);
+    foreach ($locations as $location) {
+      factory(\App\Models\Business\GeoAccount::class)->create(['location_id' => $location->id]);
+    }
     $headers = $this->customerHeaders($customer);
 
     $body = [

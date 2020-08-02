@@ -37,6 +37,9 @@ class GeoLocationTest extends TestCase {
     $lng = $this->faker->longitude;
     $region = factory(\App\Models\Location\Region::class)->create(['center_lat' => $lat, 'center_lng' => $lng]);
     $locations = factory(\App\Models\Business\Location::class, 9)->create(['region_id' => $region->id]);
+    foreach ($locations as $location) {
+      factory(\App\Models\Business\GeoAccount::class)->create(['location_id' => $location->id]);
+    }
     $headers = $this->customerHeaders($customer);
 
     $body = [
@@ -47,6 +50,34 @@ class GeoLocationTest extends TestCase {
 
     $response = $this->json('POST', 'api/customer/geo-location', $body, $headers)->getData();
     $this->assertEquals(9, count($response->data));
+  }
+
+  public function test_businesses_are_ordered_by_distance() {
+    $customer = factory(\App\Models\Customer\Customer::class)->create();
+    $lat = $this->faker->latitude;
+    $lng = $this->faker->longitude;
+    $region = factory(\App\Models\Location\Region::class)->create(['center_lat' => $lat, 'center_lng' => $lng]);
+    $locations = factory(\App\Models\Business\Location::class, 9)->create(['region_id' => $region->id]);
+    foreach ($locations as $location) {
+      factory(\App\Models\Business\GeoAccount::class)->create(['location_id' => $location->id]);
+    }
+    $headers = $this->customerHeaders($customer);
+
+    $body = [
+      'lat' => $lat,
+      'lng' => $lng,
+      'start_location' => false
+    ];
+
+    $response = $this->json('POST', 'api/customer/geo-location', $body, $headers)->getData();
+
+    foreach ($response->data as $key => $business) {
+      if (count($response->data) - 1 != $key) {
+        $geoAccount = \App\Models\Business\GeoAccount::where('identifier', $business->location->geo->identifier)->first();
+        $nextAccount = \App\Models\Business\GeoAccount::where('identifier', $response->data[$key + 1]->location->geo->identifier)->first();
+        $this->assertTrue($geoAccount->location->getDistance($lat, $lng) < $nextAccount->location->getDistance($lat, $lng));
+      }
+    }
   }
 
   public function test_an_auth_customer_is_returned_no_geo_locations_if_not_in_region() {

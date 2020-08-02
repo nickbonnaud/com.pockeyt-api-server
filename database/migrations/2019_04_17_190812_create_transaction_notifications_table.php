@@ -21,8 +21,8 @@ class CreateTransactionNotificationsTable extends Migration
             $table->timestamp('time_exit_sent')->nullable();
             $table->boolean('bill_closed_sent')->default(false);
             $table->timestamp('time_bill_closed_sent')->nullable();
-            $table->boolean('auto_pay_sent')->default(false);
-            $table->timestamp('time_auto_pay_sent')->nullable();
+            $table->boolean('auto_paid_sent')->default(false);
+            $table->timestamp('time_auto_paid_sent')->nullable();
             $table->boolean('fix_bill_sent')->default(false);
             $table->timestamp('time_fix_bill_sent')->nullable();
             $table->integer('number_times_fix_bill_sent')->default(0);

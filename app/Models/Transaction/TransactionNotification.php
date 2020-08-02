@@ -15,7 +15,7 @@ class TransactionNotification extends Model {
   protected $casts = [
     'exit_sent' => 'boolean',
     'bill_closed_sent' => 'boolean',
-    'auto_pay_sent' => 'boolean',
+    'auto_paid_sent' => 'boolean',
     'fix_bill_sent' => 'boolean',
   ];
 

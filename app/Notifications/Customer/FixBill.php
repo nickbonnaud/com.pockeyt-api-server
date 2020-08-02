@@ -53,7 +53,7 @@ class FixBill extends Notification implements ShouldQueue {
       ->setData('transaction_identifier', $this->transaction->identifier)
       ->setData('business_identifier', $this->transaction->business->identifier)
       ->setData("type", 'fix_bill')
-      ->setData("warnings_left", $this->warningsLeft)
+      ->setData("warnings_sent", 3 - $this->warningsLeft)
       ->setParameter('ios_category', 'fix_bill')
       ->button(
         OneSignalButton::create('view_bill')
