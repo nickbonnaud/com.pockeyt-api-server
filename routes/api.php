@@ -185,6 +185,40 @@ Route::prefix('customer')->group(function() {
 	Route::post('transaction-issue', 'Customer\TransactionIssueController@store');
 	Route::patch('transaction-issue/{transaction_issue}', 'Customer\TransactionIssueController@update');
 	Route::delete('transaction-issue/{transaction_issue}', 'Customer\TransactionIssueController@destroy');
+
+	// Help tickets
+	Route::get('help', 'Customer\HelpTicketController@index');
+	Route::post('help', 'Customer\HelpTicketController@store');
+	Route::delete('help/{help_ticket}', 'Customer\HelpTicketController@destroy');
+
+	// Help Ticket replies
+	Route::post('help-reply', 'Customer\HelpTicketReplyController@store');
+	Route::patch('help-reply/{help_ticket}', 'Customer\HelpTicketReplyController@update');
+});
+
+Route::prefix('admin')->group(function() {
+
+	// Auth
+	Route::prefix('auth')->group(function() {
+		Route::post('register', 'Admin\AuthController@register');
+		Route::post('login', 'Admin\AuthController@login');
+		Route::get('logout', 'Admin\AuthController@logout');
+		Route::get('refresh', 'Admin\AuthController@refresh');
+	});
+
+	// Help Tickets
+	Route::get('help', 'Admin\HelpTicketController@index');
+	Route::patch('help/{help_ticket}', 'Admin\HelpTicketController@update');
+
+	// Help Ticket Replies
+	Route::post('help-reply', 'Admin\HelpTicketReplyController@store');
+	Route::patch('help-reply/{help_ticket}', 'Admin\HelpTicketReplyController@update');
+
+	// Master admin
+	Route::prefix('master')->group(function() {
+		Route::patch('admin', 'Admin\MasterAdminController@approve');
+	});
+
 });
 
 // Webhooks

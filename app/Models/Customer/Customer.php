@@ -71,6 +71,10 @@ class Customer extends Authenticatable implements JWTSubject {
 		return $this->hasMany('App\Models\Location\OnStartLocation');
 	}
 
+	public function helpTickets() {
+		return $this->hasMany('App\Models\Customer\HelpTicket');
+	}
+
 	//////////////////// Relationship Methods ////////////////////
 
 	public function storeProfile($profile) {

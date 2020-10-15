@@ -49,6 +49,11 @@ return [
         'customer' => [
             'driver' => 'jwt',
             'provider' => 'customers'
+        ],
+
+        'admin' => [
+            'driver' => 'jwt',
+            'provider' => 'admins'
         ]
     ],
 
@@ -82,6 +87,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Customer\Customer::class,
         ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin\Admin::class
+        ]
     ],
 
     /*
@@ -109,7 +118,12 @@ return [
             'provider' => 'customers',
             'table' => 'password_resets',
             'expire' => 60,
-        ]
+        ],
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'password_resets',
+            'expire' => 60,
+        ],
     ],
 
 ];

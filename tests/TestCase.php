@@ -5,6 +5,7 @@ namespace Tests;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use App\Models\Business\Business;
 use App\Models\Customer\Customer;
+use App\Models\Admin\Admin;
 
 abstract class TestCase extends BaseTestCase {
   use CreatesApplication;
@@ -23,6 +24,14 @@ abstract class TestCase extends BaseTestCase {
   	$headers['Authorization'] = 'Bearer '.$token;
 
   	return $headers;
+  }
+
+  protected function adminHeaders($admin) {
+    $headers = ['Accept' => 'application/json'];
+    $token = $admin->createToken();
+    $headers['Authorization'] = 'Bearer '.$token;
+
+    return $headers;
   }
 
   protected function squareWebhookHeaders($url, $body) {

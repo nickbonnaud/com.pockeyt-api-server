@@ -66,6 +66,10 @@ use App\Models\Location\ActiveLocation;
 
 use App\Observers\Location\ActiveLocationObserver;
 
+use App\Models\Admin\Admin;
+
+use App\Observers\Admin\AdminObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -113,5 +117,7 @@ class AppServiceProvider extends ServiceProvider
         TransactionNotification::observe(TransactionNotificationObserver::class);
 
         ActiveLocation::observe(ActiveLocationObserver::class);
+
+        Admin::observe(AdminObserver::class);
     }
 }

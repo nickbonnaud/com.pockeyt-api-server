@@ -176,7 +176,7 @@ class AuthTest extends TestCase {
   public function test_a_not_logged_in_customer_cannot_refresh_their_token() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
 
-    $response = $this->json('GET', '/api/customer/auth/logout')->assertStatus(401);
+    $response = $this->json('GET', '/api/customer/auth/refresh')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 

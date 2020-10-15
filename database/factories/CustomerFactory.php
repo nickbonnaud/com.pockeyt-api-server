@@ -2,6 +2,7 @@
 
 use App\Models\Customer;
 use App\Models\Business;
+use App\Models\Admin;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 
@@ -92,5 +93,28 @@ $factory->define(Customer\LoyaltyCard::class, function(Faker $faker) {
 			return factory(Business\LoyaltyProgram::class)->create()->id;
 		},
 		'points' => 100
+	];
+});
+
+$factory->define(Customer\HelpTicket::class, function(Faker $faker) {
+	return [
+		'customer_id' => function() {
+			return factory(Customer\Customer::class)->create()->id;
+		},
+		'admin_id' => function() {
+			return factory(Admin\Admin::class)->create()->id;
+		},
+		'subject' => $faker->sentence($nbWords = 15, $variableNbWords = true),
+		'message' => $faker->paragraph($nbSentences = 3, $variableNbSentences = true),
+	];
+});
+
+$factory->define(Customer\HelpTicketReply::class, function(Faker $faker) {
+	return [
+		'help_ticket_id' => function() {
+			return factory(Customer\HelpTicket::class)->create()->id;
+		},
+		'message' => $faker->paragraph($nbSentences = 3, $variableNbSentences = true),
+		'from_customer' => true
 	];
 });
