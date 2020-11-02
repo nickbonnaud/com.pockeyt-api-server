@@ -29,7 +29,7 @@ class HelpTicketTest extends TestCase {
     $this->assertEquals(8, $response->meta->total);
   }
 
-  public function test_an_auth_customer_can_fecth_help_tickets_by_resolved() {
+  public function test_an_auth_customer_can_fetch_help_tickets_by_resolved() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     factory(\App\Models\Customer\HelpTicket::class, 8)->create(['customer_id' => $customer->id, 'resolved' => false]);
     factory(\App\Models\Customer\HelpTicket::class, 3)->create(['customer_id' => $customer->id, 'resolved' => true]);
@@ -137,5 +137,5 @@ class HelpTicketTest extends TestCase {
     $this->customerHeaders($helpTicket->customer);
     $response = $this->json('DELETE', "/api/customer/help/{$helpTicket->identifier}")->assertStatus(200);
     $this->assertSame(true, ($response->getData())->data->deleted);
-  } 
+  }
 }

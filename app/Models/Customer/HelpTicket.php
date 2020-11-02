@@ -16,7 +16,7 @@ class HelpTicket extends Model {
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
 	protected $fillable = ['subject', 'message', 'read', 'resolved'];
-	protected $hidden = ['id', 'customer_id', 'admin_id'];
+	protected $hidden = ['id', 'customer_id', 'admin_id', 'created_at'];
 	protected $uuidFieldName = 'identifier';
 	protected $casts = ['read' => 'boolean', 'resolved' => 'boolean'];
 

@@ -9,7 +9,7 @@ class HelpTicketReply extends Model {
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
 	protected $fillable = ['message', 'from_customer'];
-	protected $hidden = ['id', 'help_ticket_id'];
+	protected $hidden = ['id', 'help_ticket_id', 'updated_at'];
 	protected $casts = ['read' => 'boolean', 'from_customer' => 'boolean'];
 
 	//////////////////// Relationships ////////////////////

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Customer\Customer;
 use App\Models\Customer\HelpTicket;
-use App\Http\Resources\Customer\HelpTicketReplyResource;
 use App\Http\Resources\Customer\HelpTicketResource;
 use App\Http\Requests\Customer\StoreHelpTicketReplyRequest;
 
@@ -22,8 +21,8 @@ class HelpTicketReplyController extends Controller {
   	if (is_null($helpTicket)) {
   		return response()->json(['errors' => 'Permission denied.'], 403);
   	}
-  	
-  	return new HelpTicketReplyResource($helpTicket->addCustomerReply($request->validated()));
+    $helpTicket->addCustomerReply($request->validated());
+  	return new HelpTicketResource($helpTicket->fresh());
   }
 
   public function update(Request $request, HelpTicket $helpTicket) {

@@ -63,15 +63,14 @@ class HelpTicketReplyTest extends TestCase {
     ];
 
     $response = $this->json('POST', '/api/customer/help-reply', $formData)->getData();
-
     $this->assertDatabaseHas('help_ticket_replies', [
       'message' => $message,
       'read' => false,
       'from_customer' => true
     ]);
 
-    $this->assertSame($message, $response->data->message);
-    $this->assertTrue($response->data->from_customer);
+    $this->assertSame($message, $response->data->replies[0]->message);
+    $this->assertTrue($response->data->replies[0]->from_customer);
   }
 
   public function test_auth_customer_adding_reply_touches_owning_help_ticket() {
