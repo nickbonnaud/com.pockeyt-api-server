@@ -4,11 +4,7 @@ namespace App\Filters;
 
 class RefundFilters extends Filters {
 
-	protected $filters = ['id', 'transactionId', 'recent', 'date', 'firstName', 'lastName', 'status', 'business'];
-
-	protected function recent($value) {
-		return $this->builder;
-	}
+	protected $filters = ['id', 'transactionId', 'date', 'firstName', 'lastName', 'customer', 'status', 'business'];
 
 	protected function id($identifier) {
 		return $this->builder->where('identifier', $identifier);
@@ -33,6 +29,12 @@ class RefundFilters extends Filters {
 	protected function lastName($lastName) {
 		return $this->builder->whereHas('transaction.customer.profile', function($q) use ($lastName) {
 			$q->where('last_name', $lastName);
+		});
+	}
+
+	public function customer($identifier) {
+		return $this->builder->whereHas('transaction.customer', function($q) use ($identifier) {
+			$q->where('identifier', $identifier);
 		});
 	}
 

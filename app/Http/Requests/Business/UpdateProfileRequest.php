@@ -28,7 +28,6 @@ class UpdateProfileRequest extends FormRequest
       'website' => 'url',
       'description' => 'min:25',
       'phone' => ['string', 'numeric', 'digits:10'],
-      'hours' => 'array'
     ];
   }
 }

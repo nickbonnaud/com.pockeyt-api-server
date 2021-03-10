@@ -12,9 +12,10 @@ use App\Http\Requests\Business\StoreReplyRequest;
 use App\Http\Requests\Business\UpdateReplyRequest;
 
 class ReplyController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:business');
+		$this->middleware('csrf');
   }
 
   public function store(StoreReplyRequest $request) {
@@ -22,17 +23,10 @@ class ReplyController extends Controller {
   	if (Business::getAuthBusiness()->id != $message->business_id) {
   		return response()->json(['errors' => 'Permission denied.'], 403);
   	}
+
   	$replyData = $request->except('message_identifier');
-  	$replyData['read'] = true;
-  	$reply = $message->addReply($replyData);
+		$replyData['sent_by_business'] = true;
+		$reply = $message->addReply($replyData);
   	return new ReplyResource($reply->fresh());
-  }
-
-  public function update(UpdateReplyRequest $request, BusinessMessageReply $businessMessageReply) {
-  	if ($businessMessageReply->message->business_id != Business::getAuthBusiness()->id) {
-  		return response()->json(['errors' => 'Permission denied.'], 403);
-  	}
-
-  	return new ReplyResource($businessMessageReply->updateReply($request->validated()));
   }
 }

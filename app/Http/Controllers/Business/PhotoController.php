@@ -13,6 +13,7 @@ class PhotoController extends Controller {
 
   public function __construct() {
   	$this->middleware('auth:business');
+    $this->middleware('csrf');
   }
 
   public function store(Profile $profile, StorePhotoRequest $request) {
@@ -20,7 +21,7 @@ class PhotoController extends Controller {
   		return response()->json(['errors' => 'Permission denied.'], 403);
   	}
     $request = $request->validated();
-    $request['is_logo'] = $request['is_logo'] === 'true';
+    $request['is_logo'] = $request['is_logo'] == true;
 
   	$photos = (new Photo)->createPhoto($request, $profile);
   	return new ProfilePhotosResource($photos);

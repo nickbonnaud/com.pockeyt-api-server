@@ -11,11 +11,12 @@ class BusinessController extends Controller
 {
   public function __construct() {
   	$this->middleware('auth:business');
+    $this->middleware('csrf');
   }
 
   public function index() {
   	$business = Business::getAuthBusiness();
-  	$business['token'] = Business::refreshToken();
+  	$business['token'] = Business::refreshToken($business);
   	return new BusinessResource($business);
   }
 
@@ -23,7 +24,7 @@ class BusinessController extends Controller
   	if ($business->id != (Business::getAuthBusiness())->id) {
       return response()->json(['errors' => 'Permission denied.'], 403);
     }
-  	$business->update($request->only('password', 'email'));
+  	$business->update($request->validated());
   	return new BusinessResource($business);
   }
 }

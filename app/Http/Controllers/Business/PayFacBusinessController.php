@@ -14,10 +14,11 @@ class PayFacBusinessController extends Controller {
   
   public function __construct() {
   	$this->middleware('auth:business');
+    $this->middleware('csrf');
   }
 
   public function store(StorePayFacBusinessRequest $request) {
-  	$business = Business::getAuthBusiness();
+    $business = Business::getAuthBusiness();
     $account = $business->account;
   	$account->createAccount($business, $request->entity_type);
   	$account->payFacAccount->storeData($request->except('entity_type'), $type = 'business');

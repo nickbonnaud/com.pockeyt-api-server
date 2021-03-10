@@ -23,11 +23,12 @@ class PasswordResetTest extends TestCase {
     $business = factory(\App\Models\Business\Business::class)->create(['email' => 'test@pockeyt.com', 'password' => 'Password1!']);
 
     $body = ['email' => 'not_an email'];
-    $response = $this->json('POST', '/api/business/auth/request-reset', $body)->assertStatus(422);
+    $response = $this->send("", 'post', '/api/business/auth/request-reset', $body)->assertStatus(422);
     $this->assertEquals('The email must be a valid email address.', $response->getData()->errors->email[0]);
 
     $body = ['email' => 'fake@pockeyt.com'];
-    $response = $this->json('POST', '/api/business/auth/request-reset', $body)->assertStatus(422);
+
+    $response = $this->send("", 'post', '/api/business/auth/request-reset', $body)->assertStatus(422);
     $this->assertEquals('The selected email is invalid.', $response->getData()->errors->email[0]);
   }
 
@@ -40,7 +41,7 @@ class PasswordResetTest extends TestCase {
     $body = ['email' => $email];
 
     Notification::assertNothingSent();
-    $response = $this->json('POST', '/api/business/auth/request-reset', $body)->assertStatus(200);
+    $response = $this->send("", 'post', '/api/business/auth/request-reset', $body)->assertStatus(200);
     $response = $response->getData();
 
     Notification::assertSentTo(
@@ -73,7 +74,7 @@ class PasswordResetTest extends TestCase {
       'password_confirmation' => 'Password2@'
     ];
 
-    $response = $this->json('PATCH', '/api/business/auth/reset-password', $body)->assertStatus(422);
+    $response = $this->send('', 'patch', '/api/business/auth/reset-password', $body)->assertStatus(422);
     $this->assertEquals('The token field is required.', $response->getData()->errors->token[0]);
 
     $body = [
@@ -81,7 +82,7 @@ class PasswordResetTest extends TestCase {
       'token' => $token
     ];
 
-    $response = $this->json('PATCH', '/api/business/auth/reset-password', $body)->assertStatus(422);
+    $response = $this->send("", 'patch', '/api/business/auth/reset-password', $body)->assertStatus(422);
     $this->assertEquals('The password confirmation does not match.', $response->getData()->errors->password[0]);
   }
 
@@ -102,7 +103,7 @@ class PasswordResetTest extends TestCase {
       'token' => "not_token"
     ];
 
-    $response = $this->json('PATCH', '/api/business/auth/reset-password', $body)->assertStatus(422);
+    $response = $this->send("", 'patch', '/api/business/auth/reset-password', $body)->assertStatus(422);
     $this->assertEquals('The selected token is invalid.', $response->getData()->errors->token[0]);
   }
 
@@ -125,7 +126,7 @@ class PasswordResetTest extends TestCase {
       'token' => $token
     ];
 
-    $response = $this->json('PATCH', '/api/business/auth/reset-password', $body)->assertStatus(422);
+    $response = $this->send('', 'patch', '/api/business/auth/reset-password', $body)->assertStatus(422);
     $this->assertEquals('Reset token has expired.', $response->getData()->errors->token[0]);
   }
 
@@ -147,7 +148,7 @@ class PasswordResetTest extends TestCase {
       'token' => $token
     ];
 
-    $response = $this->json('PATCH', '/api/business/auth/reset-password', $body)->assertStatus(200);
+    $response = $this->send('', 'patch', '/api/business/auth/reset-password', $body)->assertStatus(200);
     $response = $response->getData();
 
     $this->assertTrue($response->data->reset);

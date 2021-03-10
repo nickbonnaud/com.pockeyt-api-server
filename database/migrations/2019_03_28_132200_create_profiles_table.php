@@ -21,8 +21,6 @@ class CreateProfilesTable extends Migration
             $table->string('website');
             $table->text('description');
             $table->string('phone');
-            $table->json('hours');
-            $table->string('google_place_id')->nullable();
             $table->timestamps();
 
             $table->foreign('business_id')

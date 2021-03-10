@@ -16,7 +16,7 @@ class RefundTest extends TestCase {
   }
 
   public function test_an_unauth_business_cannot_retrieve_refunds() {
-    $response = $this->json('GET', '/api/business/refunds')->assertStatus(401);
+    $response = $this->send('', 'get', '/api/business/refunds')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
@@ -31,8 +31,8 @@ class RefundTest extends TestCase {
       $i++;
     }
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/refunds?recent=true')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/refunds')->getData();
     $this->assertEquals($numRefunds, $response->meta->total);
   }
 
@@ -45,8 +45,8 @@ class RefundTest extends TestCase {
 
     factory(\App\Models\Refund\Refund::class, 10)->create();
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/refunds?recent=true')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/refunds')->getData();
     $this->assertEquals(count($refunds), $response->meta->total);
   }
 
@@ -57,11 +57,11 @@ class RefundTest extends TestCase {
     $refunds = factory(\App\Models\Refund\Refund::class, 7)->create(['created_at' => Carbon::now()->subDays(rand(1, 100)), 'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $this->createCustomer()])->id]);
     $refunds->push($refund);
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/refunds?recent=true')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/refunds')->getData();
 
     $storedRefunds = \App\Models\Refund\Refund::orderBy('created_at', 'desc')->get();
-    
+
     foreach ($storedRefunds as $key => $refund) {
       $this->assertEquals($refund->created_at->toDateTimeString(), $response->data[$key]->refund->created_at);
     }
@@ -81,8 +81,8 @@ class RefundTest extends TestCase {
 
     $refunds->push($refund);
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', "/api/business/refunds?date[]={$startDate}&date[]={$endDate}")->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', "/api/business/refunds?date[]={$startDate}&date[]={$endDate}")->getData();
     $this->assertEquals(count($refunds), $response->meta->total);
   }
 
@@ -94,8 +94,21 @@ class RefundTest extends TestCase {
     $refunds = factory(\App\Models\Refund\Refund::class, 9)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id]);
     $refunds->push($refund);
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', "/api/business/refunds?firstName={$customer->profile->first_name}&lastName={$customer->profile->last_name}")->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', "/api/business/refunds?firstName={$customer->profile->first_name}&lastName={$customer->profile->last_name}")->getData();
+    $this->assertEquals(count($refunds), $response->meta->total);
+  }
+
+  public function test_a_business_can_retrieve_refunds_by_customer_identifier() {
+    $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer()])->id]);
+    $business = $refund->transaction->business;
+    $customer = $refund->transaction->customer;
+
+    $refunds = factory(\App\Models\Refund\Refund::class, 3)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id]);
+    $refunds->push($refund);
+
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', "/api/business/refunds?customer={$customer->identifier}")->getData();
     $this->assertEquals(count($refunds), $response->meta->total);
   }
 
@@ -104,8 +117,8 @@ class RefundTest extends TestCase {
     factory(\App\Models\Business\PosAccount::class)->create(['business_id' => $business->id]);
     $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['customer_id' => $this->createCustomer(), 'business_id' => $business->id])->id]);
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', "/api/business/refunds?id={$refund->identifier}")->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', "/api/business/refunds?id={$refund->identifier}")->getData();
     $this->assertEquals($refund->identifier, $response->data[0]->refund->identifier);
   }
 
@@ -114,10 +127,31 @@ class RefundTest extends TestCase {
     $refund = factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => $transaction->id]);
 
     $business = $transaction->business;
-    $this->businessHeaders($business);
-    $response = $this->json('GET', "/api/business/refunds?transactionId={$transaction->identifier}")->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', "/api/business/refunds?transactionId={$transaction->identifier}")->getData();
     $this->assertEquals($refund->identifier, $response->data[0]->refund->identifier);
     $this->assertEquals($transaction->identifier, $response->data[0]->transaction->identifier);
+  }
+
+  public function test_a_business_can_request_refund_data_net_refunds() {
+    $startDate = urlencode(Carbon::now()->subDays(6)->toIso8601String());
+    $endDate = urlencode(Carbon::now()->subDays(3)->toIso8601String());
+
+    $correctRefund = factory(\App\Models\Refund\Refund::class)->create(['created_at' => Carbon::now()->subDays(4)]);
+    $numCorrectRefunds = 6;
+
+    $correctRefunds = factory(\App\Models\Refund\Refund::class, $numCorrectRefunds)->create(['created_at' => Carbon::now()->subDays(5), 'transaction_id' => $correctRefund->transaction_id]);
+
+    factory(\App\Models\Refund\Refund::class, 8)->create(['created_at' => Carbon::now()->subDays(1), 'transaction_id' => $correctRefund->transaction_id]);
+
+    $token = $this->createBusinessToken($correctRefund->transaction->business);
+    $response = $this->send($token, 'get', "/api/business/refunds?date[]={$startDate}&date[]={$endDate}&sum=total")->getData();
+
+    $total = $correctRefund->total;
+    foreach ($correctRefunds as $refund) {
+      $total += $refund->total;
+    }
+    $this->assertEquals($response->data->refund_data, $total);
   }
 
   private function createCustomer() {

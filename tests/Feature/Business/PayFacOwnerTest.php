@@ -25,11 +25,11 @@ class PayFacOwnerTest extends TestCase {
   public function test_an_authorized_business_must_have_less_than_equal_to_100_ownership() {
   	$payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make(['percent_ownership' => 101]);
   	$business = $payFacOwner->payFacAccount->account->business;
-  	$header = $this->businessHeaders($business);
+  	$token = $this->createBusinessToken($business);
   	$payFacOwner = $payFacOwner->toArray();
   	$payFacOwner['ssn'] = $this->faker->ssn;
 
-  	$response = $this->json('POST', '/api/business/payfac/owner', $payFacOwner, $header)->assertStatus(422);
+  	$response = $this->send($token, 'post', '/api/business/payfac/owner', $payFacOwner)->assertStatus(422);
   	$response = $response->getData();
 		$this->assertEquals('The given data was invalid.', $response->message);
 		$this->assertEquals('Percent ownership is greater than 100.', $response->errors->percent_ownership[0]);
@@ -41,12 +41,12 @@ class PayFacOwnerTest extends TestCase {
     $account = $business->account;
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make();
-    $header = $this->businessHeaders($business);
     $payFacOwner = $payFacOwner->toArray();
     $payFacOwner['ssn'] = $this->faker->numerify('#########');
     $payFacOwner['dob'] = '10/24/1987';
-    $response = $this->json('POST', '/api/business/payfac/owner', $payFacOwner, $header)->getData();
-
+    
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'post', '/api/business/payfac/owner', $payFacOwner)->getData();
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $business->fresh()->account->getPayFacOwners()->first()->id]);
 
     $this->assertEquals($payFacOwner['last_name'], $response->data->last_name);
@@ -59,11 +59,11 @@ class PayFacOwnerTest extends TestCase {
     factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 25]);
 
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make(['percent_ownership' => 25]);
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
     $payFacOwnerArray = $payFacOwner->toArray();
     $payFacOwnerArray['ssn'] = $this->faker->numerify("#########");
 
-    $response = $this->json('POST', '/api/business/payfac/owner', $payFacOwnerArray, $header)->getData();
+    $response = $this->send($token, 'post', '/api/business/payfac/owner', $payFacOwnerArray)->getData();
 
     $this->assertDatabaseHas('pay_fac_owners', ['first_name' => $payFacOwner->first_name, 'last_name' => $payFacOwner->last_name]);
   }
@@ -75,11 +75,11 @@ class PayFacOwnerTest extends TestCase {
     factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 75]);
 
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->make(['percent_ownership' => 50]);
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
     $payFacOwnerArray = $payFacOwner->toArray();
     $payFacOwnerArray['ssn'] = $this->faker->ssn;
 
-    $response = $this->json('POST', '/api/business/payfac/owner', $payFacOwnerArray, $header)->assertStatus(422);
+    $response = $this->send($token, 'post', '/api/business/payfac/owner', $payFacOwnerArray)->assertStatus(422);
     $response = $response->getData();
     $this->assertEquals('The given data was invalid.', $response->message);
     $this->assertEquals('Percent ownership is greater than 100.', $response->errors->percent_ownership[0]);
@@ -91,7 +91,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
     $lastName = "Newname";
@@ -101,7 +101,7 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
 
-    $response = $this->json('PATCH', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray, $header)->getData();
+    $response = $this->send($token, 'patch', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray)->getData();
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $lastName]);
 
@@ -116,7 +116,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 50]);
 
     factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'percent_ownership' => 50]);
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
     $lastName = "Newname";
@@ -125,7 +125,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacOwnerArray['percent_ownership'] = 75;
     $payFacOwnerArray['title'] = 'CEO';
 
-    $response = $this->json('PATCH', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray, $header)->assertStatus(422);
+    $response = $this->send($token, 'patch', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray)->assertStatus(422);
     $response = $response->getData();
     $this->assertEquals('The given data was invalid.', $response->message);
     $this->assertEquals('Percent ownership is greater than 100.', $response->errors->percent_ownership[0]);
@@ -137,7 +137,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
     $lastName = "Newname";
@@ -147,10 +147,9 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
 
-    $response = $this->json('PATCH', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray, $header)->getData();
+    $response = $this->send($token, 'patch', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray)->getData();
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $lastName]);
-
     $this->assertEquals($lastName, $response->data->last_name);
   }
 
@@ -160,7 +159,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
     $lastName = "Newname";
@@ -171,10 +170,9 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
 
-    $response = $this->json('PATCH', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray, $header)->getData();
+    $response = $this->send($token, 'patch', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray)->getData();
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $lastName]);
-
     $this->assertEquals($oldSsn, $payFacOwner->fresh()->ssn);
   }
 
@@ -184,7 +182,7 @@ class PayFacOwnerTest extends TestCase {
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $payFacOwnerArray = $payFacOwner->toArray();
     $lastName = "Newname";
@@ -195,10 +193,9 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
 
-    $response = $this->json('PATCH', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray, $header)->getData();
+    $response = $this->send($token, 'patch', "/api/business/payfac/owner/{$payFacOwner->identifier}", $payFacOwnerArray)->getData();
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $lastName]);
-
     $this->assertNotEquals($oldSsn, $payFacOwner->fresh()->ssn);
   }
 
@@ -211,10 +208,9 @@ class PayFacOwnerTest extends TestCase {
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
 
-    $response = $this->json('DELETE', "/api/business/payfac/owner/{$payFacOwner->identifier}")->assertStatus(401);
+    $response = $this->send("", 'delete', "/api/business/payfac/owner/{$payFacOwner->identifier}")->assertStatus(401);
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
-
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
@@ -224,13 +220,13 @@ class PayFacOwnerTest extends TestCase {
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $account->id]);
 
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $otherBusinessOwner = factory(\App\Models\Business\PayFacOwner::class)->create();
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $otherBusinessOwner->id, 'last_name' => $otherBusinessOwner->last_name]);
 
-    $response = $this->json('DELETE', "/api/business/payfac/owner/{$otherBusinessOwner->identifier}")->assertStatus(403);
+    $response = $this->send($token, 'delete', "/api/business/payfac/owner/{$otherBusinessOwner->identifier}")->assertStatus(403);
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $otherBusinessOwner->id, 'last_name' => $otherBusinessOwner->last_name]);
 
@@ -246,14 +242,15 @@ class PayFacOwnerTest extends TestCase {
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'primary' => false]);
 
     factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    $this->businessHeaders($business);
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
     $this->assertEquals(\App\Models\Business\PayFacOwner::count(), 4);
 
-    $response = $this->json('DELETE', "/api/business/payfac/owner/{$payFacOwner->identifier}")->getData();
+    
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'delete', "/api/business/payfac/owner/{$payFacOwner->identifier}")->getData();
 
-    $this->assertEquals(true, $response->success);
+    $this->assertEquals(true, $response->data->success);
     $this->assertDatabaseMissing('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
     $this->assertEquals(\App\Models\Business\PayFacOwner::count(), 3);
   }
@@ -266,12 +263,12 @@ class PayFacOwnerTest extends TestCase {
     $payFacOwner = factory(\App\Models\Business\PayFacOwner::class)->create(['pay_fac_account_id' => $payFacAccount->id, 'primary' => true]);
 
     factory(\App\Models\Business\PayFacOwner::class, 3)->create(['pay_fac_account_id' => $payFacAccount->id]);
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);
     $this->assertEquals(\App\Models\Business\PayFacOwner::count(), 4);
 
-    $response = $this->json('DELETE', "/api/business/payfac/owner/{$payFacOwner->identifier}")->assertStatus(403);
+    $response = $this->send($token, 'delete', "/api/business/payfac/owner/{$payFacOwner->identifier}")->assertStatus(403);
 
     $this->assertEquals("Cannot delete primary owner.", $response->getData()->errors);
     $this->assertDatabaseHas('pay_fac_owners', ['id' => $payFacOwner->id, 'last_name' => $payFacOwner->last_name]);

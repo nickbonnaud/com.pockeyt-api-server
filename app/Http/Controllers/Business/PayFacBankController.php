@@ -10,9 +10,10 @@ use App\Http\Requests\Business\StorePayFacBankRequest;
 use App\Http\Requests\Business\UpdatePayFacBankRequest;
 
 class PayFacBankController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:business');
+		$this->middleware('csrf');
   }
 
   public function store(StorePayFacBankRequest $request) {

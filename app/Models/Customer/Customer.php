@@ -10,7 +10,7 @@ use App\Notifications\Customer\ResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Customer extends Authenticatable implements JWTSubject {
-  
+
   //////////////////// Traits ////////////////////
 
 	use Notifiable;
@@ -49,10 +49,6 @@ class Customer extends Authenticatable implements JWTSubject {
 
 	public function account() {
 		return $this->hasOne('App\Models\Customer\CustomerAccount');
-	}
-
-	public function loyaltyCard() {
-		return $this->hasOne('App\Models\Customer\LoyaltyCard');
 	}
 
 	public function transactions() {
@@ -100,7 +96,7 @@ class Customer extends Authenticatable implements JWTSubject {
 
 	public static function login($credentials) {
 		if (!auth('customer')->validate($credentials)) {
-      return ['token' => null, 'error' => 'invalid_credentials', 'code' => 401]; 
+      return ['token' => null, 'error' => 'invalid_credentials', 'code' => 401];
     }
     $customer = Customer::where('email', $credentials['email'])->first();
     return self::createToken($customer);
@@ -123,7 +119,7 @@ class Customer extends Authenticatable implements JWTSubject {
 	public static function createToken($customer) {
 		try {
   		if (!$token = auth('customer')->login($customer))
-  			return ['token' => null, 'error' => 'invalid_credentials', 'code' => 401]; 
+  			return ['token' => null, 'error' => 'invalid_credentials', 'code' => 401];
   	} catch(Exceptions\JWTException $e) {
   		return ['token' => null, 'error' => 'could_not_create_token', 'code' => 500];
   	}

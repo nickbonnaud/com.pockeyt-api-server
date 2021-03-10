@@ -2,14 +2,14 @@
 
 namespace App\Models\Business;
 
-use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\Business\ResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Business extends Authenticatable implements JWTSubject {
-	
+
 	//////////////////// Traits ////////////////////
 
 	use Notifiable;
@@ -36,10 +36,6 @@ class Business extends Authenticatable implements JWTSubject {
 
 	public function account() {
 		return $this->hasOne('App\Models\Business\Account');
-	}
-
-	public function loyaltyProgram() {
-		return $this->hasOne('App\Models\Business\LoyaltyProgram');
 	}
 
 	public function location() {
@@ -77,11 +73,6 @@ class Business extends Authenticatable implements JWTSubject {
 		return $this->profile;
 	}
 
-	public function storeLoyaltyProgram($loyaltyProgram) {
-		$this->loyaltyProgram()->save($loyaltyProgram);
-		return $this->loyaltyProgram;
-	}
-
 	//////////////////// JWT Helpers ////////////////////
 
 	public function getJWTIdentifier() {
@@ -94,36 +85,27 @@ class Business extends Authenticatable implements JWTSubject {
 
 	//////////////////// Core Methods ////////////////////
 
+	public static function register($credentials) {
+		$business = Self::create($credentials);
+		Self::login($credentials);
+		return $business;
+	}
+
 	public static function login($credentials) {
-		if (!auth('business')->validate($credentials)) {
-      return ['token' => null, 'error' => 'invalid_credentials', 'code' => 401]; 
-    }
-    $business = Business::where('email', $credentials['email'])->first();
-    return self::createToken($business);
+		return auth('business')->claims(['csrf-token' => Self::createCsrfToken()])->attempt($credentials);
 	}
 
 	public static function logout() {
 		auth('business')->logout();
-		return ['token' => null, 'error' => null, 'code' => 200];
 	}
 
-	public static function refreshToken() {
-		return auth('business')->refresh();
+	public static function refreshToken($business) {
+		auth('business')->invalidate();
+		return auth('business')->claims(['csrf-token' => Self::createCsrfToken()])->login($business);
 	}
 
-	public static function updateToken() {
-		$token = self::refreshToken();
-		return ['token' => $token, 'error' => null, 'code' => 200];
-	}
-
-	public static function createToken($business) {
-		try {
-  		if (!$token = auth('business')->login($business))
-  			return ['token' => null, 'error' => 'invalid_credentials', 'code' => 401]; 
-  	} catch(Exceptions\JWTException $e) {
-  		return ['token' => null, 'error' => 'could_not_create_token', 'code' => 500];
-  	}
-  	return ['token' => $token, 'error' => null, 'code' => 200];
+	private static function createCsrfToken() {
+		return Str::uuid();
 	}
 
 	public static function getAuthBusiness() {
@@ -132,16 +114,6 @@ class Business extends Authenticatable implements JWTSubject {
 
 	public function scopeFilter($query, $filters) {
 		return $filters->apply($query);
-	}
-
-	//////////////////// Formatting Methods ////////////////////
-
-	public static function formatToken($token = null) {
-		return [
-      'value' => $token,
-      'token_type' => 'bearer',
-      'expiry' => $token ? Carbon::now()->addMinutes(auth('business')->factory()->getTTL())->timestamp : null
-    ];
 	}
 
 	//////////////////// Inherited Overrides Methods ////////////////////

@@ -22,7 +22,7 @@ class PayFacBankTest extends TestCase {
     $payFacBankArray['routing_number'] = $this->createFakeNumber();
     $payFacBankArray['account_number'] = $this->createFakeNumber();
 
-    $response = $this->json('POST', '/api/business/payfac/bank', $payFacBankArray)->assertStatus(401);
+    $response = $this->send("", 'post', '/api/business/payfac/bank', $payFacBankArray)->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
@@ -31,20 +31,23 @@ class PayFacBankTest extends TestCase {
     $payFacAccount = factory(\App\Models\Business\PayFacAccount::class)->create(['account_id' => $business->account->id]);
 
     $payFacBank = factory(\App\Models\Business\PayFacBank::class)->make();
-    $header = $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
     $payFacBankArray = $payFacBank->toArray();
     $payFacBankArray['routing_number'] = $this->createFakeNumber();
     $payFacBankArray['account_number'] = $this->createFakeNumber();
 
-    $response = $this->json('POST', '/api/business/payfac/bank', $payFacBankArray, $header)->getData();
+    $response = $this->send($token, 'post', '/api/business/payfac/bank', $payFacBankArray)->getData();
     $this->assertDatabaseHas('pay_fac_banks', ['first_name' => $payFacBank->first_name, 'last_name' => $payFacBank->last_name]);
     $this->assertEquals($payFacBank->address, $response->data->address->address);
   }
 
   public function test_an_authorized_business_must_send_correct_data() {
     $business = factory(\App\Models\Business\Business::class)->create();
-    $response = $this->json('POST', '/api/business/payfac/bank', [], $this->businessHeaders($business))->assertStatus(422);
+    $token = $this->createBusinessToken($business);
+
+    $response = $this->send($token, 'post', '/api/business/payfac/bank', [])->assertStatus(422);
+
     $response = $response->getData();
     $this->assertEquals('The given data was invalid.', $response->message);
   }
@@ -61,14 +64,15 @@ class PayFacBankTest extends TestCase {
     $payFacBankArray['account_number'] = $account;
     $payFacBankArray['first_name'] = $newFirstName;
 
-    $response = $this->json('PATCH', "/api/business/payfac/bank/{$payFacBank['identifier']}", $payFacBankArray)->assertStatus(401);
+    $response = $this->send("", 'patch', "/api/business/payfac/bank/{$payFacBank['identifier']}", $payFacBankArray)->assertStatus(401);
+
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
   public function test_an_authorized_business_can_update_bank_data() {
     factory(\App\Models\Business\AccountStatus::class)->create();
     $payFacBank = factory(\App\Models\Business\PayFacBank::class)->create();
-    $header = $this->businessHeaders($payFacBank->payFacAccount->account->business);
+    $token = $this->createBusinessToken($payFacBank->payFacAccount->account->business);
     $routing = $this->createFakeNumber();
     $account = $this->createFakeNumber();
     $newFirstName = 'new name';
@@ -78,7 +82,8 @@ class PayFacBankTest extends TestCase {
     $payFacBankArray['account_number'] = $account;
     $payFacBankArray['first_name'] = $newFirstName;
 
-    $response = $this->json('PATCH', "/api/business/payfac/bank/{$payFacBank['identifier']}", $payFacBankArray, $header)->getData();
+    $response = $this->send($token, 'patch', "/api/business/payfac/bank/{$payFacBank['identifier']}", $payFacBankArray)->getData();
+
     $this->assertDatabaseHas('pay_fac_banks', ['first_name' => $newFirstName]);
     $this->assertEquals($routing, $payFacBank->fresh()->routing_number);
     $this->assertEquals($account, $payFacBank->fresh()->account_number);
@@ -88,7 +93,7 @@ class PayFacBankTest extends TestCase {
   public function test_an_authorized_business_does_not_change_PII_if_untouched() {
     factory(\App\Models\Business\AccountStatus::class)->create();
     $payFacBank = factory(\App\Models\Business\PayFacBank::class)->create();
-    $header = $this->businessHeaders($payFacBank->payFacAccount->account->business);
+    $token = $this->createBusinessToken($payFacBank->payFacAccount->account->business);
     $oldRouting = $payFacBank->routing_number;
     $oldAccount = $payFacBank->account_number;
     $routing = 'XXXXX' . substr($payFacBank->routing_number, -4);
@@ -100,7 +105,8 @@ class PayFacBankTest extends TestCase {
     $payFacBankArray['account_number'] = $account;
     $payFacBankArray['first_name'] = $newFirstName;
 
-    $response = $this->json('PATCH', "/api/business/payfac/bank/{$payFacBank['identifier']}", $payFacBankArray, $header)->getData();
+    $response = $this->send($token, 'patch', "/api/business/payfac/bank/{$payFacBank['identifier']}", $payFacBankArray)->getData();
+
     $this->assertDatabaseHas('pay_fac_banks', ['first_name' => $newFirstName]);
     $this->assertEquals($oldRouting, $payFacBank->fresh()->routing_number);
     $this->assertEquals($oldAccount, $payFacBank->fresh()->account_number);

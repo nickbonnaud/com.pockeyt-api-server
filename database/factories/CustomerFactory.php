@@ -84,18 +84,6 @@ $factory->define(Customer\CardCustomer::class, function(Faker $faker) {
 	];
 });
 
-$factory->define(Customer\LoyaltyCard::class, function(Faker $faker) {
-	return [
-		'customer_id' => function() {
-			return factory(Customer\Customer::class)->create()->id;
-		},
-		'loyalty_program_id' => function() {
-			return factory(Business\LoyaltyProgram::class)->create()->id;
-		},
-		'points' => 100
-	];
-});
-
 $factory->define(Customer\HelpTicket::class, function(Faker $faker) {
 	return [
 		'customer_id' => function() {

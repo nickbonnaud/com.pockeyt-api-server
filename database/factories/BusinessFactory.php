@@ -20,17 +20,24 @@ $factory->define(Business\Profile::class, function (Faker $faker) {
 		'website' => $faker->domainName,
 		'description' => $faker->paragraph($nbSentences = 3, $variableNbSentences = true),
 		'phone' => $faker->numerify('##########'),
-		'hours' => [
-      'monday' => "Monday: 11:00 AM – 10:00 PM",
-      'tuesday' => "Tuesday: 11:00 AM – 10:00 PM",
-      'wednesday' => "Wednesday: 11:00 AM – 10:00 PM",
-      'thursday' => "Thursday: 11:00 AM – 10:00 PM",
-      'friday' => "Friday: 11:00 AM – 10:30 PM",
-      'saturday' => "Saturday: 11:00 AM – 10:30 PM",
-      'sunday' => "Sunday: 10:30 AM – 9:00 PM",
-    ],
 		'business_id' => function() {
 			return factory(Business\Business::class)->create()->id;
+		}
+	];
+});
+
+$factory->define(Business\Hours::class, function (Faker $faker) {
+	$hour = '10:00 AM - 10:00 PM';
+	return [
+		'sunday' => $hour,
+		'monday' => $hour,
+		'tuesday' => $hour,
+		'wednesday' => $hour,
+		'thursday' => $hour,
+		'friday' => $hour,
+		'saturday' => $hour,
+		'profile_id' => function() {
+			return factory(Business\Profile::class)->create()->id;
 		}
 	];
 });
@@ -175,17 +182,6 @@ $factory->define(Business\AchOwner::class, function(Faker $faker) {
 		'zip' => (string)($faker->randomNumber($nbDigits = 5, $strict = true)),
 		'ssn' => $faker->ssn,
 		'primary' => true,
-	];
-});
-
-$factory->define(Business\LoyaltyProgram::class, function(Faker $faker) {
-	return [
-		'business_id' => function() {
-			return factory(Business\Business::class)->create()->id;
-		},
-		'purchases_required' => 20,
-		'amount_required' => 10000,
-		'reward' => 'Large Ice Cream'
 	];
 });
 
@@ -353,7 +349,8 @@ $factory->define(Business\BusinessMessage::class, function(Faker $faker) {
 		'title' => $faker->sentence($nbWords = 15, $variableNbWords = true),
 		'body' => $faker->paragraph($nbSentences = 3, $variableNbSentences = true),
 		'sent_by_business' => false,
-		'read' => false
+		'read' => false,
+		'latest_reply' => now()
 	];
 });
 

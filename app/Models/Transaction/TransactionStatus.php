@@ -10,6 +10,7 @@ class TransactionStatus extends Model {
 
 	protected $fillable = ['name', 'code'];
 	protected $hidden = ['id', 'created_at', 'updated_at'];
+  protected $casts = ['code' => 'integer'];
 
   //////////////////// Relationships ////////////////////
 

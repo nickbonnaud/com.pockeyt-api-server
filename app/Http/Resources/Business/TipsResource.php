@@ -16,7 +16,7 @@ class TipsResource extends JsonResource
     return [
       'first_name' => $this->first_name,
       'last_name' => $this->last_name,
-      'tips' => $this->tips,
+      'tips' => (int) $this->tips,
     ];
   }
 }

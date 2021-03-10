@@ -4,7 +4,7 @@ namespace App\Http\Resources\Business;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LoyaltyProgramResource extends JsonResource
+class HoursResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

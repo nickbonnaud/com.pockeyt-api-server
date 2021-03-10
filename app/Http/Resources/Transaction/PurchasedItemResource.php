@@ -12,13 +12,14 @@ class PurchasedItemResource extends JsonResource {
    * @return array
    */
   public function toArray($request) {
-    $item = $this->getInventoryItem();
     return [
-      'name' => $item->name,
-      'sub_name' => $item->sub_name,
-      'price' => $item->price,
-      'main_id' => $item->main_id,
-      'sub_id' => $item->sub_id
+      'name' => $this->name,
+      'sub_name' => $this->sub_name,
+      'price' => (int)$this->price,
+      'main_id' => $this->main_id,
+      'sub_id' => $this->sub_id,
+      'quantity' => $this->quantity,
+      'total' => $this->quantity * $this->price
     ];
   }
 }

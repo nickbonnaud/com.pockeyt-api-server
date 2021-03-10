@@ -39,7 +39,7 @@ class StorePhotoRequest extends FormRequest
           }
         }
       }],
-      'is_logo' =>'required|string|in:true,false'
+      'is_logo' =>'required|boolean'
     ];
   }
 }

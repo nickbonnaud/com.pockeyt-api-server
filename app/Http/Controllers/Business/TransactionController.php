@@ -13,6 +13,7 @@ class TransactionController extends Controller {
 
 	public function __construct() {
   	$this->middleware('auth:business');
+    $this->middleware('csrf');
   }
 
   public function index(Request $request, TransactionFilters $filters) {
@@ -21,8 +22,10 @@ class TransactionController extends Controller {
       ->where('business_id', $business->id)
       ->orderBy('created_at', 'desc');
   	if ($request->has('sum')) {
-  		return response()->json(['data' => ['sales_data' => $query->sum($request->query('sum'))]]);
-  	}
+  		return response()->json(['data' => ['sales_data' => (int) $query->sum($request->query('sum'))]]);
+  	} elseif($request->has('count')) {
+      return response()->json(['data' => ['sales_data' => (int) $query->count($request->query('count'))]]);
+    }
   	return TransactionResource::collection($query->paginate(10)->appends($request->except('page')));
   }
 }

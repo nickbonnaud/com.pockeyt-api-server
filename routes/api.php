@@ -32,13 +32,13 @@ Route::prefix('business')->group(function() {
 	Route::get('business', 'Business\BusinessController@index');
 	Route::patch('business/{business}', 'Business\BusinessController@update');
 
-	// Dashboard Business
-	Route::get('me', 'Business\DashboardBusinessController@index');
-
 	// Business Profile
-	Route::get('profile', 'Business\ProfileController@index');
 	Route::post('profile', 'Business\ProfileController@store');
 	Route::patch('profile/{profile}', 'Business\ProfileController@update');
+
+	// Business Hours
+	Route::post('hours', 'Business\HoursController@store');
+	Route::patch('hours/{hours}', 'Business\HoursController@update');
 
 	// Business Photos
 	Route::post('photos/{profile}', 'Business\PhotoController@store');
@@ -56,14 +56,8 @@ Route::prefix('business')->group(function() {
 		Route::patch('bank/{pay_fac_bank}', 'Business\PayFacBankController@update');
 	});
 
-	// Loyalty Program
-	Route::get('loyalty-program', 'Business\LoyaltyProgramController@index');
-	Route::post('loyalty-program', 'Business\LoyaltyProgramController@store');
-	Route::delete('loyalty-program/{loyalty_program}', 'Business\LoyaltyProgramController@destroy');
-
 	// Location
 	Route::prefix('location')->group(function() {
-		Route::get('geo', 'Business\GeoAccountController@index');
 		Route::post('geo', 'Business\GeoAccountController@store');
 		Route::patch('geo/{geo_account}', 'Business\GeoAccountController@update');
 	});
@@ -92,7 +86,7 @@ Route::prefix('business')->group(function() {
 		Route::get('vend/oauth', 'Business\VendAccountController@store');
 	});
 
-	
+
 	// Business Customers
 	Route::get('customers', 'Business\CustomerController@index');
 
@@ -105,10 +99,9 @@ Route::prefix('business')->group(function() {
 	// Business Refunds
 	Route::get('refunds', 'Business\RefundController@index');
 
-	// Business Statuses
+	// Business Transaction Statuses
 	Route::prefix('status')->group(function() {
 		Route::get('transaction', 'Business\TransactionStatusController@index');
-		Route::get('refund', 'Business\RefundStatusController@index');
 	});
 
 	// Business Employee Tips
@@ -124,7 +117,9 @@ Route::prefix('business')->group(function() {
 
 	// Business Replies
 	Route::post('reply', 'Business\ReplyController@store');
-	Route::patch('reply/{business_message_reply}', 'Business\ReplyController@update');
+
+	// Business API Credentials
+	Route::get('credentials', 'Business\CredentialsController@index');
 });
 
 // Customer
@@ -194,6 +189,9 @@ Route::prefix('customer')->group(function() {
 	// Help Ticket replies
 	Route::post('help-reply', 'Customer\HelpTicketReplyController@store');
 	Route::patch('help-reply/{help_ticket}', 'Customer\HelpTicketReplyController@update');
+
+	// Customer API Credentials
+	Route::get('credentials', 'Customer\CredentialsController@index');
 });
 
 Route::prefix('admin')->group(function() {

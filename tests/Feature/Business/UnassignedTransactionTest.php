@@ -18,7 +18,7 @@ class UnassignedTransactionTest extends TestCase {
   public function test_an_unauth_business_cannot_request_unassigned() {
     $numTrans = 11;
     $unassigned = factory(\App\Models\Transaction\UnassignedTransaction::class, $numTrans)->create();
-    $response = $this->json('GET', '/api/business/unassigned-transactions?recent=true')->assertStatus(401);
+    $response = $this->send("", 'get', '/api/business/unassigned-transactions?recent=true')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
@@ -29,10 +29,10 @@ class UnassignedTransactionTest extends TestCase {
       ->create(['business_id' => $unassignedBiz->business_id, 'created_at' => Carbon::now()->subDays(rand(1, 100))]);
 
     $unassigned = $unassigned->push($unassignedBiz);
-    
+
     $business = $unassigned[0]->business;
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/unassigned-transactions?recent=true')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/unassigned-transactions?recent=true')->getData();
 
     $storedTrans = \App\Models\Transaction\UnassignedTransaction::orderBy('created_at', 'desc')->get();
     foreach ($storedTrans as $key => $tran) {
@@ -50,8 +50,8 @@ class UnassignedTransactionTest extends TestCase {
     factory(\App\Models\Transaction\UnassignedTransaction::class, 4)->create();
     $business = $unassignedBiz->business;
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/unassigned-transactions?recent=true')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/unassigned-transactions?recent=true')->getData();
     $this->assertEquals(count($unassigned), $response->meta->total);
   }
 
@@ -73,24 +73,8 @@ class UnassignedTransactionTest extends TestCase {
 
     $business = $unassignedBiz->business;
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', "/api/business/unassigned-transactions?date[]={$startDate}&date[]={$endDate}")->getData();
-    $this->assertEquals(count($unassigned), $response->meta->total);
-  }
-
-  public function test_a_business_can_retrieve_unassigned_by_employee() {
-    $employee = factory(\App\Models\Business\Employee::class)->create();
-    $unassignedBiz = factory(\App\Models\Transaction\UnassignedTransaction::class)->create(['employee_id' => $employee->external_id]);
-
-    $unassigned = factory(\App\Models\Transaction\UnassignedTransaction::class, 5)
-      ->create(['business_id' => $unassignedBiz->business_id, 'employee_id' => $employee->external_id]);
-    $unassigned = $unassigned->push($unassignedBiz);
-
-    factory(\App\Models\Transaction\UnassignedTransaction::class, 12)
-      ->create(['business_id' => $unassignedBiz->business_id, 'employee_id' => factory(\App\Models\Business\Employee::class)->create()->external_id]);
-
-    $this->businessHeaders($unassignedBiz->business);
-    $response = $this->json('GET', "/api/business/unassigned-transactions?employee={$employee->external_id}")->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', "/api/business/unassigned-transactions?date[]={$startDate}&date[]={$endDate}")->getData();
     $this->assertEquals(count($unassigned), $response->meta->total);
   }
 }

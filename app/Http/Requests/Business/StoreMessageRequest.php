@@ -25,7 +25,6 @@ class StoreMessageRequest extends FormRequest {
     return [
       'title' => 'required|string|min:2',
       'body' => 'required|string|min:2',
-      'sent_by_business' => 'required|boolean'
     ];
   }
 }

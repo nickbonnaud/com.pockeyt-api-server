@@ -17,9 +17,8 @@ class PayFacOwner extends Model {
 
 	protected $guarded = ['identifier'];
 	protected $hidden = ['id', 'pay_fac_account_id', 'ssn', 'gender'];
-	protected $casts = ['primary' => 'boolean'];
+	protected $casts = ['primary' => 'boolean', 'percent_ownership' => 'integer'];
 	protected $uuidFieldName = 'identifier';
-
 	protected $dates = ['dob'];
 
 	//////////////////// Routing ////////////////////

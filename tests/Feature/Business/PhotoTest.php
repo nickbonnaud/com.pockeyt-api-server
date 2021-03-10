@@ -24,10 +24,10 @@ class PhotoTest extends TestCase {
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-  		'is_logo' => 'true'
+  		'is_logo' => true
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(401);
+    $response = $this->send("", 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(401);
   	$this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
@@ -35,28 +35,29 @@ class PhotoTest extends TestCase {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
   	$unauthorizedProfile = factory(\App\Models\Business\Profile::class)->create();
-  	$header = $this->businessHeaders($unauthorizedProfile->business);
+    $token = $this->createBusinessToken($unauthorizedProfile->business);
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-  		'is_logo' => 'true'
+  		'is_logo' => true
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes, $header)->assertStatus(403);
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(403);
   	$this->assertEquals('Permission denied.', ($response->getData())->errors);
   }
 
   public function test_a_valid_photo_must_be_submitted() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
-  	$header = $this->businessHeaders($profile->business);
+  	$token = $this->createBusinessToken($profile->business);
+    $token = $this->createBusinessToken($profile->business);
 
   	$attributes = [
   		'photo' => 'not a photo',
-  		'is_logo' => 'true'
+  		'is_logo' => true
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
 
   	$this->assertEquals('The given data was invalid.', ($response->getData())->message);
   	$this->assertEquals('The photo must be a file.', ($response->getData())->errors->photo[0]);
@@ -65,14 +66,14 @@ class PhotoTest extends TestCase {
   public function test_a_photo_must_be_of_correct_type() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
-  	$header = $this->businessHeaders($profile->business);
+  	$token = $this->createBusinessToken($profile->business);
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.gif', 1000, 720),
-  		'is_logo' => 'true'
+  		'is_logo' => true
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
 
   	$this->assertEquals('The given data was invalid.', ($response->getData())->message);
   	$this->assertEquals('The photo must be a file of type: jpg, jpeg, png.', ($response->getData())->errors->photo[0]);
@@ -81,13 +82,13 @@ class PhotoTest extends TestCase {
   public function test_a_profile_cannot_store_a_photo_without_is_logo_attribute() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
-  	$header = $this->businessHeaders($profile->business);
+  	$token = $this->createBusinessToken($profile->business);
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720)
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
 
   	$this->assertEquals('The given data was invalid.', ($response->getData())->message);
   	$this->assertEquals('The is logo field is required.', ($response->getData())->errors->is_logo[0]);
@@ -96,14 +97,14 @@ class PhotoTest extends TestCase {
   public function test_a_profile_cannot_store_a_photo_if_is_logo_attribute_is_not_string() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
-  	$header = $this->businessHeaders($profile->business);
+  	$token = $this->createBusinessToken($profile->business);
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
   		'is_logo' => true
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
 
   	$this->assertEquals('The given data was invalid.', ($response->getData())->message);
   	$this->assertEquals('The is logo must be a string.', ($response->getData())->errors->is_logo[0]);
@@ -112,42 +113,42 @@ class PhotoTest extends TestCase {
   public function test_logo_must_be_larger_than_150_x_150() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
-    $header = $this->businessHeaders($profile->business);
+    $token = $this->createBusinessToken($profile->business);
 
     $attributes = [
       'photo' => $file = UploadedFile::fake()->image('logo.jpg', 100, 100),
-      'is_logo' => 'true'
+      'is_logo' => true
     ];
 
-    $response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
     $this->assertEquals('Logo must be larger than 150x150 pixels.', ($response->getData())->errors->photo[0]);
   }
 
   public function test_banner_must_be_larger_than_320_x_100() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
-    $header = $this->businessHeaders($profile->business);
+    $token = $this->createBusinessToken($profile->business);
 
     $attributes = [
       'photo' => $file = UploadedFile::fake()->image('banner.jpg', 300, 90),
-      'is_logo' => 'false'
+      'is_logo' => false
     ];
 
-    $response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->assertStatus(422);
     $this->assertEquals('Banner must be larger than 320x100 pixels.', ($response->getData())->errors->photo[0]);
   }
 
   public function test_an_authorized_profile_can_store_a_logo() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
-  	$header = $this->businessHeaders($profile->business);
+  	$token = $this->createBusinessToken($profile->business);
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-  		'is_logo' => 'true'
+  		'is_logo' => true
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
   	$this->assertNotNull($response->data->logo->name);
   	$this->assertNotNull($response->data->logo->small_url);
   	$this->assertNotNull($response->data->logo->large_url);
@@ -161,14 +162,14 @@ class PhotoTest extends TestCase {
   public function test_an_authorized_profile_can_store_a_banner() {
     Storage::fake('public');
   	$profile = factory(\App\Models\Business\Profile::class)->create();
-  	$header = $this->businessHeaders($profile->business);
+  	$token = $this->createBusinessToken($profile->business);
 
   	$attributes = [
   		'photo' => $file = UploadedFile::fake()->image('banner.jpg', 320, 100),
-  		'is_logo' => 'false'
+  		'is_logo' => false
   	];
 
-  	$response = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $response = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
   	$this->assertNotNull($response->data->banner->name);
   	$this->assertNotNull($response->data->banner->small_url);
@@ -183,14 +184,14 @@ class PhotoTest extends TestCase {
   public function test_changing_a_logo_removes_photo_from_db_and_storage() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
-    $header = $this->businessHeaders($profile->business);
+    $token = $this->createBusinessToken($profile->business);
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-      'is_logo' => 'true'
+      'is_logo' => true
     ];
 
-    $responseOld = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseOld = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     Storage::disk('public')->assertExists(Str::after($responseOld->data->logo->small_url, "http://localhost/storage/"));
     Storage::disk('public')->assertExists(Str::after($responseOld->data->logo->large_url, "http://localhost/storage/"));
@@ -201,10 +202,10 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileNew = UploadedFile::fake()->image('new_logo.jpg', 1000, 720),
-      'is_logo' => 'true'
+      'is_logo' => true
     ];
 
-    $responseNew = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseNew = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     Storage::disk('public')->assertExists(Str::after($responseNew->data->logo->small_url, "http://localhost/storage/"));
     Storage::disk('public')->assertExists(Str::after($responseNew->data->logo->large_url, "http://localhost/storage/"));
@@ -220,14 +221,14 @@ class PhotoTest extends TestCase {
   public function test_changing_a_banner_removes_photo_from_db_and_storage() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
-    $header = $this->businessHeaders($profile->business);
+    $token = $this->createBusinessToken($profile->business);
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('banner.jpg', 1000, 720),
-      'is_logo' => 'false'
+      'is_logo' => false
     ];
 
-    $responseOld = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseOld = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     Storage::disk('public')->assertExists(Str::after($responseOld->data->banner->small_url, "http://localhost/storage/"));
     Storage::disk('public')->assertExists(Str::after($responseOld->data->banner->large_url, "http://localhost/storage/"));
@@ -238,10 +239,10 @@ class PhotoTest extends TestCase {
 
     $attributes = [
       'photo' => $fileNew = UploadedFile::fake()->image('new_banner.jpg', 1000, 720),
-      'is_logo' => 'false'
+      'is_logo' => false
     ];
 
-    $responseNew = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseNew = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     Storage::disk('public')->assertExists(Str::after($responseNew->data->banner->small_url, "http://localhost/storage/"));
     Storage::disk('public')->assertExists(Str::after($responseNew->data->banner->large_url, "http://localhost/storage/"));
@@ -257,21 +258,21 @@ class PhotoTest extends TestCase {
   public function test_adding_logo_after_banner_does_not_affect_banner() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
-    $header = $this->businessHeaders($profile->business);
+    $token = $this->createBusinessToken($profile->business);
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('banner.jpg', 1000, 720),
-      'is_logo' => 'false'
+      'is_logo' => false
     ];
 
-    $responseBanner = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseBanner = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-      'is_logo' => 'true'
+      'is_logo' => true
     ];
 
-    $responseLogo = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseLogo = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     Storage::disk('public')->assertExists(Str::after($responseLogo->data->logo->small_url, "http://localhost/storage/"));
     Storage::disk('public')->assertExists(Str::after($responseLogo->data->logo->large_url, "http://localhost/storage/"));
@@ -287,30 +288,31 @@ class PhotoTest extends TestCase {
   public function test_updating_logo_does_not_affect_banner() {
     Storage::fake('public');
     $profile = factory(\App\Models\Business\Profile::class)->create();
-    $header = $this->businessHeaders($profile->business);
+    $token = $this->createBusinessToken($profile->business);
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('banner.jpg', 1000, 720),
-      'is_logo' => 'false'
+      'is_logo' => false
     ];
 
-    $responseBanner = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseBanner = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('logo.jpg', 1000, 720),
-      'is_logo' => 'true'
+      'is_logo' => true
     ];
 
-    $responseLogo = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
+    $responseLogo = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     $oldLogoId = $profile->photos->logo_id;
 
     $attributes = [
       'photo' => $fileOld = UploadedFile::fake()->image('new_logo.jpg', 1000, 720),
-      'is_logo' => 'true'
+      'is_logo' => true
     ];
 
-    $newResponseLogo = $this->json('POST', "/api/business/photos/{$profile->identifier}", $attributes)->getData();    
+    $newResponseLogo = $this->send($token, 'post', "/api/business/photos/{$profile->identifier}", $attributes)->getData();
 
     Storage::disk('public')->assertExists(Str::after($newResponseLogo->data->logo->small_url, "http://localhost/storage/"));
     Storage::disk('public')->assertExists(Str::after($newResponseLogo->data->logo->large_url, "http://localhost/storage/"));

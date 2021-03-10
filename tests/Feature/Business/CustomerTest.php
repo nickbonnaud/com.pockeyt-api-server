@@ -16,7 +16,7 @@ class CustomerTest extends TestCase {
   }
 
   public function test_an_unauth_business_cannot_request_customers() {
-    $response = $this->json('GET', '/api/business/customers')->assertStatus(401);
+    $response = $this->send('', 'get', '/api/business/customers')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
@@ -24,9 +24,9 @@ class CustomerTest extends TestCase {
     $business = $this->createPosAccount();
     $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 13)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=active')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=active')->getData();
     $this->assertEquals(count($activeCustomers), $response->meta->total);
   }
 
@@ -34,9 +34,9 @@ class CustomerTest extends TestCase {
     $business = $this->createPosAccount();
     $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=historic')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=historic')->getData();
     $this->assertEquals(count($historicCustomers), $response->meta->total);
   }
 
@@ -48,9 +48,9 @@ class CustomerTest extends TestCase {
     $otherBusiness = $this->createPosAccount();
     factory(\App\Models\Location\ActiveLocation::class, 10)->create(['location_id' => $otherBusiness->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=active')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=active')->getData();
     $this->assertEquals(count($activeCustomers), $response->meta->total);
   }
 
@@ -59,9 +59,9 @@ class CustomerTest extends TestCase {
 
     $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 12)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id, 'created_at' => Carbon::now()->subDays(rand(1, 100))]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=active')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=active')->getData();
     $storedActive = \App\Models\Location\ActiveLocation::orderBy('created_at', 'desc')->get();
 
     foreach ($storedActive as $key => $active) {
@@ -74,9 +74,9 @@ class CustomerTest extends TestCase {
 
     $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 14)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=active&withTransaction=true')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=active&withTransaction=true')->getData();
 
     $customersWithTransactionsCount = $business->location->activeCustomers()->whereNotNull('transaction_id')->count();
     $this->assertEquals($customersWithTransactionsCount, $response->meta->total);
@@ -87,9 +87,9 @@ class CustomerTest extends TestCase {
 
     $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=historic&withTransaction=true')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=historic&withTransaction=true')->getData();
     $customersWithTransactionsCount = $business->location->historicCustomers()->whereNotNull('transaction_id')->count();
     $this->assertEquals($customersWithTransactionsCount, $response->meta->total);
   }
@@ -98,9 +98,9 @@ class CustomerTest extends TestCase {
     $business = $this->createPosAccount();
     $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 15)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=active&withTransaction=false')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=active&withTransaction=false')->getData();
 
     $customersWithoutTransactionsCount = $business->location->activeCustomers()->whereNull('transaction_id')->count();
     $this->assertEquals($customersWithoutTransactionsCount, $response->meta->total);
@@ -110,9 +110,9 @@ class CustomerTest extends TestCase {
     $business = $this->createPosAccount();
     $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 9)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', '/api/business/customers?status=historic&withTransaction=false')->getData();
+    $response = $this->send($token, 'get', '/api/business/customers?status=historic&withTransaction=false')->getData();
     $customersWithoutTransactionsCount = $business->location->historicCustomers()->whereNull('transaction_id')->count();
     $this->assertEquals($customersWithoutTransactionsCount, $response->meta->total);
   }
@@ -129,9 +129,9 @@ class CustomerTest extends TestCase {
 
     factory(\App\Models\Location\HistoricLocation::class, 17)->create(['location_id' => $business->location->id, 'created_at' => Carbon::now()->subDays(rand(41, 67))]);
 
-    $this->businessHeaders($business);
+    $token = $this->createBusinessToken($business);
 
-    $response = $this->json('GET', "/api/business/customers?status=historic&date[]={$startDate}&date[]={$endDate}")->getData();
+    $response = $this->send($token, 'get', "/api/business/customers?status=historic&date[]={$startDate}&date[]={$endDate}")->getData();
     $this->assertEquals(count($historicCustomers), $response->meta->total);
   }
 

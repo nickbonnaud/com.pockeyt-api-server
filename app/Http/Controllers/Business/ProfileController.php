@@ -12,14 +12,10 @@ use App\Http\Requests\Business\UpdateProfileRequest;
 use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:business');
-  }
-
-  public function index() {
-  	$business = Business::getAuthBusiness();
-  	return new ProfileResource($business->profile);
+    $this->middleware('csrf');
   }
 
   public function store(StoreProfileRequest $request) {

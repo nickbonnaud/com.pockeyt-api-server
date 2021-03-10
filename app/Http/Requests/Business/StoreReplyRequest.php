@@ -25,7 +25,6 @@ class StoreReplyRequest extends FormRequest {
     return [
       'message_identifier' => 'required|uuid|exists:business_messages,identifier',
       'body' => 'required|string|min:2',
-      'sent_by_business' => 'required|boolean'
     ];
   }
 }

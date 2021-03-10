@@ -5,7 +5,7 @@ namespace App\Models\Business;
 use Illuminate\Database\Eloquent\Model;
 
 class Profile extends Model {
-  
+
 	//////////////////// Traits ////////////////////
 
 	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
@@ -32,15 +32,19 @@ class Profile extends Model {
 		return $this->hasOne('App\Models\Business\ProfilePhotos');
 	}
 
-	//////////////////// Mutator Methods ////////////////////
-
-	public function setHoursAttribute($value) {
-		$this->attributes['hours'] = json_encode($value); 
+	public function hours() {
+		return $this->hasOne('App\Models\Business\Hours');
 	}
 
-	//////////////////// Accessor Methods ////////////////////
+	//////////////////// Relationship Methods ////////////////////
 
-	public function getHoursAttribute($value) {
-		return json_decode($value);
+	public function storeHours($hours) {
+		$this->hours()->save($hours);
+		return $this->hours;
+	}
+
+	public function updateHours($hoursData) {
+		$this->hours()->update($hoursData);
+		return $this->hours;
 	}
 }

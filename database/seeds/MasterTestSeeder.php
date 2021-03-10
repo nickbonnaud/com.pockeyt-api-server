@@ -15,6 +15,7 @@ class MasterTestSeeder extends Seeder {
 
     $business = factory(\App\Models\Business\Business::class)->create(['email' => 'test@pockeyt.com', 'password' => 'Password1!']);
     $profile = factory(\App\Models\Business\Profile::class)->create(['business_id' => $business->id]);
+    $hours = factory(\App\Models\Business\Hours::class)->create(['profile_id' => $profile->id]);
     $photos = factory(\App\Models\Business\ProfilePhotos::class)->create(['profile_id' => $profile->id]);
     $profile->photos->logo()->associate(factory(\App\Models\Business\Photo::class)->create())->save();
     $profile->photos->banner()->associate(factory(\App\Models\Business\Photo::class)->create(['name' => 'banner-' . time() . Str::random(5) . '.png']))->save();

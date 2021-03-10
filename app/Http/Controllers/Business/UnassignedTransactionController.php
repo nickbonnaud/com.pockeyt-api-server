@@ -10,9 +10,10 @@ use App\Models\Transaction\UnassignedTransaction;
 use App\Http\Resources\Business\UnassignedTransactionResource;
 
 class UnassignedTransactionController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:business');
+    $this->middleware('csrf');
   }
 
   public function index(Request $request, UnassignedTransactionFilters $filters) {

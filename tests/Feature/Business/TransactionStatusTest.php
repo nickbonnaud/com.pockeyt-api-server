@@ -15,14 +15,14 @@ class TransactionStatusTest extends TestCase {
   }
 
   public function test_an_unauth_business_cannot_retrieve_transaction_statuses() {
-    $response = $this->json('GET', '/api/business/status/transaction')->assertStatus(401);
+    $response = $this->send("", 'get', '/api/business/status/transaction')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
   public function test_an_auth_business_can_retrieve_transaction_statuses() {
     $business = factory(\App\Models\Business\Business::class)->create();
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/status/transaction')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/status/transaction')->getData();
 
     $numTransactionStatuses = \App\Models\Transaction\TransactionStatus::count();
     $this->assertEquals($numTransactionStatuses, count($response->data));

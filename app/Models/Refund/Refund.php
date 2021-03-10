@@ -19,6 +19,7 @@ class Refund extends Model {
 	protected $fillable = ['transaction_id', 'status_id', 'total', 'pos_refund_id'];
 	protected $hidden = [ 'id', 'transaction_id', 'status_id', 'payment_refund_id', 'pos_refund_id', 'updated_at'];
 	protected $uuidFieldName = 'identifier';
+	protected $casts = ['total' => 'integer'];
 
 	//////////////////// Routing ////////////////////
 

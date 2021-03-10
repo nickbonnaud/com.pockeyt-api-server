@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Business;
 
+use App\Http\Resources\Business\HoursResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProfileResource extends JsonResource
@@ -19,8 +20,7 @@ class ProfileResource extends JsonResource
       'website' => $this->website,
       'description' => $this->description,
       'phone' => $this->phone,
-      'hours' => $this->hours,
-      'google_place_id' => $this->google_place_id
+      'hours' => new HoursResource($this->hours)
     ];
   }
 }

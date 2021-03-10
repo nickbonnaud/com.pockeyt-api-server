@@ -12,10 +12,10 @@ class BusinessMessageReply extends Model {
 
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
-	protected $fillable = ['body', 'sent_by_business', 'read', 'read_by_admin'];
+	protected $fillable = ['body', 'sent_by_business', 'read'];
 	protected $hidden = ['id', 'business_message_id'];
 	protected $uuidFieldName = 'identifier';
-	protected $casts = ['sent_by_business' => 'boolean', 'read' => 'boolean', 'read_by_admin' => 'boolean'];
+	protected $casts = ['sent_by_business' => 'boolean', 'read' => 'boolean'];
 	protected $touches = ['message'];
 
 	//////////////////// Routing ////////////////////
@@ -28,17 +28,5 @@ class BusinessMessageReply extends Model {
 
 	public function message() {
 		return $this->belongsTo('App\Models\Business\BusinessMessage', 'business_message_id');
-	}
-
-	//////////////////// Core Methods ////////////////////
-
-	public function updateReply($replyData) {
-		if (!$this->read) {
-			$this->update($replyData);
-			if (!$this->sent_by_business) {
-				$this->message->updateUnreadReply($this);
-			}
-		}
-		return $this;
 	}
 }

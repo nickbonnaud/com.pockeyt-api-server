@@ -25,9 +25,8 @@ class UpdateBusinessRequest extends FormRequest
     public function rules()
     {
         return [
-            'old_password' => ['required_without:email','required_with:password','min:6', new PasswordConfirm('business')],
-            'password' => 'required_without:email|required_with:old_password|min:6|confirmed',
-            'email' => 'required_without_all:old_password,password|email|unique:businesses'
+            'password' => 'required_without:email|min:6|confirmed',
+            'email' => 'required_without_all:password|email|unique:businesses'
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Business;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Business\Business;
 use App\Http\Controllers\Controller;
@@ -11,49 +12,57 @@ use App\Http\Requests\Business\LoginBusinessRequest;
 use App\Http\Resources\Business\DashboardBusinessResource;
 
 class AuthController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:business')->only(['logout', 'refresh', 'verify']);
-  } 
+    $this->middleware('csrf')->only(['logout', 'refresh', 'verify']);
+  }
 
   public function register(StoreBusinessRequest $request) {
-  	$business = Business::create($request->only('email', 'password'));
-  	return $this->formatResponse(Business::createToken($business), $business);
+  	$business = Business::register($request->only('email', 'password'));
+  	return $this->formatResponse($business);
   }
 
   public function login(LoginBusinessRequest $request) {
-    $tokenData = Business::login($request->only('email', 'password'));
-    $business = Business::getAuthBusiness();
-    return $this->formatResponse($tokenData, $business);
+    return $this->formatResponse(auth('business')->user());
   }
 
   public function logout() {
-    return $this->formatResponse(Business::logout());
+    Business::logout();
+    return response()->json([
+    'data' => [
+        'success' => true
+      ]
+    ], 200);
   }
 
   public function refresh() {
-    return $this->formatResponse(Business::updateToken());
+    $business = auth('business')->user();
+    Business::refreshToken($business);
+    return $this->formatResponse($business);
   }
 
   public function verify(Request $request) {
-    $business = Business::getAuthBusiness();
-    return response()->json(['data' => ['password_verified' => Hash::check($request->password, $business->password)]]);
+    $passwordValid = Hash::check($request->password, auth('business')->user()->password);
+    return response()->json([
+      'data' => [
+        'password_verified' => $passwordValid
+      ]], $passwordValid ? 200 : 401
+    );
   }
 
 
 
-
-
-  private function formatResponse($loginResult, $business = null) {
-    return response()->json([
-      'data' => [
-        'token' => $loginResult['token'],
-        'business' => $business != null ? new DashboardBusinessResource($business) : null
-      ],
-      'errors' => [
-        'email' => array($loginResult['error']),
-        'password' => array($loginResult['error'])
-      ]
-    ], $loginResult['code']);
+  private function formatResponse($business) {
+    return response()
+      ->json([
+        'data' => [
+          'csrf_token' => [
+            'value' => auth('business')->payload()->get('csrf-token'),
+            'expiry' => Carbon::now()->addMinutes(config('jwt.ttl'))
+          ],
+          'business' => new DashboardBusinessResource($business)
+        ]
+      ], 200)->cookie('jwt', auth('business')->getToken()->get(), config('jwt.ttl'));
   }
 }

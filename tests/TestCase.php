@@ -5,6 +5,7 @@ namespace Tests;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use App\Models\Business\Business;
 use App\Models\Customer\Customer;
+use Illuminate\Support\Str;
 use App\Models\Admin\Admin;
 
 abstract class TestCase extends BaseTestCase {
@@ -16,6 +17,23 @@ abstract class TestCase extends BaseTestCase {
   	$headers['Authorization'] = 'Bearer '.$token;
 
   	return $headers;
+  }
+
+  protected function createBusinessToken($business) {
+    return auth('business')->claims(['csrf-token' => Str::random(32)])->login($business);
+  }
+
+  protected function send($token, $method, $url, $body = []) {
+    $headers = ['Accept' => 'application/json'];
+
+    if (!is_null(auth('business')->user())) {
+      $headers['csrf-token'] = auth('business')->payload()->get('csrf-token');
+    }
+
+    return $this
+      ->withCookie('jwt', $token)
+      ->withHeaders($headers)
+      ->$method($url, $body);
   }
 
   protected function customerHeaders($customer) {

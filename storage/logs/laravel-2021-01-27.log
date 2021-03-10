@@ -1,0 +1,4 @@
+[2021-01-27 16:00:50] testing.ERROR: Cannot redeclare App\Models\Business\PayFacOwner::$casts {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare App\\Models\\Business\\PayFacOwner::$casts at /home/vagrant/Code/com.pockeyt-api/app/Models/Business/PayFacOwner.php:24)
+[stacktrace]
+#0 {main}
+"} 

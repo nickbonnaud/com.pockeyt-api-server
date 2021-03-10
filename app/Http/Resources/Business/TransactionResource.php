@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Business;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Business\CustomerResource;
 use App\Http\Resources\Business\EmployeeResource;
@@ -13,14 +14,15 @@ class TransactionResource extends JsonResource {
   
   public function toArray($request) {
   	$transaction =  parent::toArray($request);
-    $transaction['status'] = $this->status->name;
-    $transaction['purchased_items'] = PurchasedItemResource::collection($this->purchasedItems);
-    $transaction['refunds'] = RefundResource::collection($this->refunds);
-    $transaction['issue'] = $this->issue;
+    $transaction['status'] = $this->status;
+    $transaction = Arr::except($transaction, ['employee_id', 'refunds', 'purchased_items']);
     return [
       'transaction' => $transaction,
       'customer' => new CustomerResource($this->customer),
-      'employee' => new EmployeeResource($this->employee)
+      'employee' => new EmployeeResource($this->employee),
+      'refunds' => RefundResource::collection($this->refunds),
+      'purchased_items' => PurchasedItemResource::collection($this->formattedPurchashedItems()),
+      'issue' => $this->issue
     ];
   }
 }

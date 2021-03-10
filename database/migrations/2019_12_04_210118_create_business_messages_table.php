@@ -21,8 +21,8 @@ class CreateBusinessMessagesTable extends Migration
             $table->text('body');
             $table->boolean('sent_by_business');
             $table->boolean('read')->default(false);
-            $table->boolean('read_by_admin')->default(false);
             $table->boolean('unread_reply')->default(false);
+            $table->timestamp('latest_reply');
             $table->timestamps();
 
             $table->foreign('business_id')

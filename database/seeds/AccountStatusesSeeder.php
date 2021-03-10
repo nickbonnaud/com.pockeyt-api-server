@@ -41,6 +41,10 @@ class AccountStatusesSeeder extends Seeder
 	  		'code' => 106
 	  	],
 	  	[
+	  		'name' => 'Hours Incomplete',
+	  		'code' => 107
+	  	],
+	  	[
 	  		'name' => 'Credit Processor Pending/ACH Processor Pending',
 	  		'code' => 120
 	  	],

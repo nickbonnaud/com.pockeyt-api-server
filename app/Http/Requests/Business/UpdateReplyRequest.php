@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Business;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateReplyRequest extends FormRequest
@@ -24,7 +25,7 @@ class UpdateReplyRequest extends FormRequest
     public function rules()
     {
         return [
-            'read' => 'required|boolean'
+            'read' => ['required', 'boolean', Rule::in([true])]
         ];
     }
 }

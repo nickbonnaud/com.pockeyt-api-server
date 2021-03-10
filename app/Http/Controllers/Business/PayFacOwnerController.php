@@ -14,6 +14,7 @@ class PayFacOwnerController extends Controller {
 
 	public function __construct() {
   	$this->middleware('auth:business');
+    $this->middleware('csrf');
   }
 
   public function store(StorePayFacOwnerRequest $request) {
@@ -42,6 +43,6 @@ class PayFacOwnerController extends Controller {
       return response()->json(['errors' => 'Cannot delete primary owner.'], 403);
     }
     $payFacOwner->delete();
-    return response()->json(['success' => true], 200);
+    return response()->json(['data' => ['success' => true]], 200);
   }
 }

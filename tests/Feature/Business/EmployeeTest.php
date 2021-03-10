@@ -17,7 +17,7 @@ class EmployeeTest extends TestCase {
   public function test_an_unauth_business_cannot_retrieve_employees() {
     $business = factory(\App\Models\Business\Business::class)->create();
     factory(\App\Models\Business\Employee::class, 12)->create(['business_id' => $business->id]);
-    $response = $this->json('GET', '/api/business/employees')->assertStatus(401);
+    $response = $this->send('', 'get', '/api/business/employees')->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
@@ -26,8 +26,8 @@ class EmployeeTest extends TestCase {
     $business = factory(\App\Models\Business\Business::class)->create();
     $employees = factory(\App\Models\Business\Employee::class, $numEmployees)->create(['business_id' => $business->id]);
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/employees')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/employees')->getData();
     $this->assertEquals($numEmployees, $response->meta->total);
   }
 
@@ -39,8 +39,8 @@ class EmployeeTest extends TestCase {
     $notBusiness = factory(\App\Models\Business\Business::class)->create();
     factory(\App\Models\Business\Employee::class, 17)->create(['business_id' => $notBusiness->id]);
 
-    $this->businessHeaders($business);
-    $response = $this->json('GET', '/api/business/employees')->getData();
+    $token = $this->createBusinessToken($business);
+    $response = $this->send($token, 'get', '/api/business/employees')->getData();
     $this->assertEquals($numEmployees, $response->meta->total);
   }
 }

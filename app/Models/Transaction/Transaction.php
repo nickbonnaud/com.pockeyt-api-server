@@ -3,7 +3,6 @@
 namespace App\Models\Transaction;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Business\ActiveItem;
 use App\Models\Transaction\TransactionStatus;
@@ -13,7 +12,7 @@ use App\Notifications\Customer\BillClosed;
 use App\Notifications\Customer\ExitBusiness;
 
 class Transaction extends Model {
-  
+
   //////////////////// Traits ////////////////////
 
 	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
@@ -23,7 +22,13 @@ class Transaction extends Model {
 	protected $guarded = ['identifier'];
 	protected $hidden = [ 'id', 'customer_id', 'business_id', 'status_id', 'payment_transaction_id', 'pos_transaction_id', 'created_at'];
 	protected $uuidFieldName = 'identifier';
-	protected $casts = ['locked' => 'boolean'];
+	protected $casts = [
+		'locked' => 'boolean',
+		'tax' => 'integer',
+		'tip' => 'integer',
+		'net_sales' => 'integer',
+		'total' => 'integer'
+	];
 
 	//////////////////// Routing ////////////////////
 

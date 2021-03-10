@@ -10,14 +10,10 @@ use App\Http\Resources\Business\GeoAccountResource;
 use App\Http\Requests\Business\StoreGeoAccountRequest;
 
 class GeoAccountController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:business');
-  }
-
-  public function index() {
-    $geoAccount = (Business::getAuthBusiness())->location->geoAccount;
-    return new GeoAccountResource($geoAccount);
+    $this->middleware('csrf');
   }
 
   public function store(StoreGeoAccountRequest $request) {
