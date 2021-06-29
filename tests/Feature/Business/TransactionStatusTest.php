@@ -23,7 +23,6 @@ class TransactionStatusTest extends TestCase {
     $business = factory(\App\Models\Business\Business::class)->create();
     $token = $this->createBusinessToken($business);
     $response = $this->send($token, 'get', '/api/business/status/transaction')->getData();
-
     $numTransactionStatuses = \App\Models\Transaction\TransactionStatus::count();
     $this->assertEquals($numTransactionStatuses, count($response->data));
   }

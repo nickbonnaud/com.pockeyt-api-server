@@ -16,8 +16,8 @@ class GeoAccountResource extends JsonResource
     {
         return [
             'identifier' => $this->identifier,
-            'lat' => floatval($this->lat),
-            'lng' =>floatval($this->lng),
+            'lat' => $this->lat,
+            'lng' => $this->lng,
             'radius' => $this->radius
         ];
     }

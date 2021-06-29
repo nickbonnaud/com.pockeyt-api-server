@@ -18,6 +18,7 @@ class UnassignedTransaction extends Model {
 	protected $guarded = ['identifier'];
 	protected $hidden = [ 'id'];
 	protected $uuidFieldName = 'identifier';
+	protected $casts = ['tax' => 'integer', 'net_sales' => 'integer', 'total' => 'integer'];
 
 	//////////////////// Routing ////////////////////
 

@@ -16,7 +16,7 @@ class TransactionResource extends JsonResource {
     return [
       'transaction' => $transaction,
       'business' => new BusinessResource($this->business),
-      'refund' => RefundResource::collection($this->refunds),
+      'refunds' => RefundResource::collection($this->refunds),
       'issue' => new IssueResource($this->issue)
     ];
   }

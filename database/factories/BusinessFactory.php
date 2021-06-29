@@ -192,7 +192,8 @@ $factory->define(Business\Location::class, function(Faker $faker) {
 		},
 		'region_id' => function() {
 			return factory(Location\Region::class)->create()->id;
-		}
+		},
+		'major' => $faker->randomNumber(5)
 	];
 });
 

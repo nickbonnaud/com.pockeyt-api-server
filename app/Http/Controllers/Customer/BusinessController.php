@@ -15,7 +15,8 @@ class BusinessController extends Controller {
   }
 
   public function index(Request $request, BusinessFilters $filters) {
-  	$businesses = Business::filter($filters)->get();
-  	return BusinessResource::collection($businesses);
+		if (!$filters->exist()) return response()->json(['errors' => 'Bad Request.'], 400);
+  	$query = Business::filter($filters);
+  	return BusinessResource::collection($query->paginate()->appends($request->except('page')));
   }
 }

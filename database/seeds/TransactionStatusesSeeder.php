@@ -12,47 +12,47 @@ class TransactionStatusesSeeder extends Seeder {
   public function run() {
     DB::table('transaction_statuses')->insert([
     	[
-    		'name' => 'open',
+    		'name' => 'Open',
     		'code' => 100
     	],
     	[
-    		'name' => 'closed',
+    		'name' => 'Closed',
     		'code' => 101
     	],
     	[
-    		'name' => 'payment processing',
+    		'name' => 'Payment Processing',
     		'code' => 103
     	],
-        [
-            'name' => 'customer approved',
-            'code' => 104
-        ],
-        [
-            'name' => 'keep open notification sent',
-            'code' => 105
-        ],
-        [
-            'name' => 'customer request keep open',
-            'code' => 106
-        ],
+			[
+					'name' => 'Customer Approved',
+					'code' => 104
+			],
+			[
+					'name' => 'Keep Open Notification Sent',
+					'code' => 105
+			],
+			[
+					'name' => 'Customer Request Keep Open',
+					'code' => 106
+			],
     	[
-    		'name' => 'paid',
+    		'name' => 'Paid',
     		'code' => 200
     	],
     	[
-    		'name' => 'wrong bill assigned',
+    		'name' => 'Wrong Bill Assigned',
     		'code' => 500
     	],
     	[
-    		'name' => 'error in bill',
+    		'name' => 'Error in Bill',
     		'code' => 501
     	],
     	[
-    		'name' => 'error notifying',
+    		'name' => 'Error Notifying',
     		'code' => 502
     	],
     	[
-    		'name' => 'other bill error',
+    		'name' => 'Other Bill Error',
     		'code' => 503
     	]
     ]);

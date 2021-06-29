@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 
 class Location extends Model {
-  
+
   //////////////////// Traits ////////////////////
 
 	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
@@ -16,7 +16,7 @@ class Location extends Model {
   //////////////////// Attribute Mods/Helpers ////////////////////
 
  	protected $guarded = [];
-  protected $hidden = ['business_id', 'id', 'created_at', 'updated_at'];
+  protected $hidden = ['business_id', 'id', 'major', 'created_at', 'updated_at'];
   protected $uuidFieldName = 'identifier';
 
   //////////////////// Routing ////////////////////
@@ -55,9 +55,16 @@ class Location extends Model {
 
 	public static function createLocation($coords, $business) {
 		$region = self::getRegion($coords);
-		$location = self::create(['business_id' => $business->id, 'region_id' => $region->id]);
+		$major = self::generateMajor();
+		$location = self::create([
+			'business_id' => $business->id,
+			'region_id' => $region->id,
+			'major' => $major
+		]);
 		return $location;
 	}
+
+
 
 	public function updateLocation($coords) {
 		$region = self::getRegion($coords);
@@ -69,9 +76,9 @@ class Location extends Model {
 		$lng1 = $this->geoAccount->lng;
 		$R = 6371; // Radius of the earth in km
 	  $dLat = $this->deg2rad($lat2 - $lat1);  // deg2rad below
-	  $dLng = $this->deg2rad($lng2 - $lng1); 
-	  $a = sin($dLat / 2) * sin($dLat / 2) + cos($this->deg2rad($lat1)) * cos($this->deg2rad($lat2)) * sin($dLng / 2) * sin($dLng / 2); 
-	  $c = 2 * atan2(sqrt($a), sqrt(1 - $a)); 
+	  $dLng = $this->deg2rad($lng2 - $lng1);
+	  $a = sin($dLat / 2) * sin($dLat / 2) + cos($this->deg2rad($lat1)) * cos($this->deg2rad($lat2)) * sin($dLng / 2) * sin($dLng / 2);
+	  $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 	  return $R * $c; // Distance in km
 	}
 
@@ -89,5 +96,13 @@ class Location extends Model {
 
 	private function deg2rad($deg) {
 		return $deg * (pi() / 180);
+	}
+
+	private static function generateMajor() {
+		$major = mt_rand(0, 65535);
+		if (self::where('major', $major)->exists()) {
+			return self::generateMajor();
+		}
+		return $major;
 	}
 }

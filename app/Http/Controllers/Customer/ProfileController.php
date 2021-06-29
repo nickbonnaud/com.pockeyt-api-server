@@ -10,7 +10,7 @@ use App\Http\Resources\Customer\CustomerResource;
 use App\Http\Requests\Customer\StoreProfileRequest;
 
 class ProfileController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:customer');
   }
@@ -31,6 +31,6 @@ class ProfileController extends Controller {
   		return response()->json(['errors' => 'Permission denied.'], 403);
   	}
   	$customerProfile->update($request->validated());
-  	return new ProfileResource($customerProfile);
+		return new CustomerResource($customerProfile->customer->fresh());
   }
 }

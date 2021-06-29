@@ -15,7 +15,6 @@ class TransactionResource extends JsonResource {
    */
   public function toArray($request) {
     $transaction =  parent::toArray($request);
-    $transaction['status'] = $this->status->name;
     $transaction['purchased_items'] = PurchasedItemResource::collection($this->purchasedItems);
     $transaction['refunds'] = RefundResource::collection($this->refunds);
     return $transaction;

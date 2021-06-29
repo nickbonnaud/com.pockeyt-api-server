@@ -33,6 +33,7 @@ class BusinessTest extends TestCase {
     }
 
     $response = $this->json('GET', "api/customer/business?name={$profile->name}")->getData();
+
     $this->assertEquals($profile->name, $response->data[0]->profile->name);
   }
 
@@ -48,6 +49,25 @@ class BusinessTest extends TestCase {
 
     $response = $this->json('GET', "api/customer/business?name=fake_name")->getData();
     $this->assertEquals(0, count($response->data));
+  }
+
+  public function test_an_auth_customer_can_fetch_businesses_by_id() {
+    $customer = factory(\App\Models\Customer\Customer::class)->create();
+    $headers = $this->customerHeaders($customer);
+    $profile = factory(\App\Models\Business\Profile::class)->create();
+    factory(\App\Models\Business\Location::class)->create(['business_id' => $profile->business_id]);
+
+    $i = 0;
+    while ($i <= 3) {
+      $otherProfile = factory(\App\Models\Business\Profile::class)->create();
+      factory(\App\Models\Business\Location::class)->create(['business_id' => $otherProfile->business_id]);
+      $i++;
+    }
+
+    $response = $this->json('GET', "api/customer/business?id={$profile->business->identifier}")->getData();
+
+    $this->assertEquals(1, count($response->data));
+    $this->assertSame($profile->name, $response->data[0]->profile->name);
   }
 
   public function test_an_auth_customer_can_fetch_business_by_beacon_id() {

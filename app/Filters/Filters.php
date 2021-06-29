@@ -12,6 +12,10 @@ abstract class Filters {
 		$this->request = $request;
 	}
 
+	public function exist() {
+		return count($this->getFilters()) > 0;
+	}
+
 	public function apply($builder) {
 		$this->builder = $builder;
 

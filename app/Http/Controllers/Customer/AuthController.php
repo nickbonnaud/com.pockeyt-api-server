@@ -57,9 +57,7 @@ class AuthController extends Controller {
 
   private function formatResponse($loginResult, $customer = null) {
     return response()->json([
-      'data' => [
-        'customer' => $customer != null ? new CustomerResource($customer) : null,
-      ],
+      'data' => $customer != null ? new CustomerResource($customer) : null,
       'errors' => [
         'email' => array($loginResult['error']),
         'password' => array($loginResult['error'])

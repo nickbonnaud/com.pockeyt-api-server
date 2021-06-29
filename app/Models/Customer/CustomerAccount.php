@@ -5,7 +5,7 @@ namespace App\Models\Customer;
 use Illuminate\Database\Eloquent\Model;
 
 class CustomerAccount extends Model {
-  
+
   //////////////////// Traits ////////////////////
 
 	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
@@ -15,6 +15,7 @@ class CustomerAccount extends Model {
 	protected $fillable = ['tip_rate', 'primary', 'quick_tip_rate'];
 	protected $hidden = ['id', 'customer_id', 'created_at', 'updated_at'];
 	protected $uuidFieldName = 'identifier';
+	protected $casts = ['tip_rate' => 'integer', 'quick_tip_rate' => 'integer'];
 
 	//////////////////// Routing ////////////////////
 

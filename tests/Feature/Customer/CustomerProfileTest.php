@@ -113,8 +113,8 @@ class CustomerProfileTest extends TestCase {
     ];
 
     $response = $this->json('PATCH', "/api/customer/profile/{$profile->identifier}", $attributes, $headers)->getData();
-    $this->assertEquals($firstName, $response->data->first_name);
-    $this->assertEquals($lastName, $response->data->last_name);
+    $this->assertEquals($firstName, $response->data->profile->first_name);
+    $this->assertEquals($lastName, $response->data->profile->last_name);
     $this->assertDatabaseHas('customer_profiles', ['last_name' => $lastName]);
   }
 

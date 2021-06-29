@@ -13,7 +13,7 @@ class UnassignedTransactionResource extends JsonResource {
     $unassignedTransaction = parent::toArray($request);
     $unassignedTransaction['purchased_items'] = PurchasedItemResource::collection($this->purchasedItems);
     return [
-      'transaction' => Arr::except($unassignedTransaction, ['business_id', 'customer_id', 'status_id', 'pos_transaction_id', 'employee_id']),
+      'transaction' => Arr::except($unassignedTransaction, ['business_id', 'customer_id', 'status_id', 'pos_transaction_id', 'employee_id', 'partial_payment']),
       'employee' => new EmployeeResource($this->employee)
     ];
   }

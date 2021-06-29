@@ -22,7 +22,7 @@ class CustomerTest extends TestCase {
 
   public function test_an_auth_business_can_retrieve_active_customers() {
     $business = $this->createPosAccount();
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 13)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
+    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 12)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
 
     $token = $this->createBusinessToken($business);
 
@@ -71,69 +71,156 @@ class CustomerTest extends TestCase {
 
   public function test_a_business_can_retrieve_customers_active_with_transaction() {
     $business = $this->createPosAccount();
+    $customer = factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer;
 
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 14)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
+    $activeLocations = factory(\App\Models\Location\ActiveLocation::class, 11)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id
+    ]);
+
+    factory(\App\Models\Location\ActiveLocation::class, 4)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+    ]);
+
 
     $token = $this->createBusinessToken($business);
-
     $response = $this->send($token, 'get', '/api/business/customers?status=active&withTransaction=true')->getData();
 
     $customersWithTransactionsCount = $business->location->activeCustomers()->whereNotNull('transaction_id')->count();
     $this->assertEquals($customersWithTransactionsCount, $response->meta->total);
+    $this->assertEquals($activeLocations->count(), $response->meta->total);
   }
 
   public function test_a_business_can_retrieve_customers_historic_with_transaction() {
     $business = $this->createPosAccount();
+    $customer = factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer;
 
-    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
+    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 8)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id
+    ]);
+
+    factory(\App\Models\Location\HistoricLocation::class, 12)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+    ]);
 
     $token = $this->createBusinessToken($business);
 
     $response = $this->send($token, 'get', '/api/business/customers?status=historic&withTransaction=true')->getData();
     $customersWithTransactionsCount = $business->location->historicCustomers()->whereNotNull('transaction_id')->count();
     $this->assertEquals($customersWithTransactionsCount, $response->meta->total);
+    $this->assertEquals($historicCustomers->count(), $response->meta->total);
   }
 
   public function test_a_business_can_retrieve_active_customers_without_transaction() {
     $business = $this->createPosAccount();
-    $activeCustomers = factory(\App\Models\Location\ActiveLocation::class, 15)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
+    $customer = factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer;
+
+    factory(\App\Models\Location\ActiveLocation::class, 11)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id
+    ]);
+
+    $activeLocations = factory(\App\Models\Location\ActiveLocation::class, 4)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+    ]);
+
 
     $token = $this->createBusinessToken($business);
-
     $response = $this->send($token, 'get', '/api/business/customers?status=active&withTransaction=false')->getData();
-
     $customersWithoutTransactionsCount = $business->location->activeCustomers()->whereNull('transaction_id')->count();
     $this->assertEquals($customersWithoutTransactionsCount, $response->meta->total);
+    $this->assertEquals($activeLocations->count(), $response->meta->total);
+
   }
 
   public function test_a_business_can_retrieve_customers_historic_without_transaction() {
     $business = $this->createPosAccount();
-    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 9)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id]);
+    $customer = factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer;
+
+    factory(\App\Models\Location\HistoricLocation::class, 5)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id
+    ]);
+
+    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 12)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+    ]);
 
     $token = $this->createBusinessToken($business);
 
     $response = $this->send($token, 'get', '/api/business/customers?status=historic&withTransaction=false')->getData();
     $customersWithoutTransactionsCount = $business->location->historicCustomers()->whereNull('transaction_id')->count();
     $this->assertEquals($customersWithoutTransactionsCount, $response->meta->total);
+    $this->assertEquals($historicCustomers->count(), $response->meta->total);
   }
 
   public function test_a_business_can_retrieve_historic_with_date() {
     $business = $this->createPosAccount();
+    $customer = factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer;
 
     $startDate = urlencode(Carbon::now()->subDays(40)->toIso8601String());
     $endDate = urlencode(Carbon::now()->subDays(20)->toIso8601String());
 
-    $historicCustomers = factory(\App\Models\Location\HistoricLocation::class, 13)->create(['location_id' => $business->location->id, 'customer_id' => factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer_id, 'created_at' => Carbon::now()->subDays(rand(21, 39))]);
 
-    factory(\App\Models\Location\HistoricLocation::class, 9)->create(['location_id' => $business->location->id, 'created_at' => Carbon::now()->subDays(rand(1, 19))]);
+    $historicCustomersWithTransaction = factory(\App\Models\Location\HistoricLocation::class, 5)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id,
+      'created_at' => Carbon::now()->subDays(rand(21, 39))
+    ]);
 
-    factory(\App\Models\Location\HistoricLocation::class, 17)->create(['location_id' => $business->location->id, 'created_at' => Carbon::now()->subDays(rand(41, 67))]);
+    $historicCustomersNoTransactions = factory(\App\Models\Location\HistoricLocation::class, 5)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'created_at' => Carbon::now()->subDays(rand(21, 39))
+    ]);
+
+    factory(\App\Models\Location\HistoricLocation::class, 5)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id,
+      'created_at' => Carbon::now()->subDays(rand(1, 19))
+    ]);
+
+    factory(\App\Models\Location\HistoricLocation::class, 5)->create([
+      'location_id' => $business->location->id,
+      'customer_id' => $customer->id,
+      'transaction_id' => factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id])->id,
+      'created_at' => Carbon::now()->subDays(rand(41, 67))
+    ]);
 
     $token = $this->createBusinessToken($business);
 
     $response = $this->send($token, 'get', "/api/business/customers?status=historic&date[]={$startDate}&date[]={$endDate}")->getData();
-    $this->assertEquals(count($historicCustomers), $response->meta->total);
+    $this->assertEquals($historicCustomersWithTransaction->count() + $historicCustomersNoTransactions->count(), $response->meta->total);
   }
+
+  // public function test_full_response_body() {
+  //   $business = $this->createPosAccount();
+  //   $customer = factory(\App\Models\Customer\CustomerProfilePhoto::class)->create()->profile->customer;
+  //   $transaction = factory(\App\Models\Transaction\Transaction::class)->create(['business_id' => $business->id, 'customer_id' => $customer->id]);
+  //   factory(\App\Models\Refund\Refund::class)->create(['transaction_id' => $transaction->id]);
+
+  //   $activeLocations = factory(\App\Models\Location\ActiveLocation::class)->create([
+  //     'location_id' => $business->location->id,
+  //     'customer_id' => $customer->id,
+  //     'transaction_id' => $transaction->id,
+  //     'transaction_notification_id' => factory(\App\Models\Transaction\TransactionNotification::class)->create(['transaction_id' => $transaction->id])
+  //   ]);
+
+  //   $token = $this->createBusinessToken($business);
+  //   $response = $this->send($token, 'get', '/api/business/customers?status=active&withTransaction=true')->getData();
+  //   dd($response);
+  // }
 
 
   private function createPosAccount() {

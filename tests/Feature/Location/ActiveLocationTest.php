@@ -122,7 +122,7 @@ class ActiveLocationTest extends TestCase {
     $activeLocation = factory(\App\Models\Location\ActiveLocation::class)->create(['location_id' => $geoAccount->location->id, 'transaction_id' => null]);
     $customer = $activeLocation->customer;
 
-    
+
     $headers = $this->customerHeaders($customer);
 
     $response = $this->json('DELETE', "/api/customer/location/{$activeLocation->identifier}", $headers)->getData();
@@ -137,7 +137,7 @@ class ActiveLocationTest extends TestCase {
     $activeLocation = factory(\App\Models\Location\ActiveLocation::class)->create(['location_id' => $geoAccount->location->id, 'transaction_id' => null]);
     $customer = $activeLocation->customer;
 
-    
+
     $headers = $this->customerHeaders($customer);
 
     $response = $this->json('DELETE', "/api/customer/location/{$activeLocation->identifier}", $headers)->getData();

@@ -56,11 +56,9 @@ use App\Observers\Customer\CustomerProfilePhotoObserver;
 
 use App\Models\Transaction\UnassignedTransaction;
 use App\Models\Transaction\Transaction;
-use App\Models\Transaction\TransactionNotification;
 
 use App\Observers\Transaction\UnassignedTransactionObserver;
 use App\Observers\Transaction\TransactionObserver;
-use App\Observers\Transaction\TransactionNotificationObserver;
 
 use App\Models\Location\ActiveLocation;
 
@@ -114,7 +112,6 @@ class AppServiceProvider extends ServiceProvider
 
         UnassignedTransaction::observe(UnassignedTransactionObserver::class);
         Transaction::observe(TransactionObserver::class);
-        TransactionNotification::observe(TransactionNotificationObserver::class);
 
         ActiveLocation::observe(ActiveLocationObserver::class);
 

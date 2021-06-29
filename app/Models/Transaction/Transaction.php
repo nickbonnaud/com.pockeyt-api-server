@@ -20,7 +20,7 @@ class Transaction extends Model {
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
 	protected $guarded = ['identifier'];
-	protected $hidden = [ 'id', 'customer_id', 'business_id', 'status_id', 'payment_transaction_id', 'pos_transaction_id', 'created_at'];
+	protected $hidden = [ 'id', 'customer_id', 'employee_id', 'business_id', 'status_id', 'payment_transaction_id', 'pos_transaction_id', 'created_at'];
 	protected $uuidFieldName = 'identifier';
 	protected $casts = [
 		'locked' => 'boolean',

@@ -6,17 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Transaction\Transaction;
 
 class TransactionNotification extends Model {
-  
+
   //////////////////// Attribute Mods/Helpers ////////////////////
 
   protected $guarded = [];
-  protected $hidden = ['id'];
-
+  protected $hidden = ['id', 'transaction_id', 'created_at'];
   protected $casts = [
     'exit_sent' => 'boolean',
     'bill_closed_sent' => 'boolean',
     'auto_paid_sent' => 'boolean',
     'fix_bill_sent' => 'boolean',
+    'number_times_fix_bill_sent' => 'integer'
   ];
 
   //////////////////// Relationships ////////////////////

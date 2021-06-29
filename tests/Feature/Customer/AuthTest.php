@@ -26,7 +26,7 @@ class AuthTest extends TestCase {
 
     $response = $this->json('POST', '/api/customer/auth/register', $attributes)->getData();
     $this->assertDatabaseHas('customers', ['email' => $email]);
-    $this->assertNotEmpty($response->data->customer->token);
+    $this->assertNotEmpty($response->data->token);
     $this->assertNull($response->errors->email[0]);
   }
 
@@ -40,7 +40,7 @@ class AuthTest extends TestCase {
     ];
 
     $response = $this->json('POST', '/api/customer/auth/register', $attributes)->getData();
-    $this->assertEquals(100, $response->data->customer->status->code);
+    $this->assertEquals(100, $response->data->status->code);
   }
 
   public function test_registering_a_new_customer_requires_email_and_password() {
@@ -115,7 +115,7 @@ class AuthTest extends TestCase {
     ];
 
     $response = $this->json('POST', '/api/customer/auth/login', $attributes)->getData();
-    $this->assertNotEmpty($response->data->customer->token);
+    $this->assertNotEmpty($response->data->token);
     $this->assertNull($response->errors->email[0]);
   }
 
@@ -147,7 +147,7 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/customer/auth/logout', $headers)->assertStatus(200);
     $response = $response->getData();
-    $this->assertNull($response->data->customer);
+    $this->assertNull($response->data);
 
     $response = $this->json('GET', '/api/customer/auth/logout', $headers)->assertStatus(401);
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
@@ -166,8 +166,8 @@ class AuthTest extends TestCase {
 
     $response = $this->json('GET', '/api/customer/auth/refresh', $headers)->assertStatus(200);
     $response = $response->getData();
-    $this->assertNotNull($response->data->customer->token);
-    $this->assertNotEquals($headers['Authorization'], $response->data->customer->token);
+    $this->assertNotNull($response->data->token);
+    $this->assertNotEquals($headers['Authorization'], $response->data->token);
 
     $response = $this->json('GET', '/api/customer/auth/refresh', $headers)->assertStatus(500);
     $this->assertEquals('The token has been blacklisted', ($response->getData())->message);

@@ -18,7 +18,7 @@ class PurchasedItemResource extends JsonResource {
       'price' => (int)$this->price,
       'main_id' => $this->main_id,
       'sub_id' => $this->sub_id,
-      'quantity' => $this->quantity,
+      'quantity' => (int)$this->quantity,
       'total' => $this->quantity * $this->price
     ];
   }

@@ -18,6 +18,6 @@ class GeoAccountObserver {
   }
 
   public function created(GeoAccount $geoAccount) {
-  	BeaconAccount::createAccount($geoAccount->location, $geoAccount->identifier);
+  	BeaconAccount::createAccount($geoAccount->location);
   }
 }

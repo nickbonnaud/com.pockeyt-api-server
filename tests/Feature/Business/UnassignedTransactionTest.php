@@ -23,17 +23,26 @@ class UnassignedTransactionTest extends TestCase {
   }
 
   public function test_a_business_can_request_unassigned_recent() {
-    $unassignedBiz = factory(\App\Models\Transaction\UnassignedTransaction::class)->create(['created_at' => Carbon::now()->subDays(rand(1, 100))]);
-    $numTrans = 5;
-    $unassigned = factory(\App\Models\Transaction\UnassignedTransaction::class, $numTrans)
-      ->create(['business_id' => $unassignedBiz->business_id, 'created_at' => Carbon::now()->subDays(rand(1, 100))]);
+    $employee = factory(\App\Models\Business\Employee::class)->create();
+    $inventory = factory(\App\Models\Business\Inventory::class)->create(['business_id' => $employee->business_id]);
+    $activeItem = factory(\App\Models\Business\ActiveItem::class)->create(['inventory_id' => $inventory->id]);
 
-    $unassigned = $unassigned->push($unassignedBiz);
+    $numTrans = 6;
+    $unassigned = factory(\App\Models\Transaction\UnassignedTransaction::class, $numTrans)
+      ->create([
+        'business_id' => $employee->business_id,
+        'created_at' => Carbon::now()->subDays(rand(1, 100)),
+        'employee_id' => $employee->external_id
+      ]);
+
+    factory(\App\Models\Transaction\UnassignedPurchasedItem::class)->create([
+      'unassigned_transaction_id' => $unassigned[0]->id,
+      'item_id' => $activeItem->id
+    ]);
 
     $business = $unassigned[0]->business;
     $token = $this->createBusinessToken($business);
-    $response = $this->send($token, 'get', '/api/business/unassigned-transactions?recent=true')->getData();
-
+    $response = $this->send($token, 'get', '/api/business/unassigned-transactions')->getData();
     $storedTrans = \App\Models\Transaction\UnassignedTransaction::orderBy('created_at', 'desc')->get();
     foreach ($storedTrans as $key => $tran) {
       $this->assertSame($tran->created_at->toJson(), $response->data[$key]->transaction->created_at);
@@ -51,7 +60,7 @@ class UnassignedTransactionTest extends TestCase {
     $business = $unassignedBiz->business;
 
     $token = $this->createBusinessToken($business);
-    $response = $this->send($token, 'get', '/api/business/unassigned-transactions?recent=true')->getData();
+    $response = $this->send($token, 'get', '/api/business/unassigned-transactions')->getData();
     $this->assertEquals(count($unassigned), $response->meta->total);
   }
 

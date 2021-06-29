@@ -12,6 +12,7 @@ class GeoAccount extends Model {
 
 	protected $fillable = ['location_id', 'lat', 'lng', 'radius', 'identifier'];
 	protected $hidden = ['location_id', 'id', 'created_at', 'updated_at'];
+	protected $casts = ['lat' => 'double', 'lng' => 'double', 'radius' => 'integer'];
 
 	//////////////////// Routing ////////////////////
 

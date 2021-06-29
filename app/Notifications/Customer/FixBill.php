@@ -77,7 +77,7 @@ class FixBill extends Notification implements ShouldQueue {
    */
   public function toArray($notifiable) {
     return [
-      'type' => 'exit',
+      'type' => 'fix_bill',
       'customer_id' => $notifiable->id,
       'business_id' => $this->transaction->business->id,
       'transaction_id' => $this->transaction->id

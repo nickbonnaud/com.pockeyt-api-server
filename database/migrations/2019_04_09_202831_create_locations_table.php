@@ -18,6 +18,7 @@ class CreateLocationsTable extends Migration
             $table->uuid('identifier')->unique();
             $table->unsignedInteger('business_id');
             $table->unsignedInteger('region_id');
+            $table->smallInteger('major')->unique();
             $table->timestamps();
 
             $table->foreign('business_id')
