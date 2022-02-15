@@ -9,6 +9,8 @@ use App\Http\Resources\Customer\CustomerResource;
 use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\LoginCustomerRequest;
 use App\Http\Requests\Customer\CheckPasswordRequest;
+use App\Http\Requests\Customer\RequestPasswordResetRequest;
+use App\Http\Requests\Business\ResetPasswordRequest;
 
 class AuthController extends Controller {
 
@@ -49,6 +51,28 @@ class AuthController extends Controller {
     return response()->json([
       'data' => [
         'password_verified' => $isCorrectPassword
+      ]
+    ]);
+  }
+
+  public function requestResetPassword(RequestPasswordResetRequest $request) {
+    $customer = Customer::where('email', $request->email)->first();
+    $customer->sendResetCode();
+
+    return response()->json([
+      'data' => [
+        'email_sent' => true
+      ]
+    ]);
+  }
+
+  public function resetPassword(ResetPasswordRequest $request) {
+    $customer = Customer::where('email', $request->email)->first();
+    $customer->resetPassword($request->only('password'));
+
+    return response()->json([
+      'data' => [
+        'password_reset' => true
       ]
     ]);
   }

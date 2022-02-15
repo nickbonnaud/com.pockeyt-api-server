@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Location;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Customer\BusinessResource;
 
 class ActiveLocationResource extends JsonResource
 {
@@ -15,8 +16,8 @@ class ActiveLocationResource extends JsonResource
     public function toArray($request)
     {
       return [
-        'active_location_id' => $this->identifier,
-        'beacon_identifier' => $this->location->beaconAccount->identifier,
+        'identifier' => $this->identifier,
+        'business' => new BusinessResource($this->location->business),
         'transaction_id' => optional($this->transaction)->identifier,
         'last_notification' => optional($this->notification)->last
       ];

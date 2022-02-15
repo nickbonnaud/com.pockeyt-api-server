@@ -15,8 +15,9 @@ class CreateBeaconAccountsTable extends Migration
     {
         Schema::create('beacon_accounts', function (Blueprint $table) {
             $table->increments('id');
-            $table->uuid('identifier');
             $table->unsignedInteger('location_id');
+            $table->uuid('region_identifier');
+            $table->uuid('proximity_uuid');
             $table->integer('major');
             $table->integer('minor');
             $table->timestamps();

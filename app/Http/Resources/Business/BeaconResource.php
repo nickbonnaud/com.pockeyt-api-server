@@ -13,11 +13,6 @@ class BeaconResource extends JsonResource
    * @return array
    */
   public function toArray($request) {
-    return [
-      'identifier' => $this->identifier,
-      'region_identifier' => $this->location->region->identifier,
-      'major' => $this->major,
-      'minor' => $this->minor
-    ];
+    return parent::toArray($request);
   }
 }

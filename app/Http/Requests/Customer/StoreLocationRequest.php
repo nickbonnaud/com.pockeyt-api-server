@@ -24,7 +24,9 @@ class StoreLocationRequest extends FormRequest
     public function rules()
     {
         return [
-            'beacon_identifier' => 'required|uuid',
+            'proximity_uuid' => 'required|uuid|exists:beacon_accounts',
+            'major' => 'required|integer|exists:beacon_accounts',
+            'minor' => 'required|integer|exists:beacon_accounts',
         ];
     }
 }

@@ -3,15 +3,16 @@
 namespace App\Models\Customer;
 
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use App\Models\Customer\CustomerStatus;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
-use App\Notifications\Customer\ResetPassword;
+use App\Notifications\Customer\PasswordReset;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Customer extends Authenticatable implements JWTSubject {
 
-  //////////////////// Traits ////////////////////
+	//////////////////// Traits ////////////////////
 
 	use Notifiable;
 	use \BinaryCabin\LaravelUUID\Traits\HasUUID;
@@ -47,6 +48,10 @@ class Customer extends Authenticatable implements JWTSubject {
 		return $this->hasOne('App\Models\Customer\PushToken');
 	}
 
+	public function resetCode() {
+		return $this->hasOne('App\Models\Customer\ResetCode');
+	}
+
 	public function account() {
 		return $this->hasOne('App\Models\Customer\CustomerAccount');
 	}
@@ -80,6 +85,11 @@ class Customer extends Authenticatable implements JWTSubject {
 
 	public function storePushToken($pushTokenData) {
 		$this->pushToken()->updateOrCreate(['customer_id' => $this->id], $pushTokenData);
+	}
+
+	public function storeResetCode() {
+		$this->resetCode()->delete();
+		return $this->resetCode()->create(['value' => Str::random(6)]);
 	}
 
 	//////////////////// JWT Helpers ////////////////////
@@ -135,6 +145,16 @@ class Customer extends Authenticatable implements JWTSubject {
 		$this->save();
 	}
 
+	public function sendResetCode() {
+		$code = $this->storeResetCode();
+		$this->notify(new PasswordReset($code));
+	}
+
+	public function resetPassword($password) {
+		$this->update($password);
+		$this->resetCode()->delete();
+	}
+
 	//////////////////// Formatting Methods ////////////////////
 
 	public static function formatToken($token = null) {
@@ -146,11 +166,5 @@ class Customer extends Authenticatable implements JWTSubject {
 
 	public static function getByIdentifier($identifier) {
 		return self::where('identifier', $identifier)->first();
-	}
-
-	//////////////////// Inherited Overrides Methods ////////////////////
-
-	public function sendPasswordResetNotification($token){
-    $this->notify(new ResetPassword($token));
 	}
 }

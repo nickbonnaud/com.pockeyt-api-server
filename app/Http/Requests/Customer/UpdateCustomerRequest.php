@@ -25,8 +25,8 @@ class UpdateCustomerRequest extends FormRequest
     public function rules()
     {
         return [
-           'old_password' => ['required_without:email','required_with:password','min:6', new PasswordConfirm('customer')],
-            'password' => 'required_without:email|required_with:old_password|min:6|confirmed',
+           'old_password' => ['required_without:email','required_with:password','min:8', new PasswordConfirm('customer')],
+            'password' => 'required_without:email|required_with:old_password|min:8|confirmed',
             'email' => 'required_without_all:old_password,password|email|unique:businesses'
         ];
     }

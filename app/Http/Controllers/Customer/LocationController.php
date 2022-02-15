@@ -10,14 +10,14 @@ use App\Http\Requests\Customer\StoreLocationRequest;
 use App\Http\Resources\Location\ActiveLocationResource;
 
 class LocationController extends Controller {
-  
+
   public function __construct() {
   	$this->middleware('auth:customer');
   }
 
   public function store(StoreLocationRequest $request) {
   	$customer = Customer::getAuthCustomer();
-    $beaconAccount = BeaconAccount::where('identifier', $request->beacon_identifier)->first();
+		$beaconAccount = BeaconAccount::getBeacon($request->proximity_uuid, $request->major, $request->minor);
     $activeLocation = ActiveLocation::createLocation($customer, $beaconAccount->location);
   	return new ActiveLocationResource($activeLocation);
   }

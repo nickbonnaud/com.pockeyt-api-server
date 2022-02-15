@@ -25,7 +25,7 @@ class StoreCustomerRequest extends FormRequest
     {
         return [
             'email' => 'required|email|unique:customers',
-            'password' => 'required|min:6|confirmed'
+            'password' => 'required|min:8|confirmed'
         ];
     }
 }

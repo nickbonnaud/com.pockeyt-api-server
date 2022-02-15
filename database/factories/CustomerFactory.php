@@ -55,6 +55,15 @@ $factory->define(Customer\PushToken::class, function(Faker $faker) {
 	];
 });
 
+$factory->define(Customer\ResetCode::class, function (Faker $faker) {
+	return [
+		'customer_id' => function () {
+			return factory(Customer\Customer::class)->create()->id;
+		},
+		'value' => $faker->bothify("#?##??"),
+	];
+});
+
 $factory->define(Customer\CustomerAccount::class, function(Faker $faker) {
 	return [
 		'customer_id' => function() {

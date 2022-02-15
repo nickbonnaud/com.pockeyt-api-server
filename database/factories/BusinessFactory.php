@@ -210,12 +210,14 @@ $factory->define(Business\GeoAccount::class, function(Faker $faker) {
 });
 
 $factory->define(Business\BeaconAccount::class, function(Faker $faker) {
+	$location = factory(Business\Location::class)->create();
 	return [
-		'location_id' => function() {
-			return factory(Business\Location::class)->create()->id;
+		'location_id' => function() use ($location) {
+			return $location->id;
 		},
-		'identifier' => $faker->uuid,
-		'major' => $faker->numberBetween($min = 0, $max = 9000),
+		'region_identifier' => $location->region->identifier,
+		'proximity_uuid' => $location->identifier,
+		'major' => $location->major,
 		'minor' => $faker->numberBetween($min = 0, $max = 10000)
 	];
 });

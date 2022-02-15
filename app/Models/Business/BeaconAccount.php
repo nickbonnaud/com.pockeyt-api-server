@@ -10,7 +10,7 @@ class BeaconAccount extends Model {
 	//////////////////// Attribute Mods/Helpers ////////////////////
 
 	protected $guarded = ['id'];
-	protected $hidden = ['location_id', 'id', 'created_at', 'updated_at'];
+	protected $hidden = ['id', 'location_id', 'created_at', 'updated_at'];
 	protected $casts = ['major' => 'integer', 'minor' => 'integer'];
 
 	//////////////////// Relationships ////////////////////
@@ -25,10 +25,19 @@ class BeaconAccount extends Model {
 		$minor = self::generateMinor($location->major);
 		self::create([
 			'location_id' => $location->id,
-			'identifier' => $location->region->identifier,
+			'region_identifier' => $location->region->identifier,
+			'proximity_uuid' => $location->identifier,
 			'major' => $location->major,
 			'minor' => $minor
 		]);
+	}
+
+	public static function getBeacon($proximityUUID, $major, $minor) {
+		return self::where([
+			['proximity_uuid', $proximityUUID],
+			['major', $major],
+			['minor', $minor]
+		])->first();
 	}
 
 	private static function generateMinor($major) {

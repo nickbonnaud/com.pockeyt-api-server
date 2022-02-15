@@ -133,8 +133,8 @@ Route::prefix('customer')->group(function() {
 		Route::post('login', 'Customer\AuthController@login');
 		Route::post('password-check', 'Customer\AuthController@check');
 
-		Route::post('request-reset', 'Customer\AuthResetPasswordController@requestReset');
-		Route::patch('reset-password', 'Customer\AuthResetPasswordController@reset');
+		Route::post('request-reset', 'Customer\AuthController@requestResetPassword');
+		Route::patch('reset-password', 'Customer\AuthController@resetPassword');
 	});
 
 	// Customer Self

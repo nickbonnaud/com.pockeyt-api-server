@@ -43,7 +43,9 @@ class ActiveLocationTest extends TestCase {
     $this->createAccounts($geoAccount);
 
     $attributes = [
-      'beacon_identifier' => $geoAccount->location->beaconAccount->identifier,
+      'proximity_uuid' => $geoAccount->location->beaconAccount->proximity_uuid,
+      'major' => $geoAccount->location->beaconAccount->major,
+      'minor' => $geoAccount->location->beaconAccount->minor
     ];
 
     $response = $this->json('POST', "/api/customer/location", $attributes)->assertStatus(401);
@@ -59,12 +61,16 @@ class ActiveLocationTest extends TestCase {
     $headers = $this->customerHeaders($customer);
 
     $attributes = [
-      'beacon_identifier' => "fcdcdf",
+      'proximity_uuid' => 'not uuid',
+      'major' => "mshsgsk",
+      'minor' => 1354525
     ];
 
     $response = $this->json('POST', "/api/customer/location", $attributes)->assertStatus(422);
     $response = $response->getData();
-    $this->assertEquals('The beacon identifier must be a valid UUID.', $response->errors->beacon_identifier[0]);
+    $this->assertSame("The proximity uuid must be a valid UUID.", $response->errors->proximity_uuid[0]);
+    $this->assertSame("The major must be an integer.", $response->errors->major[0]);
+    $this->assertSame("The selected minor is invalid.", $response->errors->minor[0]);
   }
 
   public function test_an_auth_customer_can_create_an_active_location() {
@@ -76,11 +82,13 @@ class ActiveLocationTest extends TestCase {
     $headers = $this->customerHeaders($customer);
 
     $attributes = [
-      'beacon_identifier' => $geoAccount->location->beaconAccount->identifier,
+      'proximity_uuid' => $geoAccount->location->beaconAccount->proximity_uuid,
+      'major' => $geoAccount->location->beaconAccount->major,
+      'minor' => $geoAccount->location->beaconAccount->minor
     ];
 
     $response = $this->json('POST', "/api/customer/location", $attributes, $headers)->getData();
-    $this->assertDatabaseHas('active_locations', ['identifier' => $response->data->active_location_id, 'customer_id' => $customer->id]);
+    $this->assertDatabaseHas('active_locations', ['identifier' => $response->data->identifier, 'customer_id' => $customer->id]);
   }
 
   public function test_creating_an_active_location_sends_enter_notification() {
@@ -92,11 +100,12 @@ class ActiveLocationTest extends TestCase {
     $headers = $this->customerHeaders($customer);
 
     $attributes = [
-      'beacon_identifier' => $geoAccount->location->beaconAccount->identifier,
+      'proximity_uuid' => $geoAccount->location->beaconAccount->proximity_uuid,
+      'major' => $geoAccount->location->beaconAccount->major,
+      'minor' => $geoAccount->location->beaconAccount->minor
     ];
 
     $response = $this->json('POST', "/api/customer/location", $attributes, $headers)->getData();
-
     Notification::assertSentTo(
       [$customer],
       EnterBusiness::class

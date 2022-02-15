@@ -180,30 +180,6 @@ class AuthTest extends TestCase {
     $this->assertEquals('Unauthenticated.', ($response->getData())->message);
   }
 
-  public function test_a_customer_can_request_password_reset() {
-    Mail::fake();
-    $customer = factory(\App\Models\Customer\Customer::class)->create();
-
-    $attributes = [
-      'email' => $customer->email,
-    ];
-
-    $response = $this->json('POST', '/api/customer/auth/request-reset', $attributes)->getData();
-    $this->assertTrue($response->data->email_sent);
-  }
-
-  public function test_a_customer_must_provide_correct_email_to_reset_password() {
-    Mail::fake();
-    $customer = factory(\App\Models\Customer\Customer::class)->create();
-
-    $attributes = [
-      'email' => 'fake@gmail.com',
-    ];
-
-    $response = $this->json('POST', '/api/customer/auth/request-reset', $attributes)->getData();
-    $this->assertEquals('The selected email is invalid.', $response->errors->email[0]);
-  }
-
   public function test_an_unauth_customer_cannot_check_password() {
     $customer = factory(\App\Models\Customer\Customer::class)->create();
     $attributes = [
