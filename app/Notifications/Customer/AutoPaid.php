@@ -48,7 +48,7 @@ class AutoPaid extends Notification implements ShouldQueue {
 
     return OneSignalMessage::create()
       ->subject("Bill paid at {$businessName}.")
-      ->body("You're bill of {$billTotal} has been automatically paid.")
+      ->body("Your bill of {$billTotal} has been automatically paid.")
       ->setData('transaction_identifier', $this->transaction->identifier)
       ->setData('business_identifier', $this->transaction->business->identifier)
       ->setData("type", 'auto_paid')
